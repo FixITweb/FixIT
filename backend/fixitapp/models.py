@@ -56,6 +56,8 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.message
 
 # BOOKING MODEL
 class Booking(models.Model):
@@ -72,6 +74,9 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.service} - {self.status}"
+
 
 # RATING MODEL
 class Rating(models.Model):
@@ -80,3 +85,7 @@ class Rating(models.Model):
     rating = models.FloatField()
     review = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.worker} - {self.rating}"
+
