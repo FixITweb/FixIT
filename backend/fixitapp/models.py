@@ -1,10 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-
-# =========================
 # USER MODEL
-# =========================
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('customer', 'Customer'),
@@ -16,9 +13,7 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-# =========================
 # SERVICE MODEL
-# =========================
 class Service(models.Model):
     worker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services')
     title = models.CharField(max_length=255)
@@ -32,9 +27,7 @@ class Service(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-# =========================
 # JOB REQUEST MODEL
-# =========================
 class JobRequest(models.Model):
     STATUS_CHOICES = (
         ('waiting', 'Waiting'),
@@ -51,10 +44,11 @@ class JobRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.title
 
-# =========================
+
 # NOTIFICATION MODEL
-# =========================
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
@@ -63,9 +57,7 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-# =========================
 # BOOKING MODEL
-# =========================
 class Booking(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending'),
@@ -81,9 +73,7 @@ class Booking(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-# =========================
 # RATING MODEL
-# =========================
 class Rating(models.Model):
     worker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_ratings')
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_ratings')
