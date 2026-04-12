@@ -182,11 +182,7 @@ def worker_ratings(request, worker_id):
     })
 
 
-
-
-# =========================
 # REGISTER
-# =========================
 @api_view(['POST'])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
@@ -196,9 +192,7 @@ def register(request):
     return Response(serializer.errors, status=400)
 
 
-# =========================
 # LOGIN
-# =========================
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')
@@ -216,9 +210,7 @@ def login(request):
     return Response({"error": "Invalid credentials"}, status=400)
 
 
-# =========================
 # PROFILE
-# =========================
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request):
