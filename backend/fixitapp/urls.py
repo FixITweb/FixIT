@@ -9,4 +9,7 @@ urlpatterns = [
     path("bookings/<int:id>/", update_booking),
     path("ratings/", create_rating),
     path("ratings/<int:worker_id>/", worker_ratings),
+    path('auth/register/', register),
+    path('auth/login/', login),
+    path('auth/profile/', profile),
 ]
