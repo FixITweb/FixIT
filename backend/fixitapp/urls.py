@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import job_requests, mark_as_read, notifications_list, bookings, update_booking, create_rating, worker_ratings
+from .views import job_requests, mark_as_read, notifications_list, bookings, update_booking, create_rating, worker_ratings,register,login,profile,create_service,get_services
 
 urlpatterns = [
     path("requests/", job_requests),
@@ -12,4 +12,6 @@ urlpatterns = [
     path('auth/register/', register),
     path('auth/login/', login),
     path('auth/profile/', profile),
+    path('services/', create_service), 
+    path('services/', get_services),
 ]

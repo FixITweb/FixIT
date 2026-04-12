@@ -9,6 +9,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import JobRequest, Notification, Booking, Rating, Service,User
 from .serializers import JobRequestSerializer, NotificationSerializer, BookingSerializer, RatingSerializer,RegisterSerializer
 from .utils import match_services
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Q
 
 # remember to update these
 # trigger 1 for notification
@@ -227,3 +230,114 @@ def profile(request):
         "role": user.role,
         "created_at": user.created_at
     })
+
+
+def is_spam(user, title, category):
+    last_service = Service.objects.filter(worker=user, category=category).order_by('-created_at').first()
+
+    if last_service:
+        if timezone.now() - last_service.created_at < timedelta(hours=12):
+            return True
+
+        if title.lower() in last_service.title.lower() or last_service.title.lower() in title.lower():
+            return True
+
+    return False
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_service(request):
+    user = request.user
+
+    if user.role != 'worker':
+        return Response({"error": "Only workers can post services"}, status=403)
+
+    title = request.data.get('title')
+    category = request.data.get('category')
+
+    if is_spam(user, title, category):
+        return Response({
+            "error": "You already posted this service. Please edit your existing one."
+        }, status=400)
+
+    serializer = ServiceSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save(worker=user)
+        return Response(serializer.data)
+
+    return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+def get_services(request):
+    services = Service.objects.all()
+
+    # search
+    search = request.GET.get('search')
+    if search:
+        services = services.filter(
+            Q(title__icontains=search) |
+            Q(description__icontains=search)
+        )
+
+    # category
+    category = request.GET.get('category')
+    if category:
+        services = services.filter(category=category)
+
+    # price
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+
+    if min_price:
+        services = services.filter(price__gte=min_price)
+    if max_price:
+        services = services.filter(price__lte=max_price)
+
+    #  rating
+    rating = request.GET.get('rating')
+    if rating:
+        services = services.filter(rating__gte=rating)
+
+    # date
+    date = request.GET.get('date')
+    if date == "today":
+        from datetime import date as d
+        services = services.filter(created_at__date=d.today())
+    elif date == "this_week":
+        from datetime import timedelta
+        services = services.filter(created_at__gte=timezone.now() - timedelta(days=7))
+
+    # location
+    lat = request.GET.get('lat')
+    lng = request.GET.get('lng')
+    radius = request.GET.get('radius')
+
+    result = []
+    for service in services:
+        data = ServiceSerializer(service).data
+
+        if lat and lng:
+            distance = calculate_distance(
+                float(lat), float(lng),
+                service.latitude, service.longitude
+            )
+            data['distance'] = round(distance, 2)
+
+            if radius and distance > float(radius):
+                continue
+        else:
+            data['distance'] = None
+
+        result.append(data)
+
+    # sorting
+    sort = request.GET.get('sort')
+    if sort == "distance":
+        result.sort(key=lambda x: x['distance'] if x['distance'] else 999)
+    elif sort == "rating":
+        result.sort(key=lambda x: x['rating'], reverse=True)
+    elif sort == "newest":
+        result.sort(key=lambda x: x['created_at'], reverse=True)
+
+    return Response(result)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JobRequest, Notification, Booking, Rating,User
+from .models import JobRequest, Notification, Booking, Rating,User,Service
 
 class JobRequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -67,3 +67,16 @@ class RegisterSerializer(serializers.ModelSerializer):
                 role=validated_data['role']
             )
             return user
+
+class ServiceSerializer(serializers.ModelSerializer):
+    worker = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Service
+        fields = '__all__'
+
+    def get_worker(self, obj):
+        return {
+            "id": obj.worker.id,
+            "username": obj.worker.username
+        }

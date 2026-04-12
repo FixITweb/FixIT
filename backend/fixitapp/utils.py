@@ -22,3 +22,17 @@ def match_services(job_request):
 
             job_request.status = "matched"
             job_request.save()
+
+from math import radians, cos, sin, asin, sqrt
+
+def calculate_distance(lat1, lng1, lat2, lng2):
+
+    R = 6371  
+
+    dlat = radians(lat2 - lat1)
+    dlng = radians(lng2 - lng1)
+
+    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlng/2)**2
+    c = 2 * asin(sqrt(a))
+
+    return R * c
