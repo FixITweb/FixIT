@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import job_requests, mark_as_read, notifications_list, bookings, update_booking, create_rating, worker_ratings, register, login, profile
 
-
 urlpatterns = [
     path('auth/register/', register),
     path('auth/login/', login),
