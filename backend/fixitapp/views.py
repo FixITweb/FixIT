@@ -5,10 +5,47 @@ from rest_framework import status
 from django.db.models import Avg
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import get_object_or_404
 
 from .models import JobRequest, Notification, Booking, Rating, Service,User
-from .serializers import JobRequestSerializer, NotificationSerializer, BookingSerializer, RatingSerializer,RegisterSerializer
+from .serializers import JobRequestSerializer, NotificationSerializer, BookingSerializer, RatingSerializer,RegisterSerializer, UserProfileSerializer
 from .utils import match_services
+
+# REGISTER
+@api_view(['POST'])
+def register(request):
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "User created successfully"})
+    return Response(serializer.errors, status=400)
+
+
+# LOGIN
+@api_view(['POST'])
+def login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh)
+        })
+
+    return Response({"error": "Invalid credentials"}, status=400)
+
+# PROFILE
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    serializer = UserProfileSerializer(request.user)
+    return Response(serializer.data)
+
 
 # remember to update these
 # trigger 1 for notification
@@ -182,50 +219,3 @@ def worker_ratings(request, worker_id):
 
 
 
-
-# =========================
-# REGISTER
-# =========================
-@api_view(['POST'])
-def register(request):
-    serializer = RegisterSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "User created successfully"})
-    return Response(serializer.errors, status=400)
-
-
-# =========================
-# LOGIN
-# =========================
-@api_view(['POST'])
-def login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    user = authenticate(username=username, password=password)
-
-    if user:
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh)
-        })
-
-    return Response({"error": "Invalid credentials"}, status=400)
-
-
-# =========================
-# PROFILE
-# =========================
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def profile(request):
-    user = request.user
-
-    return Response({
-        "id": user.id,
-        "username": user.username,
-        "role": user.role,
-        "created_at": user.created_at
-    })
