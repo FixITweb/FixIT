@@ -80,3 +80,9 @@ class ServiceSerializer(serializers.ModelSerializer):
             "id": obj.worker.id,
             "username": obj.worker.username
         }
+    
+
+class JobRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobRequest
+        fields = '__all__'

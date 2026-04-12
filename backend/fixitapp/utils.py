@@ -1,6 +1,6 @@
 from rapidfuzz import fuzz
 from .models import Service, Notification
-
+from math import radians, cos, sin, asin, sqrt
 
 def match_services(job_request):
 
@@ -23,7 +23,6 @@ def match_services(job_request):
             job_request.status = "matched"
             job_request.save()
 
-from math import radians, cos, sin, asin, sqrt
 
 def calculate_distance(lat1, lng1, lat2, lng2):
 
@@ -36,3 +35,7 @@ def calculate_distance(lat1, lng1, lat2, lng2):
     c = 2 * asin(sqrt(a))
 
     return R * c
+
+def is_match(text1, text2):
+    score = fuzz.ratio(text1.lower(), text2.lower())
+    return score > 60   # threshold
