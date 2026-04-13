@@ -216,3 +216,91 @@ def worker_ratings(request, worker_id):
         "ratings": serializer.data
     })
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_booking(request):
+    user = request.user
+
+    if user.role != 'customer':
+        return Response({"error": "Only customers can book"}, status=403)
+
+    service_id = request.data.get('service_id')
+
+    try:
+        service = Service.objects.get(id=service_id)
+    except Service.DoesNotExist:
+        return Response({"error": "Service not found"}, status=404)
+
+    booking = Booking.objects.create(
+        service=service,
+        customer=user,
+        status='pending'
+    )
+
+    # 🔔 Notify worker
+    Notification.objects.create(
+        user=service.worker,
+        service=service,
+        message="You received a new booking request"
+    )
+
+    return Response({
+        "id": booking.id,
+        "status": booking.status,
+        "created_at": booking.created_at
+    })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_bookings(request):
+    user = request.user
+
+    if user.role == 'customer':
+        bookings = Booking.objects.filter(customer=user)
+    else:
+        bookings = Booking.objects.filter(service__worker=user)
+
+    data = []
+    for b in bookings:
+        data.append({
+            "id": b.id,
+            "status": b.status,
+            "created_at": b.created_at
+        })
+
+    return Response(data)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_booking(request, id):
+    user = request.user
+
+    try:
+        booking = Booking.objects.get(id=id)
+    except Booking.DoesNotExist:
+        return Response({"error": "Not found"}, status=404)
+
+    # Only worker can update
+    if booking.service.worker != user:
+        return Response({"error": "Not allowed"}, status=403)
+
+    new_status = request.data.get('status')
+
+    if new_status not in ['accepted', 'completed', 'rejected']:
+        return Response({"error": "Invalid status"}, status=400)
+
+    booking.status = new_status
+    booking.save()
+
+    # 🔔 Notify customer
+    Notification.objects.create(
+        user=booking.customer,
+        service=booking.service,
+        message=f"Your booking is {new_status}"
+    )
+
+    return Response({
+        "id": booking.id,
+        "status": booking.status,
+        "created_at": booking.created_at
+    })
