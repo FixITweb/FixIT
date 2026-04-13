@@ -1,25 +1,45 @@
 from rest_framework import serializers
-from .models import JobRequest, Notification, Booking, Rating,User,Service
+from .models import JobRequest, Notification, Booking, Rating, User, Service
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields=['username','password','role']
+        fields = ['username', 'password', 'role']
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            password=validated_data['password'],
-            role=validated_data['role']
-        )
-        return user
-    
+        return User.objects.create_user(**validated_data)
+
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'role', 'created_at']
+
+class ServiceSerializer(serializers.ModelSerializer):
+    worker = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Service
+        fields = [
+            "id",
+            "title",
+            "description",
+            "category",
+            "price",
+            "rating",
+            "created_at",
+            "latitude",
+            "longitude",
+            "worker"
+        ]
+
+    def get_worker(self, obj):
+        return {
+            "id": obj.worker.id,
+            "username": obj.worker.username
+        }
+
 
 class JobRequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,45 +51,39 @@ class JobRequestSerializer(serializers.ModelSerializer):
             "category",
             "budget",
             "status",
-            "created_at",
+            "created_at"
         ]
-        read_only_fields = ['customer', 'created_at', 'updated_at']
+
 
 class NotificationSerializer(serializers.ModelSerializer):
+    service_id = serializers.IntegerField(source='service.id')
 
     class Meta:
         model = Notification
         fields = [
             "id",
             "message",
-            "is_read",
+            "service_id",
             "created_at",
-            "service",
+            "is_read"
         ]
-        
-class BookingSerializer(serializers.ModelSerializer):
 
+
+class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = [
             "id",
-            "service",
             "status",
-            "created_at",
+            "created_at"
         ]
-        read_only_fields = ["status", "created_at"]
+
 
 class RatingSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Rating
         fields = [
-            "id",
-            "worker",
             "rating",
             "review",
-            "created_at",
+            "created_at"
         ]
-        read_only_fields = ["created_at"]
-
-

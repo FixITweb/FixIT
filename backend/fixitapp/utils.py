@@ -2,22 +2,21 @@ from rapidfuzz import fuzz
 from .models import Service, Notification
 from math import radians, cos, sin, asin, sqrt
 
-def match_services(job_request):
 
+def match_services(job_request):
     services = Service.objects.all()
 
     for service in services:
-
         score = fuzz.partial_ratio(
             job_request.title.lower(),
             service.title.lower()
         )
 
-        # similarity threshold
         if score > 70:
             Notification.objects.create(
-                user=service.provider,
-                message=f"New job matches your service: {job_request.title}"
+                user=job_request.customer,
+                service=service,
+                message=f"Service matching '{job_request.title}' is now available!"
             )
 
             job_request.status = "matched"
@@ -25,8 +24,7 @@ def match_services(job_request):
 
 
 def calculate_distance(lat1, lng1, lat2, lng2):
-
-    R = 6371  
+    R = 6371
 
     dlat = radians(lat2 - lat1)
     dlng = radians(lng2 - lng1)
@@ -36,6 +34,7 @@ def calculate_distance(lat1, lng1, lat2, lng2):
 
     return R * c
 
+
 def is_match(text1, text2):
     score = fuzz.ratio(text1.lower(), text2.lower())
-    return score > 60   # threshold
+    return score > 60

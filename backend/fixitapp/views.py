@@ -2,17 +2,25 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Avg
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
 
-from .models import JobRequest, Notification, Booking, Rating, Service,User
-from .serializers import JobRequestSerializer, NotificationSerializer, BookingSerializer, RatingSerializer,RegisterSerializer, UserProfileSerializer
+from .models import JobRequest, Notification, Booking, Rating, Service, User
+from .serializers import (
+    JobRequestSerializer,
+    NotificationSerializer,
+    BookingSerializer,
+    RatingSerializer,
+    RegisterSerializer,
+    UserProfileSerializer,
+    ServiceSerializer
+)
+
 from .utils import match_services
 from rapidfuzz import fuzz
 
-# REGISTER
 @api_view(['POST'])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
@@ -21,14 +29,12 @@ def register(request):
         return Response({"message": "User created successfully"})
     return Response(serializer.errors, status=400)
 
-
-# LOGIN
 @api_view(['POST'])
 def login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    user = authenticate(username=username, password=password)
+    user = authenticate(
+        username=request.data.get('username'),
+        password=request.data.get('password')
+    )
 
     if user:
         refresh = RefreshToken.for_user(user)
@@ -40,205 +46,121 @@ def login(request):
     return Response({"error": "Invalid credentials"}, status=400)
 
 
-# PROFILE
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request):
-    serializer = UserProfileSerializer(request.user)
-    return Response(serializer.data)
+    return Response(UserProfileSerializer(request.user).data)
 
-# remember to update these
-# trigger 1 for notification
-# def match_services(job_request, service):
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def services(request):
 
-    # Notification.objects.create(
-    #     user=job_request.customer,
-    #     service=service,
-    #     message=f"Your request '{job_request.title}' matched with a service!"
-    # ) 
+    if request.method == 'POST':
+        if request.user.role != 'worker':
+            return Response({"error": "Only workers can post"}, status=403)
 
-# trigger 2 for notification
-# Notification.objects.create(
-#     user=booking.customer,
-#     service=booking.service,
-#     message="Your booking was successfully created!"
-# )
+        serializer = ServiceSerializer(data=request.data)
+        if serializer.is_valid():
+            service = serializer.save(worker=request.user)
+            match_services(service)
 
-@api_view(["GET", "POST"])
+            return Response(ServiceSerializer(service).data, status=201)
+
+        return Response(serializer.errors, status=400)
+    services = Service.objects.all()
+    data = []
+
+    for s in services:
+        data.append({
+            "id": s.id,
+            "title": s.title,
+            "description": s.description,
+            "category": s.category,
+            "price": s.price,
+            "rating": s.rating,
+            "created_at": s.created_at,
+            "distance": 0,
+            "latitude": s.latitude,
+            "longitude": s.longitude,
+            "worker": {
+                "id": s.worker.id,
+                "username": s.worker.username
+            }
+        })
+
+    return Response(data)
+
+@api_view(['GET'])
+def smart_search(request):
+    query = request.GET.get('q', '').lower()
+
+    services = Service.objects.all()
+    results = []
+    suggestions = set()
+
+    for s in services:
+        score = fuzz.token_set_ratio(query, s.title.lower())
+
+        if score > 60:
+            results.append(ServiceSerializer(s).data)
+            suggestions.add(s.category)
+
+    return Response({
+        "results": results,
+        "suggestions": list(suggestions)
+    })
+
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def job_requests(request):
 
-    if request.method == "GET":
+    if request.method == 'GET':
         requests = JobRequest.objects.filter(customer=request.user)
-        serializer = JobRequestSerializer(requests, many=True)
-        return Response(serializer.data)
+        return Response(JobRequestSerializer(requests, many=True).data)
 
-    if request.method == "POST":
+    serializer = JobRequestSerializer(data=request.data)
+    if serializer.is_valid():
+        job_request = serializer.save(customer=request.user)
 
-        serializer = JobRequestSerializer(data=request.data)
+        # 🔥 match services
+        match_services(job_request)
 
-        if serializer.is_valid():
-            job_request = serializer.save(customer=request.user)
+        return Response(JobRequestSerializer(job_request).data, status=201)
 
-            match_services(job_request)
+    return Response(serializer.errors, status=400)
 
-            return Response(
-                JobRequestSerializer(job_request).data,
-                status=status.HTTP_201_CREATED,
-            )
 
-        return Response(serializer.errors, status=400)
-    
-
-@api_view(["GET"])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def notifications_list(request):
-
     notifications = Notification.objects.filter(user=request.user).order_by("-created_at")
-    serializer = NotificationSerializer(notifications, many=True)
+    return Response(NotificationSerializer(notifications, many=True).data)
 
-    return Response(serializer.data)
-
-
-@api_view(["PUT"])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def mark_as_read(request, id):
-
-    try:
-        notification = Notification.objects.get(id=id, user=request.user)
-    except Notification.DoesNotExist:
-        return Response({"error": "Not found"}, status=404)
+    notification = get_object_or_404(Notification, id=id, user=request.user)
 
     notification.is_read = request.data.get("is_read", True)
     notification.save()
 
-    serializer = NotificationSerializer(notification)
-    return Response(serializer.data)
-
-
-@api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
-def bookings(request):
-
-    if request.method == "GET":
-        data = Booking.objects.filter(customer=request.user)
-        serializer = BookingSerializer(data, many=True)
-        return Response(serializer.data)
-
-    if request.method == "POST":
-
-        service_id = request.data.get("service_id")
-
-        try:
-            service = Service.objects.get(id=service_id)
-        except Service.DoesNotExist:
-            return Response({"error": "Service not found"}, status=404)
-
-        booking = Booking.objects.create(
-            service=service,
-            customer=request.user,
-            status="pending"
-        )
-
-        # notification trigger
-        Notification.objects.create(
-            user=service.provider,
-            service=service,
-            message=f"New booking request for {service.title}"
-        )
-
-        return Response(
-            BookingSerializer(booking).data,
-            status=201
-        )
-
-
-@api_view(["PUT"])
-@permission_classes([IsAuthenticated])
-def update_booking(request, id):
-
-    try:
-        booking = Booking.objects.get(id=id)
-    except Booking.DoesNotExist:
-        return Response({"error": "Not found"}, status=404)
-
-    new_status = request.data.get("status")
-
-    if new_status not in ["pending", "accepted", "completed", "rejected"]:
-        return Response({"error": "Invalid status"}, status=400)
-
-    booking.status = new_status
-    booking.save()
-
-    # notify customer
-    Notification.objects.create(
-        user=booking.customer,
-        service=booking.service,
-        message=f"Your booking is now {new_status}"
-    )
-
-    return Response(BookingSerializer(booking).data)
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def create_rating(request):
-
-    worker_id = request.data.get("worker_id")
-    rating_value = request.data.get("rating")
-    review = request.data.get("review", "")
-
-    if not worker_id or not rating_value:
-        return Response({"error": "worker_id and rating required"}, status=400)
-
-    rating = Rating.objects.create(
-        worker_id=worker_id,
-        customer=request.user,
-        rating=rating_value,
-        review=review
-    )
-
-    return Response(RatingSerializer(rating).data, status=201)
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def worker_ratings(request, worker_id):
-
-    ratings = Rating.objects.filter(worker_id=worker_id).order_by("-created_at")
-
-    serializer = RatingSerializer(ratings, many=True)
-
-    # calculate average rating
-    avg = ratings.aggregate(Avg("rating"))["rating__avg"]
-
-    return Response({
-        "average_rating": avg or 0,
-        "ratings": serializer.data
-    })
+    return Response(NotificationSerializer(notification).data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_booking(request):
-    user = request.user
 
-    if user.role != 'customer':
+    if request.user.role != 'customer':
         return Response({"error": "Only customers can book"}, status=403)
 
-    service_id = request.data.get('service_id')
-
-    try:
-        service = Service.objects.get(id=service_id)
-    except Service.DoesNotExist:
-        return Response({"error": "Service not found"}, status=404)
+    service = get_object_or_404(Service, id=request.data.get('service_id'))
 
     booking = Booking.objects.create(
         service=service,
-        customer=user,
+        customer=request.user,
         status='pending'
     )
 
-    # 🔔 Notify worker
     Notification.objects.create(
         user=service.worker,
         service=service,
@@ -251,15 +173,15 @@ def create_booking(request):
         "created_at": booking.created_at
     })
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_bookings(request):
-    user = request.user
 
-    if user.role == 'customer':
-        bookings = Booking.objects.filter(customer=user)
+    if request.user.role == 'customer':
+        bookings = Booking.objects.filter(customer=request.user)
     else:
-        bookings = Booking.objects.filter(service__worker=user)
+        bookings = Booking.objects.filter(service__worker=request.user)
 
     data = []
     for b in bookings:
@@ -271,18 +193,14 @@ def get_bookings(request):
 
     return Response(data)
 
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_booking(request, id):
-    user = request.user
 
-    try:
-        booking = Booking.objects.get(id=id)
-    except Booking.DoesNotExist:
-        return Response({"error": "Not found"}, status=404)
+    booking = get_object_or_404(Booking, id=id)
 
-    # Only worker can update
-    if booking.service.worker != user:
+    if booking.service.worker != request.user:
         return Response({"error": "Not allowed"}, status=403)
 
     new_status = request.data.get('status')
@@ -293,7 +211,6 @@ def update_booking(request, id):
     booking.status = new_status
     booking.save()
 
-    # 🔔 Notify customer
     Notification.objects.create(
         user=booking.customer,
         service=booking.service,
@@ -309,37 +226,28 @@ def update_booking(request, id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_rating(request):
-    user = request.user
 
-    if user.role != 'customer':
+    if request.user.role != 'customer':
         return Response({"error": "Only customers can rate"}, status=403)
 
     worker_id = request.data.get('worker_id')
-    rating_value = request.data.get('rating')
-    review = request.data.get('review')
 
-    # Check if completed booking exists
-    booking_exists = Booking.objects.filter(
-        customer=user,
+    if not Booking.objects.filter(
+        customer=request.user,
         service__worker_id=worker_id,
         status='completed'
-    ).exists()
-
-    if not booking_exists:
-        return Response({"error": "You can only rate after completed job"}, status=400)
+    ).exists():
+        return Response({"error": "Complete job first"}, status=400)
 
     Rating.objects.create(
         worker_id=worker_id,
-        customer=user,
-        rating=rating_value,
-        review=review
+        customer=request.user,
+        rating=request.data.get('rating'),
+        review=request.data.get('review')
     )
 
-    # 🔥 UPDATE AVERAGE RATING
-    ratings = Rating.objects.filter(worker_id=worker_id)
-    avg = sum(r.rating for r in ratings) / ratings.count()
+    avg = Rating.objects.filter(worker_id=worker_id).aggregate(Avg("rating"))["rating__avg"]
 
-    # update all services of that worker
     Service.objects.filter(worker_id=worker_id).update(rating=avg)
 
     return Response({"message": "Rating submitted"})
@@ -357,26 +265,3 @@ def get_ratings(request, worker_id):
         })
 
     return Response(data)
-
-@api_view(['GET'])
-def smart_search(request):
-    query = request.GET.get('q')
-
-    services = Service.objects.all()
-
-    results = []
-    suggestions = set()
-
-    for s in services:
-        score = fuzz.token_set_ratio(query.lower(), s.title.lower())
-
-        if score > 60:
-            data = ServiceSerializer(s).data
-            results.append(data)
-
-            suggestions.add(s.category)
-
-    return Response({
-        "results": results,
-        "suggestions": list(suggestions)
-    })
