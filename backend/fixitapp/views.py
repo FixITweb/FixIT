@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from .models import JobRequest, Notification, Booking, Rating, Service,User
 from .serializers import JobRequestSerializer, NotificationSerializer, BookingSerializer, RatingSerializer,RegisterSerializer, UserProfileSerializer
 from .utils import match_services
+from rapidfuzz import fuzz
 
 # REGISTER
 @api_view(['POST'])
@@ -303,4 +304,79 @@ def update_booking(request, id):
         "id": booking.id,
         "status": booking.status,
         "created_at": booking.created_at
+    })
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_rating(request):
+    user = request.user
+
+    if user.role != 'customer':
+        return Response({"error": "Only customers can rate"}, status=403)
+
+    worker_id = request.data.get('worker_id')
+    rating_value = request.data.get('rating')
+    review = request.data.get('review')
+
+    # Check if completed booking exists
+    booking_exists = Booking.objects.filter(
+        customer=user,
+        service__worker_id=worker_id,
+        status='completed'
+    ).exists()
+
+    if not booking_exists:
+        return Response({"error": "You can only rate after completed job"}, status=400)
+
+    Rating.objects.create(
+        worker_id=worker_id,
+        customer=user,
+        rating=rating_value,
+        review=review
+    )
+
+    # 🔥 UPDATE AVERAGE RATING
+    ratings = Rating.objects.filter(worker_id=worker_id)
+    avg = sum(r.rating for r in ratings) / ratings.count()
+
+    # update all services of that worker
+    Service.objects.filter(worker_id=worker_id).update(rating=avg)
+
+    return Response({"message": "Rating submitted"})
+
+@api_view(['GET'])
+def get_ratings(request, worker_id):
+    ratings = Rating.objects.filter(worker_id=worker_id)
+
+    data = []
+    for r in ratings:
+        data.append({
+            "rating": r.rating,
+            "review": r.review,
+            "created_at": r.created_at
+        })
+
+    return Response(data)
+
+@api_view(['GET'])
+def smart_search(request):
+    query = request.GET.get('q')
+
+    services = Service.objects.all()
+
+    results = []
+    suggestions = set()
+
+    for s in services:
+        score = fuzz.token_set_ratio(query.lower(), s.title.lower())
+
+        if score > 60:
+            data = ServiceSerializer(s).data
+            results.append(data)
+
+            suggestions.add(s.category)
+
+    return Response({
+        "results": results,
+        "suggestions": list(suggestions)
     })
