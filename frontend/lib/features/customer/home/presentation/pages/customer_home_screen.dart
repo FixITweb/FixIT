@@ -5,6 +5,7 @@ import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
 import '../../../../../shared/data/mock_data.dart';
 import '../widgets/bottom_nav.dart';
+import '../../../../../shared/widgets/theme_toggle_button.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
   const CustomerHomeScreen({super.key});
@@ -73,10 +74,15 @@ class CustomerHomeView extends StatelessWidget {
                               color: Colors.white,
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.tune, color: Colors.white),
-                            onPressed: () {},
-                          ),
+                        Row(
+                          children: [
+                            const ThemeToggleButton(),
+                            IconButton(
+                              icon: const Icon(Icons.tune, color: Colors.white),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
                         ],
                       ),
                       const SizedBox(height: 20),

@@ -18,6 +18,7 @@ import '../../features/worker/services/presentation/pages/worker_services_screen
 import '../../features/worker/bookings/presentation/pages/worker_bookings_screen.dart';
 import '../../features/worker/notifications/presentation/pages/worker_notifications_screen.dart';
 import '../../features/worker/profile/presentation/pages/worker_profile_screen.dart';
+import '../../features/settings/presentation/pages/settings_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -63,6 +64,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const WorkerNotificationsScreen());
       case '/worker-profile':
         return MaterialPageRoute(builder: (_) => const WorkerProfileScreen());
+      case '/settings':
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

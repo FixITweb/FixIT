@@ -4,6 +4,7 @@ import '../bloc/worker_dashboard_bloc.dart';
 import '../bloc/worker_dashboard_event.dart';
 import '../bloc/worker_dashboard_state.dart';
 import '../widgets/worker_bottom_nav.dart';
+import '../../../../../shared/widgets/theme_toggle_button.dart';
 
 class WorkerDashboardScreen extends StatelessWidget {
   const WorkerDashboardScreen({super.key});
@@ -26,6 +27,7 @@ class WorkerDashboardView extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Dashboard"),
         actions: [
+          const ThemeToggleButton(),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => context.read<WorkerDashboardBloc>().add(RefreshDashboard()),

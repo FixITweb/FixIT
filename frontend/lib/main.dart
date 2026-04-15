@@ -14,6 +14,9 @@ import 'features/profile/data/repositories/profile_repository.dart';
 import 'features/profile/data/datasources/profile_api.dart';
 import 'core/network/api_client.dart';
 import 'core/router/app_router.dart';
+import 'core/theme/theme_bloc.dart';
+import 'core/theme/theme_event.dart';
+import 'core/theme/theme_state.dart';
 
 void main() {
   runApp(const FixITApp());
@@ -22,13 +25,15 @@ void main() {
 class FixITApp extends StatelessWidget {
   const FixITApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     final apiClient = ApiClient();
     
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => ThemeBloc()..add(LoadTheme()),
+        ),
         BlocProvider(
           create: (context) => ServiceBloc(
             ServiceRepository(ServiceApi(apiClient)),
@@ -50,31 +55,16 @@ class FixITApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'FixIT',
-        theme: ThemeData(
-          primarySwatch: Colors.teal,
-          primaryColor: const Color(0xFF14B8A6),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF14B8A6),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          inputDecorationTheme: const InputDecorationTheme(
-            border: OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF14B8A6)),
-            ),
-          ),
-        ),
-        initialRoute: '/',
-        onGenerateRoute: AppRouter.generateRoute,
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'FixIT',
+            theme: themeState.themeData,
+            initialRoute: '/',
+            onGenerateRoute: AppRouter.generateRoute,
+          );
+        },
       ),
     );
   }

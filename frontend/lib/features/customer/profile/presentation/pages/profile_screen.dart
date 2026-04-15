@@ -7,6 +7,7 @@ import '../../../../profile/data/repositories/profile_repository.dart';
 import '../../../../profile/data/datasources/profile_api.dart';
 import '../../../../../core/network/api_client.dart';
 import '../../../home/presentation/widgets/bottom_nav.dart';
+import '../../../../../shared/widgets/theme_toggle_button.dart';
 
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({super.key});
@@ -28,7 +29,12 @@ class CustomerProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Profile")),
+      appBar: AppBar(
+        title: const Text("Profile"),
+        actions: const [
+          ThemeToggleButton(),
+        ],
+      ),
       body: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading) {
@@ -73,7 +79,7 @@ class CustomerProfileView extends StatelessWidget {
                 title: const Text("Account Settings"),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () {
-                  // Navigate to settings
+                  Navigator.pushNamed(context, '/settings');
                 },
               ),
               ListTile(
