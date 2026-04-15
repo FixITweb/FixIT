@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
             if (state.role == 'worker') {
               Navigator.pushReplacementNamed(context, '/worker-dashboard');
             } else {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/customer-home');
             }
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -76,13 +76,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
                 TextField(
                   controller: emailController,
-                  decoration: const InputDecoration(labelText: "Email"),
+                  decoration: const InputDecoration(
+                    labelText: "Username/Email",
+                    hintText: "Try 'customer@test.com' or 'worker@test.com'",
+                  ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: "Password"),
+                  decoration: const InputDecoration(
+                    labelText: "Password",
+                    hintText: "Any password works for demo",
+                  ),
                 ),
                 const SizedBox(height: 40),
                 if (state is AuthLoading)
@@ -92,8 +98,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       context.read<AuthBloc>().add(
                         LoginEvent(
-                          emailController.text,
-                          passwordController.text,
+                          emailController.text.isEmpty 
+                            ? '$loginAs@test.com' 
+                            : emailController.text,
+                          passwordController.text.isEmpty 
+                            ? 'demo123' 
+                            : passwordController.text,
                         ),
                       );
                     },

@@ -76,28 +76,32 @@ class BookingsView extends StatelessWidget {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
-                    title: Text(booking.notes ?? 'Service Booking'),
+                    title: Text(booking.service.title),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Service ID: ${booking.serviceId} • \$${booking.totalPrice}"),
+                        Text("Worker: ${booking.service.worker.username} • \$${booking.service.price}"),
                         Text(
-                          "${booking.scheduledDate.day}/${booking.scheduledDate.month}/${booking.scheduledDate.year}",
+                          "Booked: ${booking.createdAt.day}/${booking.createdAt.month}/${booking.createdAt.year}",
                         ),
                       ],
                     ),
                     trailing: Chip(
                       label: Text(
-                        booking.status,
+                        booking.status.toUpperCase(),
                         style: TextStyle(
-                          color: booking.status == 'Confirmed' 
+                          color: booking.status == 'accepted' 
                               ? Colors.green 
-                              : Colors.orange,
+                              : booking.status == 'pending'
+                              ? Colors.orange
+                              : Colors.red,
                         ),
                       ),
-                      backgroundColor: booking.status == 'Confirmed' 
+                      backgroundColor: booking.status == 'accepted' 
                           ? Colors.green.withValues(alpha: 0.1)
-                          : Colors.orange.withValues(alpha: 0.1),
+                          : booking.status == 'pending'
+                          ? Colors.orange.withValues(alpha: 0.1)
+                          : Colors.red.withValues(alpha: 0.1),
                     ),
                   ),
                 );

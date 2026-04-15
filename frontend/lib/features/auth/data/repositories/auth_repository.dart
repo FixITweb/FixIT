@@ -6,13 +6,13 @@ class AuthRepository {
 
   AuthRepository(this.api);
 
-  Future<AuthModel> login(String email, String password) async {
-    final data = await api.login(email, password);
+  Future<AuthModel> login(String username, String password) async {
+    final data = await api.login(username, password);
     return AuthModel.fromJson(data);
   }
 
-  Future<AuthModel> register(String name, String email, String password, String role) async {
-    final data = await api.register(name, email, password, role);
+  Future<AuthModel> register(String username, String password, String role) async {
+    final data = await api.register(username, password, role);
     return AuthModel.fromJson(data);
   }
 

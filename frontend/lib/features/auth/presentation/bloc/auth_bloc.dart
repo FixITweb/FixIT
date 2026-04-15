@@ -13,13 +13,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // Mock login - simulate successful login without API call
         await Future.delayed(const Duration(seconds: 1));
         
-        // Determine role based on email for demo purposes
+        // Determine role based on username for demo purposes
         String role = 'customer';
-        if (event.email.contains('worker') || event.email.contains('alex')) {
+        if (event.email.contains('worker') || 
+            event.email.contains('alex') || 
+            event.email.toLowerCase().contains('john')) {
           role = 'worker';
         }
         
-        emit(AuthSuccess('mock_token_123', role));
+        emit(AuthSuccess('mock_access_token_123', role));
       } catch (e) {
         emit(AuthError(e.toString()));
       }

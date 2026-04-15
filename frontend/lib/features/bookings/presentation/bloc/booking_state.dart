@@ -16,6 +16,11 @@ class BookingCreated extends BookingState {
   BookingCreated(this.booking);
 }
 
+class BookingUpdated extends BookingState {
+  final BookingModel booking;
+  BookingUpdated(this.booking);
+}
+
 class BookingError extends BookingState {
   final String message;
   BookingError(this.message);

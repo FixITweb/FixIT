@@ -1,47 +1,123 @@
 class BookingModel {
-  final String id;
-  final String serviceId;
-  final String userId;
-  final String providerId;
-  final DateTime scheduledDate;
+  final int id;
+  final ServiceInfo service;
+  final CustomerInfo? customer;
   final String status;
-  final double totalPrice;
-  final String? notes;
+  final DateTime createdAt;
 
   BookingModel({
     required this.id,
-    required this.serviceId,
-    required this.userId,
-    required this.providerId,
-    required this.scheduledDate,
+    required this.service,
+    this.customer,
     required this.status,
-    required this.totalPrice,
-    this.notes,
+    required this.createdAt,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      id: json['id'].toString(),
-      serviceId: json['service_id'].toString(),
-      userId: json['user_id'].toString(),
-      providerId: json['provider_id'].toString(),
-      scheduledDate: DateTime.parse(json['scheduled_date']),
-      status: json['status'],
-      totalPrice: (json['total_price'] as num).toDouble(),
-      notes: json['notes'],
+      id: json['id'],
+      service: ServiceInfo.fromJson(json['service'] ?? {}),
+      customer: json['customer'] != null ? CustomerInfo.fromJson(json['customer']) : null,
+      status: json['status'] ?? 'pending',
+      createdAt: DateTime.parse(json['created_at']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'service_id': serviceId,
-      'user_id': userId,
-      'provider_id': providerId,
-      'scheduled_date': scheduledDate.toIso8601String(),
+      'service': service.toJson(),
+      'customer': customer?.toJson(),
       'status': status,
-      'total_price': totalPrice,
-      'notes': notes,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
+}
+
+class ServiceInfo {
+  final int id;
+  final String title;
+  final String description;
+  final String category;
+  final double price;
+  final WorkerInfo worker;
+
+  ServiceInfo({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.category,
+    required this.price,
+    required this.worker,
+  });
+
+  factory ServiceInfo.fromJson(Map<String, dynamic> json) {
+    return ServiceInfo(
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      category: json['category'] ?? '',
+      price: (json['price'] ?? 0).toDouble(),
+      worker: WorkerInfo.fromJson(json['worker'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'category': category,
+      'price': price,
+      'worker': worker.toJson(),
+    };
+  }
+}
+
+class WorkerInfo {
+  final int id;
+  final String username;
+
+  WorkerInfo({
+    required this.id,
+    required this.username,
+  });
+
+  factory WorkerInfo.fromJson(Map<String, dynamic> json) {
+    return WorkerInfo(
+      id: json['id'] ?? 0,
+      username: json['username'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'username': username,
+    };
+  }
+}
+
+class CustomerInfo {
+  final int id;
+  final String username;
+
+  CustomerInfo({
+    required this.id,
+    required this.username,
+  });
+
+  factory CustomerInfo.fromJson(Map<String, dynamic> json) {
+    return CustomerInfo(
+      id: json['id'] ?? 0,
+      username: json['username'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'username': username,
     };
   }
 }

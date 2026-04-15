@@ -10,9 +10,4 @@ class ProfileApi {
     final res = await client.get(Endpoints.profile);
     return res.data;
   }
-
-  Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> profileData) async {
-    final res = await client.put(Endpoints.profile, data: profileData);
-    return res.data;
-  }
 }

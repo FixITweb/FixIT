@@ -6,18 +6,17 @@ class AuthApi {
 
   AuthApi(this.client);
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String username, String password) async {
     final res = await client.post(Endpoints.login, data: {
-      "email": email,
+      "username": username,
       "password": password
     });
     return res.data;
   }
 
-  Future<Map<String, dynamic>> register(String name, String email, String password, String role) async {
+  Future<Map<String, dynamic>> register(String username, String password, String role) async {
     final res = await client.post(Endpoints.register, data: {
-      "name": name,
-      "email": email,
+      "username": username,
       "password": password,
       "role": role
     });

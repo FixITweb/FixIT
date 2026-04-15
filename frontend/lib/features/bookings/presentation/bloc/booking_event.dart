@@ -1,10 +1,14 @@
-import '../../data/models/booking_model.dart';
-
 abstract class BookingEvent {}
 
 class LoadBookings extends BookingEvent {}
 
 class CreateBooking extends BookingEvent {
-  final BookingModel booking;
-  CreateBooking(this.booking);
+  final int serviceId;
+  CreateBooking(this.serviceId);
+}
+
+class UpdateBooking extends BookingEvent {
+  final int bookingId;
+  final String status;
+  UpdateBooking(this.bookingId, this.status);
 }

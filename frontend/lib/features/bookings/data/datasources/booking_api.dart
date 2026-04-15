@@ -11,8 +11,17 @@ class BookingApi {
     return res.data;
   }
 
-  Future<Map<String, dynamic>> createBooking(Map<String, dynamic> bookingData) async {
-    final res = await client.post(Endpoints.bookings, data: bookingData);
+  Future<Map<String, dynamic>> createBooking(int serviceId) async {
+    final res = await client.post(Endpoints.createBooking, data: {
+      'service_id': serviceId,
+    });
+    return res.data;
+  }
+
+  Future<Map<String, dynamic>> updateBooking(int bookingId, String status) async {
+    final res = await client.put('${Endpoints.bookings}$bookingId/', data: {
+      'status': status,
+    });
     return res.data;
   }
 }
