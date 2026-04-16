@@ -32,8 +32,8 @@ urlpatterns = [
 
     path('notifications/<int:id>/', mark_as_read),
 
-    # BOOKINGS 
-    
+    # BOOKINGS
+    path('bookings/', bookings),
     path('bookings/<int:id>/', update_booking),
 
     # RATINGS

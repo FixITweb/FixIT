@@ -118,8 +118,50 @@ def mark_as_read(request, id):
     notification = get_object_or_404(Notification, id=id, user=request.user) 
     notification.is_read = True 
     notification.save() 
-    return Response({"message": "Marked as read"}) 
+    return Response({"message": "Marked as read"})
 
+# BOOKINGS 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def bookings(request):
+
+    if request.method == 'GET':
+        if request.user.role == 'customer':
+            data = Booking.objects.filter(customer=request.user)
+        else:
+            data = Booking.objects.filter(service__worker=request.user)
+
+        return Response([
+            {
+                "id": b.id,
+                "status": b.status,
+                "created_at": b.created_at
+            } for b in data
+        ])
+
+    if request.method == 'POST':
+        if request.user.role != 'customer':
+            return Response({"error": "Only customers can book"}, status=403)
+
+        service_id = request.data.get('service_id')
+        service = get_object_or_404(Service, id=service_id)
+
+        booking = Booking.objects.create(
+            service=service,
+            customer=request.user
+        )
+
+        Notification.objects.create(
+            user=service.worker,
+            service=service,
+            message="New booking request"
+        )
+
+        return Response({
+            "id": booking.id,
+            "status": booking.status,
+            "created_at": booking.created_at
+        }, status=201)
 # UPDATE BOOKINGS
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
