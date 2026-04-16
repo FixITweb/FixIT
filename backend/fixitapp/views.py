@@ -51,6 +51,123 @@ def profile(request):
     return Response(UserProfileSerializer(request.user).data)
 
 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def services(request):
+
+    if request.method == 'POST':
+        if request.user.role != 'worker':
+            return Response({"error": "Only workers can post"}, status=403)
+
+        serializer = ServiceSerializer(data=request.data)
+        if serializer.is_valid():
+            service = serializer.save(worker=request.user)
+
+            match_services(service)  
+
+            return Response(ServiceSerializer(service).data, status=201)
+        return Response(serializer.errors, status=400)
+
+    services = Service.objects.all()
+
+    search = request.GET.get('search')
+    category = request.GET.get('category')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    rating = request.GET.get('rating')
+    date = request.GET.get('date')
+    sort = request.GET.get('sort')
+    lat = request.GET.get('lat')
+    lng = request.GET.get('lng')
+    radius = request.GET.get('radius')
+
+    if search:
+        services = services.filter(title__icontains=search)
+
+    if category:
+        services = services.filter(category=category)
+
+    if min_price:
+        services = services.filter(price__gte=min_price)
+
+    if max_price:
+        services = services.filter(price__lte=max_price)
+
+    if rating:
+        services = services.filter(rating__gte=rating)
+
+    if date == "today":
+        services = services.filter(created_at__date=now().date())
+
+    elif date == "this_week":
+        services = services.filter(created_at__gte=now() - timedelta(days=7))
+
+    if not lat or not lng:
+        lat = getattr(request.user, "latitude", None)
+        lng = getattr(request.user, "longitude", None)
+
+    if lat is not None and lng is not None:
+        lat = float(lat)
+        lng = float(lng)
+    else:
+        lat = None
+        lng = None
+
+    result = []
+
+    for s in services:
+        distance = None
+
+        if lat is not None and lng is not None:
+            distance = calculate_distance(
+                lat, lng,
+                s.latitude, s.longitude
+            )
+
+            if radius:
+                if distance > float(radius):
+                    continue
+
+        result.append({
+            "id": s.id,
+            "title": s.title,
+            "description": s.description,
+            "category": s.category,
+            "price": s.price,
+            "rating": s.rating,
+            "created_at": s.created_at,
+            "distance": distance,
+            "latitude": s.latitude,
+            "longitude": s.longitude,
+            "worker": {
+                "id": s.worker.id,
+                "username": s.worker.username
+            }
+        })
+
+
+    if sort == "distance":
+        result = sorted(
+            result,
+            key=lambda x: float('inf') if x["distance"] is None else x["distance"]
+        )
+
+    elif sort == "rating":
+        result = sorted(result, key=lambda x: x["rating"], reverse=True)
+
+    elif sort == "newest":
+        result = sorted(result, key=lambda x: x["created_at"], reverse=True)
+
+    elif sort == "price_low":
+        result = sorted(result, key=lambda x: x["price"])
+
+    elif sort == "price_high":
+        result = sorted(result, key=lambda x: x["price"], reverse=True)
+
+    elif sort == "name":
+        result = sorted(result, key=lambda x: x["title"].lower())
+
+    return Response(result)
 
 @api_view(['GET'])
 def smart_search(request):
