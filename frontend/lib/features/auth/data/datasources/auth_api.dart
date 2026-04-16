@@ -6,27 +6,81 @@ class AuthApi {
 
   AuthApi(this.client);
 
+  //  LOGIN
   Future<Map<String, dynamic>> login(String username, String password) async {
-    final res = await client.post(Endpoints.login, data: {
-      "username": username,
-      "password": password
-    });
-    return res.data;
+    try {
+      final res = await client.post(
+        Endpoints.login,
+        data: {
+          "username": username,
+          "password": password,
+        },
+        requireAuth: false,
+      );
+
+      final data = res.data;
+
+      print("LOGIN RESPONSE: $data");
+
+      final token = data['access'] ?? data['token'];
+
+      if (token == null) {
+        throw Exception("Token not found in response");
+      }
+
+      // 💾 save token
+      await client.saveToken(token);
+
+      return data;
+    } catch (e) {
+      throw Exception("Login failed: $e");
+    }
   }
 
-  Future<Map<String, dynamic>> register(String username, String password, String role) async {
-    final res = await client.post(Endpoints.register, data: {
-      "username": username,
-      "password": password,
-      "role": role
-    });
-    return res.data;
+  // REGISTER
+  Future<Map<String, dynamic>> register(
+      String username, String password, String role) async {
+    try {
+      final res = await client.post(
+        Endpoints.register,
+        data: {
+          "username": username,
+          "password": password,
+          "role": role,
+        },
+        requireAuth: false, 
+      );
+
+      return res.data;
+    } catch (e) {
+      throw Exception("Register failed: $e");
+    }
   }
 
+  // 👤 PROFILE (Protected)
+  Future<Map<String, dynamic>> getProfile() async {
+    try {
+      final res = await client.get(Endpoints.profile);
+      return res.data;
+    } catch (e) {
+      throw Exception("Get profile failed: $e");
+    }
+  }
+
+  //  FORGOT PASSWORD
   Future<Map<String, dynamic>> forgotPassword(String email) async {
-    final res = await client.post(Endpoints.forgotPassword, data: {
-      "email": email
-    });
-    return res.data;
+    try {
+      final res = await client.post(
+        Endpoints.forgotPassword,
+        data: {
+          "email": email,
+        },
+        requireAuth: false, // optional
+      );
+
+      return res.data;
+    } catch (e) {
+      throw Exception("Forgot password failed: $e");
+    }
   }
 }

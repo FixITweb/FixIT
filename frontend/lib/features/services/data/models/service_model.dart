@@ -8,6 +8,7 @@ class ServiceModel {
   final DateTime createdAt;
   final double latitude;
   final double longitude;
+  final double distance; // 🔥 NEW
   final WorkerModel worker;
 
   ServiceModel({
@@ -20,6 +21,7 @@ class ServiceModel {
     required this.createdAt,
     required this.latitude,
     required this.longitude,
+    required this.distance,
     required this.worker,
   });
 
@@ -34,6 +36,7 @@ class ServiceModel {
       createdAt: DateTime.parse(json['created_at']),
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
+      distance: (json['distance'] as num?)?.toDouble() ?? 0.0, // 🔥 SAFE
       worker: WorkerModel.fromJson(json['worker']),
     );
   }
@@ -49,6 +52,7 @@ class ServiceModel {
       'created_at': createdAt.toIso8601String(),
       'latitude': latitude,
       'longitude': longitude,
+      'distance': distance, // 🔥 INCLUDED
       'worker': worker.toJson(),
     };
   }

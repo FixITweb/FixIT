@@ -12,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
+  final usernameController = TextEditingController(); 
   final passwordController = TextEditingController();
   String loginAs = 'customer';
 
@@ -22,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            // Navigate based on role
             if (state.role == 'worker') {
               Navigator.pushReplacementNamed(context, '/worker-dashboard');
             } else {
@@ -40,12 +39,17 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 80),
+
                 const Icon(Icons.build, size: 90, color: Color(0xFF14B8A6)),
+
                 const Text(
                   "FixIT",
                   style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
                 ),
+
                 const SizedBox(height: 50),
+
+                /// ROLE SWITCH
                 Row(
                   children: [
                     Expanded(
@@ -55,7 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? const Color(0xFF14B8A6)
                               : Colors.grey[300],
                         ),
-                        onPressed: () => setState(() => loginAs = 'customer'),
+                        onPressed: () =>
+                            setState(() => loginAs = 'customer'),
                         child: const Text("Customer"),
                       ),
                     ),
@@ -67,54 +72,68 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? const Color(0xFF14B8A6)
                               : Colors.grey[300],
                         ),
-                        onPressed: () => setState(() => loginAs = 'worker'),
+                        onPressed: () =>
+                            setState(() => loginAs = 'worker'),
                         child: const Text("Worker"),
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 30),
+
+                /// USERNAME (NOT EMAIL)
                 TextField(
-                  controller: emailController,
+                  controller: usernameController,
                   decoration: const InputDecoration(
-                    labelText: "Username/Email",
-                    hintText: "Try 'customer@test.com' or 'worker@test.com'",
+                    labelText: "Username",
+                    hintText: "Enter your username",
                   ),
                 ),
+
                 const SizedBox(height: 16),
+
                 TextField(
                   controller: passwordController,
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: "Password",
-                    hintText: "Any password works for demo",
                   ),
                 ),
+
                 const SizedBox(height: 40),
+
                 if (state is AuthLoading)
                   const CircularProgressIndicator()
                 else
                   ElevatedButton(
                     onPressed: () {
+                      final username = usernameController.text.trim();
+                      final password = passwordController.text.trim();
+
+                      if (username.isEmpty || password.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Enter username & password")),
+                        );
+                        return;
+                      }
+
                       context.read<AuthBloc>().add(
-                        LoginEvent(
-                          emailController.text.isEmpty 
-                            ? '$loginAs@test.com' 
-                            : emailController.text,
-                          passwordController.text.isEmpty 
-                            ? 'demo123' 
-                            : passwordController.text,
-                        ),
-                      );
+                            LoginEvent(username, password), 
+                          );
                     },
-                    child: const Text("Login", style: TextStyle(fontSize: 18)),
+                    child: const Text("Login",
+                        style: TextStyle(fontSize: 18)),
                   ),
+
                 TextButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/register');
                   },
                   child: const Text("Create Account"),
                 ),
+
                 TextButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/forgot-password');
@@ -131,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    emailController.dispose();
+    usernameController.dispose();
     passwordController.dispose();
     super.dispose();
   }

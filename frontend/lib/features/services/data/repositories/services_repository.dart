@@ -6,8 +6,49 @@ class ServiceRepository {
 
   ServiceRepository(this.api);
 
-  Future<List<ServiceModel>> getServices() async {
-    final data = await api.fetchServices();
-    return data.map((e) => ServiceModel.fromJson(e)).toList();
+  //  GET SERVICES (WITH FILTERS SUPPORT)
+  Future<List<ServiceModel>> getServices({
+    String? search,
+    String? category,
+    double? minPrice,
+    double? maxPrice,
+    double? rating,
+    double? lat,
+    double? lng,
+    double? radius,
+    String? date,
+    String? sort,
+  }) async {
+    return await api.fetchServices(
+      search: search,
+      category: category,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      rating: rating,
+      lat: lat,
+      lng: lng,
+      radius: radius,
+      date: date,
+      sort: sort,
+    );
+  }
+
+  //  CREATE SERVICE
+  Future<void> createService({
+    required String title,
+    required String description,
+    required String category,
+    required double price,
+    required double latitude,
+    required double longitude,
+  }) async {
+    await api.createService(
+      title: title,
+      description: description,
+      category: category,
+      price: price,
+      latitude: latitude,
+      longitude: longitude,
+    );
   }
 }
