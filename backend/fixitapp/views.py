@@ -124,9 +124,15 @@ def services(request):
                 s.latitude, s.longitude
             )
 
-            if radius:
-                if distance > float(radius):
-                    continue
+        else:
+            distance = calculate_distance(
+                9, 38.7,
+                s.latitude, s.longitude
+            )
+            
+        if radius:
+            if distance > float(radius):
+                continue
 
         result.append({
             "id": s.id,
