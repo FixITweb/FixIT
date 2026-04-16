@@ -20,7 +20,8 @@ urlpatterns = [
     path('auth/login/', login),
     path('auth/profile/', profile),
 
-
+    # SERVICES
+    path('services/', services),
     # SMART SEARCH
     path('search/', smart_search),
 

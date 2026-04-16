@@ -1,39 +1,29 @@
 class NotificationModel {
   final int id;
-  final int userId;
-  final int? serviceId;
   final String message;
+  final int? serviceId;
   final bool isRead;
   final DateTime createdAt;
 
   NotificationModel({
     required this.id,
-    required this.userId,
-    this.serviceId,
     required this.message,
+    this.serviceId,
     required this.isRead,
     required this.createdAt,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
-      id: json['id'],
-      userId: json['user'],
-      serviceId: json['service'],
+      id: json['id'] ?? 0,
       message: json['message'] ?? '',
+      // backend may return service_id or not — handle both
+      serviceId: json['service_id'] ?? json['service'],
       isRead: json['is_read'] ?? false,
-      createdAt: DateTime.parse(json['created_at']),
+      // backend notifications_list doesn't return created_at — use now as fallback
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at']) ?? DateTime.now()
+          : DateTime.now(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user': userId,
-      'service': serviceId,
-      'message': message,
-      'is_read': isRead,
-      'created_at': createdAt.toIso8601String(),
-    };
   }
 }
