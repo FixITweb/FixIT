@@ -188,3 +188,21 @@ def create_rating(request):
         "average_rating": avg
     }, status=201)
 
+#GET RATINGS
+@api_view(['GET'])
+def get_ratings(request, worker_id):
+
+    ratings = Rating.objects.filter(worker_id=worker_id).order_by("-created_at")
+
+    avg = ratings.aggregate(Avg("rating"))["rating__avg"]
+
+    return Response({
+        "average_rating": avg or 0,
+        "ratings": [
+            {
+                "rating": r.rating,
+                "review": r.review,
+                "created_at": r.created_at
+            } for r in ratings
+        ]
+    })

@@ -37,5 +37,5 @@ urlpatterns = [
 
     # RATINGS
     path('ratings/', create_rating),
-    
+    path('ratings/<int:worker_id>/', get_ratings),
 ]
