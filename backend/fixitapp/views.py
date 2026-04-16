@@ -162,6 +162,7 @@ def bookings(request):
             "status": booking.status,
             "created_at": booking.created_at
         }, status=201)
+    
 # UPDATE BOOKINGS
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
