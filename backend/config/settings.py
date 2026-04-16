@@ -144,3 +144,5 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'fixitapp.User'
+
+CORS_ALLOW_ALL_ORIGINS = True
