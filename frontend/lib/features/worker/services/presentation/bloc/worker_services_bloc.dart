@@ -1,78 +1,80 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'worker_services_event.dart';
 import 'worker_services_state.dart';
+import '../../../../services/data/repositories/services_repository.dart';
+import '../../../../services/data/models/service_model.dart';
 
 class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> {
-  List<WorkerServiceModel> _services = [];
+  final ServiceRepository serviceRepository;
+  List<ServiceModel> _services = [];
 
-  WorkerServicesBloc() : super(WorkerServicesInitial()) {
-    on<LoadWorkerServices>((event, emit) async {
-      emit(WorkerServicesLoading());
-      try {
-        // Simulate API call
-        await Future.delayed(const Duration(milliseconds: 500));
-        
-        // Mock data - replace with actual API call
-        _services = [
-          WorkerServiceModel(
-            id: '1',
-            title: 'Plumber - Sink Repair',
-            category: 'Plumbing',
-            price: 50.0,
-            isActive: true,
-            description: 'Professional sink repair service',
-          ),
-          WorkerServiceModel(
-            id: '2',
-            title: 'Emergency Plumbing',
-            category: 'Plumbing',
-            price: 75.0,
-            isActive: true,
-            description: '24/7 emergency plumbing service',
-          ),
-        ];
-        
-        emit(WorkerServicesLoaded(_services));
-      } catch (e) {
-        emit(WorkerServicesError(e.toString()));
-      }
-    });
+  WorkerServicesBloc(this.serviceRepository) : super(WorkerServicesInitial()) {
+    on<LoadWorkerServices>(_onLoad);
+    on<AddWorkerService>(_onAdd);
+    on<UpdateWorkerService>(_onUpdate);
+    on<DeleteWorkerService>(_onDelete);
+  }
 
-    on<AddWorkerService>((event, emit) async {
-      emit(WorkerServicesLoading());
-      try {
-        // Simulate API call
-        await Future.delayed(const Duration(milliseconds: 500));
-        
-        final newService = WorkerServiceModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          title: event.title,
-          category: event.category,
-          price: event.price,
-          isActive: true,
-          description: event.description,
-        );
-        
-        _services.add(newService);
-        emit(WorkerServiceAdded('Service added successfully!'));
-        emit(WorkerServicesLoaded(_services));
-      } catch (e) {
-        emit(WorkerServicesError(e.toString()));
-      }
-    });
+  Future<void> _onLoad(LoadWorkerServices event, Emitter emit) async {
+    emit(WorkerServicesLoading());
+    try {
+      final services = await serviceRepository.getServices();
+      _services = services;
+      emit(WorkerServicesLoaded(_services));
+    } catch (e) {
+      emit(WorkerServicesError('Failed to load services: $e'));
+    }
+  }
 
-    on<ToggleServiceStatus>((event, emit) async {
-      try {
-        final serviceIndex = _services.indexWhere((s) => s.id == event.serviceId);
-        if (serviceIndex != -1) {
-          _services[serviceIndex] = _services[serviceIndex].copyWith(
-            isActive: !_services[serviceIndex].isActive,
-          );
-          emit(WorkerServicesLoaded(_services));
-        }
-      } catch (e) {
-        emit(WorkerServicesError(e.toString()));
-      }
-    });
+  Future<void> _onAdd(AddWorkerService event, Emitter emit) async {
+    emit(WorkerServicesLoading());
+    try {
+      await serviceRepository.createService(
+        title: event.title,
+        description: event.description,
+        category: event.category,
+        price: event.price,
+        latitude: 0.0,
+        longitude: 0.0,
+      );
+      emit(WorkerServiceAdded('Service added successfully!'));
+      final services = await serviceRepository.getServices();
+      _services = services;
+      emit(WorkerServicesLoaded(_services));
+    } catch (e) {
+      emit(WorkerServicesError('Failed to add service: $e'));
+    }
+  }
+
+  Future<void> _onUpdate(UpdateWorkerService event, Emitter emit) async {
+    emit(WorkerServicesLoading());
+    try {
+      await serviceRepository.updateService(
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        category: event.category,
+        price: event.price,
+      );
+      emit(WorkerServiceUpdated('Service updated successfully!'));
+      final services = await serviceRepository.getServices();
+      _services = services;
+      emit(WorkerServicesLoaded(_services));
+    } catch (e) {
+      emit(WorkerServicesError('Failed to update service: $e'));
+    }
+  }
+
+  Future<void> _onDelete(DeleteWorkerService event, Emitter emit) async {
+    emit(WorkerServicesLoading());
+    try {
+      await serviceRepository.deleteService(event.id);
+      emit(WorkerServiceDeleted('Service deleted.'));
+      final services = await serviceRepository.getServices();
+      _services = services;
+      emit(WorkerServicesLoaded(_services));
+    } catch (e) {
+      emit(WorkerServicesError('Failed to delete service: $e'));
+    }
   }
 }

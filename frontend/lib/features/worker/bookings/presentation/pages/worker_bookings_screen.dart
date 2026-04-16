@@ -4,6 +4,9 @@ import '../bloc/worker_bookings_bloc.dart';
 import '../bloc/worker_bookings_event.dart';
 import '../bloc/worker_bookings_state.dart';
 import '../../../dashboard/presentation/widgets/worker_bottom_nav.dart';
+import '../../../../bookings/data/repositories/booking_repository.dart';
+import '../../../../bookings/data/datasources/booking_api.dart';
+import '../../../../../core/network/api_client.dart';
 
 class WorkerBookingsScreen extends StatelessWidget {
   const WorkerBookingsScreen({super.key});
@@ -11,7 +14,9 @@ class WorkerBookingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => WorkerBookingsBloc()..add(LoadWorkerBookings()),
+      create: (context) => WorkerBookingsBloc(
+        BookingRepository(BookingApi(ApiClient())),
+      )..add(LoadWorkerBookings()),
       child: const WorkerBookingsView(),
     );
   }

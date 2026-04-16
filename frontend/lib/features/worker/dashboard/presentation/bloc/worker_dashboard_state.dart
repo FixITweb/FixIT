@@ -3,12 +3,14 @@ class WorkerDashboardData {
   final int activeBookings;
   final int completedJobs;
   final double rating;
+  final String username;
 
   WorkerDashboardData({
     required this.totalEarnings,
     required this.activeBookings,
     required this.completedJobs,
     required this.rating,
+    required this.username,
   });
 }
 

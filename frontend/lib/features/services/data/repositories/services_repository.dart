@@ -51,4 +51,26 @@ class ServiceRepository {
       longitude: longitude,
     );
   }
+
+  // UPDATE SERVICE
+  Future<void> updateService({
+    required int id,
+    required String title,
+    required String description,
+    required String category,
+    required double price,
+  }) async {
+    await api.updateService(
+      id: id,
+      title: title,
+      description: description,
+      category: category,
+      price: price,
+    );
+  }
+
+  // DELETE SERVICE
+  Future<void> deleteService(int id) async {
+    await api.deleteService(id);
+  }
 }

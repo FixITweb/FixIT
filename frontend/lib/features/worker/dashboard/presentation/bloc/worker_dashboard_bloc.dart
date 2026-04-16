@@ -1,26 +1,29 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'worker_dashboard_event.dart';
 import 'worker_dashboard_state.dart';
+import '../../data/repositories/worker_dashboard_repository.dart';
 
 class WorkerDashboardBloc extends Bloc<WorkerDashboardEvent, WorkerDashboardState> {
-  WorkerDashboardBloc() : super(WorkerDashboardInitial()) {
+  final WorkerDashboardRepository repository;
+
+  WorkerDashboardBloc(this.repository) : super(WorkerDashboardInitial()) {
     on<LoadWorkerDashboard>((event, emit) async {
       emit(WorkerDashboardLoading());
       try {
-        // Simulate API call
-        await Future.delayed(const Duration(milliseconds: 500));
+        // Load real dashboard data from API
+        final dashboardData = await repository.getDashboardStats();
         
-        // Mock data - replace with actual API call
         final data = WorkerDashboardData(
-          totalEarnings: 2450.0,
-          activeBookings: 8,
-          completedJobs: 45,
-          rating: 4.8,
+          totalEarnings: dashboardData.totalEarnings,
+          activeBookings: dashboardData.activeBookings,
+          completedJobs: dashboardData.completedJobs,
+          rating: dashboardData.rating,
+          username: dashboardData.username,
         );
         
         emit(WorkerDashboardLoaded(data));
       } catch (e) {
-        emit(WorkerDashboardError(e.toString()));
+        emit(WorkerDashboardError('Failed to load dashboard: ${e.toString()}'));
       }
     });
 

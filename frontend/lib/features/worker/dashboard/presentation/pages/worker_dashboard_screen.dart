@@ -5,6 +5,9 @@ import '../bloc/worker_dashboard_event.dart';
 import '../bloc/worker_dashboard_state.dart';
 import '../widgets/worker_bottom_nav.dart';
 import '../../../../../shared/widgets/theme_toggle_button.dart';
+import '../../../../../core/network/api_client.dart';
+import '../../data/datasources/worker_dashboard_api.dart';
+import '../../data/repositories/worker_dashboard_repository.dart';
 
 class WorkerDashboardScreen extends StatelessWidget {
   const WorkerDashboardScreen({super.key});
@@ -12,7 +15,9 @@ class WorkerDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => WorkerDashboardBloc()..add(LoadWorkerDashboard()),
+      create: (context) => WorkerDashboardBloc(
+        WorkerDashboardRepository(WorkerDashboardApi(ApiClient())),
+      )..add(LoadWorkerDashboard()),
       child: const WorkerDashboardView(),
     );
   }
@@ -62,9 +67,9 @@ class WorkerDashboardView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Hello, Alex 👋",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  Text(
+                    "Hello, ${data.username} 👋",
+                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -109,6 +114,61 @@ class WorkerDashboardView extends StatelessWidget {
         },
       ),
       bottomNavigationBar: const WorkerBottomNav(currentIndex: 0),
+    );
+  }
+
+  Widget _buildStatCard({
+    required String title,
+    required String value,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,17 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'requests_event.dart';
 import 'requests_state.dart';
+import '../../../create_request/data/datasources/job_request_api.dart';
+import '../../../create_request/data/repositories/job_request_repository.dart';
+import '../../../../../core/network/api_client.dart';
 
 class RequestsBloc extends Bloc<RequestsEvent, RequestsState> {
-  RequestsBloc() : super(RequestsInitial()) {
+  final JobRequestRepository _repository;
+
+  RequestsBloc()
+      : _repository = JobRequestRepository(JobRequestApi(ApiClient())),
+        super(RequestsInitial()) {
     on<LoadRequests>((event, emit) async {
       emit(RequestsLoading());
       try {
-        // Simulate API call
-        await Future.delayed(const Duration(milliseconds: 500));
-        
-        // For now, return empty list - you can add mock data later
-        emit(RequestsLoaded([]));
+        final requests = await _repository.getJobRequests();
+        emit(RequestsLoaded(requests));
       } catch (e) {
         emit(RequestsError(e.toString()));
       }

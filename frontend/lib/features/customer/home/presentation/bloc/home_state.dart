@@ -1,4 +1,4 @@
-import '../../../../../shared/data/mock_data.dart';
+import '../../../../services/data/models/service_model.dart';
 
 abstract class HomeState {}
 

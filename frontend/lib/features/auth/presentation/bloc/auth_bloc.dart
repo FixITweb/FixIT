@@ -10,42 +10,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginEvent>((event, emit) async {
       emit(AuthLoading());
       try {
-        // Mock login - simulate successful login without API call
-        await Future.delayed(const Duration(seconds: 1));
+        // Login to get JWT tokens
+        final authModel = await repo.login(event.email, event.password);
         
-        // Determine role based on username for demo purposes
-        String role = 'customer';
-        if (event.email.contains('worker') || 
-            event.email.contains('alex') || 
-            event.email.toLowerCase().contains('john')) {
-          role = 'worker';
-        }
+        // Fetch user profile to get the role
+        final profile = await repo.getProfile();
+        final role = profile['role'] ?? 'customer';
         
-        emit(AuthSuccess('mock_access_token_123', role));
+        emit(AuthSuccess(authModel.accessToken, role));
       } catch (e) {
-        emit(AuthError(e.toString()));
+        emit(AuthError('Login failed: ${e.toString()}'));
       }
     });
 
     on<RegisterEvent>((event, emit) async {
       emit(AuthLoading());
       try {
-        // Mock registration - simulate successful registration
-        await Future.delayed(const Duration(seconds: 1));
-        emit(AuthRegistered('Registration successful!', event.role));
+        // Register and automatically login to get JWT tokens
+        final authModel = await repo.register(event.name, event.password, event.role);
+        
+        // User is now registered AND logged in with JWT tokens
+        // Role is already known from registration
+        emit(AuthSuccess(authModel.accessToken, event.role));
       } catch (e) {
-        emit(AuthError(e.toString()));
+        emit(AuthError('Registration failed: ${e.toString()}'));
       }
     });
 
     on<ForgotPasswordEvent>((event, emit) async {
       emit(AuthLoading());
       try {
-        // Mock forgot password
-        await Future.delayed(const Duration(seconds: 1));
-        emit(AuthPasswordResetSent('Reset link sent to ${event.email}'));
+        final message = await repo.forgotPassword(event.email);
+        emit(AuthPasswordResetSent(message));
       } catch (e) {
-        emit(AuthError(e.toString()));
+        emit(AuthError('Password reset failed: ${e.toString()}'));
       }
     });
 

@@ -22,15 +22,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthRegistered) {
+          if (state is AuthSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              const SnackBar(content: Text('Registration successful!')),
             );
             
             if (state.role == 'worker') {
-              Navigator.pushReplacementNamed(context, '/worker-onboarding');
+              Navigator.pushReplacementNamed(context, '/worker-profession-setup');
             } else {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/customer-home');
             }
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(

@@ -8,7 +8,7 @@ class ServiceModel {
   final DateTime createdAt;
   final double latitude;
   final double longitude;
-  final double distance; // 🔥 NEW
+  final double distance; 
   final WorkerModel worker;
 
   ServiceModel({

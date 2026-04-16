@@ -27,34 +27,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final apiClient = ApiClient();
-  final authApi = AuthApi(apiClient);
-
-  try {
-    
-    final registerRes = await authApi.register(
-      "john",       // change if you want
-      "123456",     // change if you want
-      "worker",     // or "customer"
-    );
-
-    print("REGISTER SUCCESS: $registerRes");
-
-   
-    final loginRes = await authApi.login("john", "123456");
-
-    print("LOGIN SUCCESS: $loginRes");
-
-
-    final token = await apiClient.getToken();
-    print("TOKEN SAVED: $token");
-
-    // 👤 TEST PROTECTED API
-    final profile = await authApi.getProfile();
-    print("PROFILE: $profile");
-
-  } catch (e) {
-    print("ERROR: $e");
-  }
 
   runApp(FixITApp(apiClient: apiClient));
 }

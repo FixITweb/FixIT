@@ -71,4 +71,36 @@ class ServiceApi {
       throw Exception("Create service failed: $e");
     }
   }
+
+  // UPDATE SERVICE
+  Future<void> updateService({
+    required int id,
+    required String title,
+    required String description,
+    required String category,
+    required double price,
+  }) async {
+    try {
+      await client.put(
+        'services/$id/',
+        data: {
+          "title": title,
+          "description": description,
+          "category": category,
+          "price": price,
+        },
+      );
+    } catch (e) {
+      throw Exception("Update service failed: $e");
+    }
+  }
+
+  // DELETE SERVICE
+  Future<void> deleteService(int id) async {
+    try {
+      await client.delete('services/$id/');
+    } catch (e) {
+      throw Exception("Delete service failed: $e");
+    }
+  }
 }

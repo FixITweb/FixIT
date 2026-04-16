@@ -7,7 +7,7 @@ class Endpoints {
   static const String register = "auth/register/";
   static const String forgotPassword = "auth/forgot-password/";
   static const String notifications = "notifications/";
-  static const String requests = "requests/";
+  static const String jobRequests = "requests/";
   static const String ratings = "ratings/";
   static const String search = "search/";
 }

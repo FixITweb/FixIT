@@ -1,80 +1,66 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'worker_bookings_event.dart';
 import 'worker_bookings_state.dart';
+import '../../../../bookings/data/repositories/booking_repository.dart';
 
 class WorkerBookingsBloc extends Bloc<WorkerBookingsEvent, WorkerBookingsState> {
-  List<WorkerBookingModel> _bookings = [];
+  final BookingRepository bookingRepository;
 
-  WorkerBookingsBloc() : super(WorkerBookingsInitial()) {
+  WorkerBookingsBloc(this.bookingRepository) : super(WorkerBookingsInitial()) {
     on<LoadWorkerBookings>((event, emit) async {
       emit(WorkerBookingsLoading());
       try {
-        // Simulate API call
-        await Future.delayed(const Duration(milliseconds: 500));
+        // Load real bookings from API
+        final bookings = await bookingRepository.getBookings();
         
-        // Mock data - replace with actual API call
-        _bookings = [
-          WorkerBookingModel(
-            id: '1',
-            serviceTitle: 'Kitchen Sink Repair',
-            customerName: 'Sarah Johnson',
-            scheduledDate: DateTime.now().add(const Duration(days: 1)),
-            status: 'Pending',
-            price: 75.0,
-          ),
-          WorkerBookingModel(
-            id: '2',
-            serviceTitle: 'Bathroom Installation',
-            customerName: 'Mike Chen',
-            scheduledDate: DateTime.now().add(const Duration(days: 3)),
-            status: 'Accepted',
-            price: 150.0,
-          ),
-        ];
+        // Convert to worker booking models
+        final workerBookings = bookings.map((booking) => WorkerBookingModel(
+          id: booking.id.toString(),
+          serviceTitle: booking.service?.title ?? 'Unknown Service',
+          customerName: booking.customer?.username ?? 'Unknown Customer',
+          scheduledDate: booking.createdAt,
+          status: _capitalizeStatus(booking.status),
+          price: booking.service?.price ?? 0.0,
+        )).toList();
         
-        emit(WorkerBookingsLoaded(_bookings));
+        emit(WorkerBookingsLoaded(workerBookings));
       } catch (e) {
-        emit(WorkerBookingsError(e.toString()));
+        emit(WorkerBookingsError('Failed to load bookings: ${e.toString()}'));
       }
     });
 
     on<AcceptBooking>((event, emit) async {
       try {
-        final bookingIndex = _bookings.indexWhere((b) => b.id == event.bookingId);
-        if (bookingIndex != -1) {
-          _bookings[bookingIndex] = _bookings[bookingIndex].copyWith(status: 'Accepted');
-          emit(WorkerBookingUpdated('Booking accepted successfully!'));
-          emit(WorkerBookingsLoaded(_bookings));
-        }
+        await bookingRepository.updateBooking(int.parse(event.bookingId), 'accepted');
+        emit(WorkerBookingUpdated('Booking accepted successfully!'));
+        add(LoadWorkerBookings()); // Reload bookings
       } catch (e) {
-        emit(WorkerBookingsError(e.toString()));
+        emit(WorkerBookingsError('Failed to accept booking: ${e.toString()}'));
       }
     });
 
     on<RejectBooking>((event, emit) async {
       try {
-        final bookingIndex = _bookings.indexWhere((b) => b.id == event.bookingId);
-        if (bookingIndex != -1) {
-          _bookings[bookingIndex] = _bookings[bookingIndex].copyWith(status: 'Rejected');
-          emit(WorkerBookingUpdated('Booking rejected'));
-          emit(WorkerBookingsLoaded(_bookings));
-        }
+        await bookingRepository.updateBooking(int.parse(event.bookingId), 'rejected');
+        emit(WorkerBookingUpdated('Booking rejected'));
+        add(LoadWorkerBookings()); // Reload bookings
       } catch (e) {
-        emit(WorkerBookingsError(e.toString()));
+        emit(WorkerBookingsError('Failed to reject booking: ${e.toString()}'));
       }
     });
 
     on<CompleteBooking>((event, emit) async {
       try {
-        final bookingIndex = _bookings.indexWhere((b) => b.id == event.bookingId);
-        if (bookingIndex != -1) {
-          _bookings[bookingIndex] = _bookings[bookingIndex].copyWith(status: 'Completed');
-          emit(WorkerBookingUpdated('Booking marked as completed!'));
-          emit(WorkerBookingsLoaded(_bookings));
-        }
+        await bookingRepository.updateBooking(int.parse(event.bookingId), 'completed');
+        emit(WorkerBookingUpdated('Booking marked as completed!'));
+        add(LoadWorkerBookings()); // Reload bookings
       } catch (e) {
-        emit(WorkerBookingsError(e.toString()));
+        emit(WorkerBookingsError('Failed to complete booking: ${e.toString()}'));
       }
     });
+  }
+
+  String _capitalizeStatus(String status) {
+    return status.substring(0, 1).toUpperCase() + status.substring(1);
   }
 }

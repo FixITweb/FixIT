@@ -1,24 +1,27 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'home_event.dart';
 import 'home_state.dart';
-import '../../../../../shared/data/mock_data.dart';
+import '../../../../services/data/repositories/services_repository.dart';
+import '../../../../services/data/models/service_model.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc() : super(HomeInitial()) {
+  final ServiceRepository serviceRepository;
+
+  HomeBloc(this.serviceRepository) : super(HomeInitial()) {
     on<LoadServices>((event, emit) async {
       emit(HomeLoading());
       try {
-        // Simulate API call delay
-        await Future.delayed(const Duration(milliseconds: 500));
+        // Load real services from API
+        final services = await serviceRepository.getServices();
         
         emit(HomeLoaded(
-          services: mockServices,
-          filteredServices: mockServices,
+          services: services,
+          filteredServices: services,
           selectedCategory: 'All',
           searchQuery: '',
         ));
       } catch (e) {
-        emit(HomeError(e.toString()));
+        emit(HomeError('Failed to load services: ${e.toString()}'));
       }
     });
 
@@ -63,7 +66,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return services.where((service) {
       final categoryMatch = category == 'All' || service.category == category;
       final searchMatch = service.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-                         service.workerName.toLowerCase().contains(searchQuery.toLowerCase());
+                         service.worker.username.toLowerCase().contains(searchQuery.toLowerCase());
       return categoryMatch && searchMatch;
     }).toList();
   }
