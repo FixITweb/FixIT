@@ -57,8 +57,7 @@ def match_services(obj):
             )
 
             category_match = (
-                req.category.strip().lower() ==
-                obj.category.strip().lower()
+                req.category.strip().lower() == obj.category.strip().lower()
             )
 
             if (category_match and score > 60) or score > 80:
