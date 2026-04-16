@@ -27,7 +27,8 @@ urlpatterns = [
     # JOB REQUESTS
     path('requests/', job_requests),
 
-    # NOTIFICATIONS
+    # NOTIFICATIONS 
+    path('notifications/', notifications_list),
 
     path('notifications/<int:id>/', mark_as_read),
 

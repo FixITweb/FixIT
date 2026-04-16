@@ -96,15 +96,29 @@ def job_requests(request):
 
     return Response(serializer.errors, status=400)
 
-
-
-@api_view(['PUT'])
+# NOTIFICATIONS
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def mark_as_read(request, id):
-    notification = get_object_or_404(Notification, id=id, user=request.user)
-    notification.is_read = True
-    notification.save()
-    return Response({"message": "Marked as read"})
+def notifications_list(request):
+
+    data = Notification.objects.all()
+
+    return Response([
+        {
+            "id": n.id,
+            "user": n.user.username,
+            "message": n.message
+        }
+        for n in data
+    ])
+ 
+@api_view(['PUT']) 
+@permission_classes([IsAuthenticated]) 
+def mark_as_read(request, id): 
+    notification = get_object_or_404(Notification, id=id, user=request.user) 
+    notification.is_read = True 
+    notification.save() 
+    return Response({"message": "Marked as read"}) 
 
 # UPDATE BOOKINGS
 @api_view(['PUT'])
