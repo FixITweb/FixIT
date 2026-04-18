@@ -1,14 +1,14 @@
 class NotificationModel {
   final int id;
-  final String message;
-  final int? serviceId;
+  final String title;
+  final String description;
   final bool isRead;
   final DateTime createdAt;
 
   NotificationModel({
     required this.id,
-    required this.message,
-    this.serviceId,
+    required this.title,
+    required this.description,
     required this.isRead,
     required this.createdAt,
   });
@@ -16,14 +16,28 @@ class NotificationModel {
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
       id: json['id'] ?? 0,
-      message: json['message'] ?? '',
-      // backend may return service_id or not — handle both
-      serviceId: json['service_id'] ?? json['service'],
+      title: json['title'] ?? 'Notification',
+      description: json['description'] ?? json['message'] ?? '',
       isRead: json['is_read'] ?? false,
-      // backend notifications_list doesn't return created_at — use now as fallback
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at']) ?? DateTime.now()
           : DateTime.now(),
+    );
+  }
+
+  NotificationModel copyWith({
+    int? id,
+    String? title,
+    String? description,
+    bool? isRead,
+    DateTime? createdAt,
+  }) {
+    return NotificationModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

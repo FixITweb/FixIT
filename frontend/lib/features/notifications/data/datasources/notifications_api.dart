@@ -7,15 +7,28 @@ class NotificationsApi {
   NotificationsApi(this.client);
 
   Future<List<dynamic>> getNotifications() async {
-    final res = await client.get(Endpoints.notifications);
-    return res.data;
+    try {
+      final res = await client.get(Endpoints.notifications);
+      if (res.data is List) {
+        return res.data;
+      } else if (res.data is Map && res.data['results'] is List) {
+        // Handle paginated responses if necessary
+        return res.data['results'];
+      }
+      return [];
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<Map<String, dynamic>> markAsRead(int notificationId) async {
-    final res = await client.put(
-      '${Endpoints.notifications}$notificationId/',
-      data: {'is_read': true},
-    );
-    return res.data;
+  Future<void> markAsRead(int notificationId) async {
+    try {
+      await client.put(
+        '${Endpoints.notifications}$notificationId/',
+        data: {'is_read': true},
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 }
