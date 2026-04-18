@@ -8,7 +8,7 @@ import '../../features/customer/service_detail/presentation/pages/service_detail
 import '../../features/customer/create_request/presentation/pages/create_request_screen.dart';
 import '../../features/customer/requests/presentation/pages/requests_screen.dart';
 import '../../features/search/presentation/pages/enhanced_search_screen.dart';
-import '../../features/notifications/presentation/pages/notifications_screen.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/bookings/presentation/pages/bookings_screen.dart';
 import '../../features/customer/profile/presentation/pages/profile_screen.dart';
 import '../../features/worker/onboarding/presentation/pages/worker_onboarding_screen.dart';
@@ -47,7 +47,7 @@ class AppRouter {
       case '/requests':
         return MaterialPageRoute(builder: (_) => const RequestsScreen());
       case '/notifications':
-        return MaterialPageRoute(builder: (_) => const NotificationsScreen());
+        return MaterialPageRoute(builder: (_) => const NotificationsPage());
       case '/bookings':
         return MaterialPageRoute(builder: (_) => const BookingsScreen());
       case '/customer-profile':

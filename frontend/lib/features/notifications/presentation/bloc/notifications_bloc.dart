@@ -18,12 +18,27 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     });
 
     on<MarkAsRead>((event, emit) async {
-      try {
-        await repository.markAsRead(event.notificationId);
-        // Reload notifications after marking as read
-        add(LoadNotifications());
-      } catch (e) {
-        emit(NotificationsError('Failed to mark as read: ${e.toString()}'));
+      final currentState = state;
+      if (currentState is NotificationsLoaded) {
+        // Optimistic update
+        final updatedNotifications = currentState.notifications.map((n) {
+          if (n.id == event.notificationId) {
+            return n.copyWith(isRead: true);
+          }
+          return n;
+        }).toList();
+        
+        emit(NotificationsLoaded(updatedNotifications));
+
+        try {
+          await repository.markAsRead(event.notificationId);
+          // Optional: We could reload to be extra sure, but optimistic is enough
+          // add(LoadNotifications()); 
+        } catch (e) {
+          // Revert on failure
+          emit(NotificationsLoaded(currentState.notifications));
+          emit(NotificationsError('Failed to mark as read: ${e.toString()}'));
+        }
       }
     });
 

@@ -10,6 +10,8 @@ class NotificationsLoaded extends NotificationsState {
   final List<NotificationModel> notifications;
 
   NotificationsLoaded(this.notifications);
+
+  int get unreadCount => notifications.where((n) => !n.isRead).length;
 }
 
 class NotificationsError extends NotificationsState {
