@@ -33,6 +33,11 @@ class ServiceRepository {
     );
   }
 
+  //  FETCH CATEGORIES
+  Future<List<String>> getCategories() async {
+    return await api.fetchCategories();
+  }
+
   //  CREATE SERVICE
   Future<void> createService({
     required String title,

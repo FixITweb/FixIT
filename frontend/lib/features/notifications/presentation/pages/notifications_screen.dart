@@ -128,7 +128,14 @@ class NotificationsView extends StatelessWidget {
                           fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text(_formatDate(notification.createdAt)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (notification.user != null && notification.user!.isNotEmpty)
+                            Text("From: ${notification.user}", style: const TextStyle(fontWeight: FontWeight.w500)),
+                          Text(_formatDate(notification.createdAt), style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                        ],
+                      ),
                       trailing: notification.isRead
                           ? null
                           : const Icon(Icons.circle, size: 8, color: Colors.teal),

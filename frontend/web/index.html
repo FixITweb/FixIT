@@ -31,8 +31,39 @@
 
   <title>frontend</title>
   <link rel="manifest" href="manifest.json">
+
+  <meta name="flutter-web-renderer" content="html">
+
+  <script>
+    // 🚨 DEBUG SCRIPT: Catch silent crashes and display them on screen
+    window.onerror = function(message, source, lineno, colno, error) {
+      const div = document.createElement('div');
+      div.style.position = 'fixed';
+      div.style.top = '0';
+      div.style.left = '0';
+      div.style.width = '100%';
+      div.style.height = '100%';
+      div.style.backgroundColor = 'white';
+      div.style.color = 'red';
+      div.style.padding = '20px';
+      div.style.zIndex = '999999';
+      div.style.fontFamily = 'monospace';
+      div.style.overflow = 'auto';
+      div.innerHTML = '<h1>FixIT App Crash detected:</h1><pre>' + 
+                      'Message: ' + message + '\n\n' + 
+                      'Source: ' + source + '\n\n' + 
+                      'Line: ' + lineno + '\n\n' + 
+                      'Stack: ' + (error ? error.stack : 'N/A') + 
+                      '</pre><p>Check the console for more details.</p>';
+      document.body.appendChild(div);
+    };
+  </script>
 </head>
 <body>
+  <script>
+    // Modern way to force HTML renderer without triggering legacy assertion
+    window.flutterWebRenderer = "html";
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

@@ -8,12 +8,16 @@ class JobRequestApi {
     required String title,
     required String description,
     required String category,
+    required double latitude,
+    required double longitude,
     double? budget,
   }) async {
     final response = await client.post('requests/', data: {
       'title': title,
       'description': description,
       'category': category,
+      'latitude': latitude,
+      'longitude': longitude,
       if (budget != null && budget > 0) 'budget': budget,
     });
     return response.data as Map<String, dynamic>;

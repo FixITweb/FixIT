@@ -15,3 +15,8 @@ class CreateRequestError extends CreateRequestState {
 
   CreateRequestError(this.message);
 }
+
+class CategoriesLoaded extends CreateRequestState {
+  final List<String> categories;
+  CategoriesLoaded(this.categories);
+}

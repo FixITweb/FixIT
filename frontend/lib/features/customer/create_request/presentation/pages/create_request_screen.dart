@@ -4,8 +4,11 @@ import '../bloc/create_request_bloc.dart';
 import '../bloc/create_request_event.dart';
 import '../bloc/create_request_state.dart';
 import '../../../../../core/network/api_client.dart';
+import 'package:frontend/core/utils/location_helper.dart';
 import '../../data/datasources/job_request_api.dart';
 import '../../data/repositories/job_request_repository.dart';
+import '../../../../services/data/repositories/services_repository.dart';
+import '../../../../services/data/datasources/services_api.dart';
 
 class CreateRequestScreen extends StatelessWidget {
   const CreateRequestScreen({super.key});
@@ -14,8 +17,9 @@ class CreateRequestScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CreateRequestBloc(
-        JobRequestRepository(JobRequestApi(ApiClient())),
-      ),
+        repository: JobRequestRepository(JobRequestApi(ApiClient())),
+        serviceRepository: ServiceRepository(ServiceApi(ApiClient())),
+      )..add(LoadCategories()),
       child: const CreateRequestView(),
     );
   }
@@ -33,19 +37,8 @@ class _CreateRequestViewState extends State<CreateRequestView> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _budgetController = TextEditingController();
-  String _selectedCategory = 'Plumbing';
-
-  final List<String> _categories = [
-    'Plumbing',
-    'Electrical',
-    'Cleaning',
-    'Carpentry',
-    'Painting',
-    'Moving',
-    'Gardening',
-    'Appliance Repair',
-    'Other',
-  ];
+  String? _selectedCategory;
+  List<String> _dynamicCategories = [];
 
   @override
   void dispose() {
@@ -64,7 +57,14 @@ class _CreateRequestViewState extends State<CreateRequestView> {
       ),
       body: BlocListener<CreateRequestBloc, CreateRequestState>(
         listener: (context, state) {
-          if (state is CreateRequestSuccess) {
+          if (state is CategoriesLoaded) {
+            setState(() {
+              _dynamicCategories = state.categories;
+              if (_dynamicCategories.isNotEmpty && _selectedCategory == null) {
+                _selectedCategory = _dynamicCategories.first;
+              }
+            });
+          } else if (state is CreateRequestSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('✅ Request posted! You\'ll be notified when workers are available.'),
@@ -104,7 +104,7 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                               child: Text(
                                 'Post your request and get notified when matching services become available!',
                                 style: TextStyle(fontSize: 14),
-                              ),
+                                ),
                             ),
                           ],
                         ),
@@ -142,26 +142,28 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      value: _selectedCategory,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.category),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    _dynamicCategories.isEmpty 
+                      ? const Center(child: LinearProgressIndicator())
+                      : DropdownButtonFormField<String>(
+                          value: _selectedCategory,
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.category),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          items: _dynamicCategories.map((category) {
+                            return DropdownMenuItem(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCategory = value!;
+                            });
+                          },
                         ),
-                      ),
-                      items: _categories.map((category) {
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCategory = value!;
-                        });
-                      },
-                    ),
                     const SizedBox(height: 20),
 
                     // Description Field
@@ -213,18 +215,36 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: state is CreateRequestLoading
+                        onPressed: state is CreateRequestLoading || _selectedCategory == null
                             ? null
-                            : () {
+                            : () async {
                                 if (_formKey.currentState!.validate()) {
-                                  context.read<CreateRequestBloc>().add(
-                                        SubmitRequest(
-                                          title: _titleController.text,
-                                          description: _descriptionController.text,
-                                          category: _selectedCategory,
-                                          budget: double.tryParse(_budgetController.text) ?? 0.0,
+                                  try {
+                                    // Automatically fetch location on click
+                                    final position = await LocationHelper.getCurrentPosition();
+                                    
+                                    if (mounted) {
+                                      context.read<CreateRequestBloc>().add(
+                                            SubmitRequest(
+                                              title: _titleController.text,
+                                              description: _descriptionController.text,
+                                              category: _selectedCategory!,
+                                              latitude: position.latitude,
+                                              longitude: position.longitude,
+                                              budget: double.tryParse(_budgetController.text) ?? 0.0,
+                                            ),
+                                          );
+                                    }
+                                  } catch (e) {
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('📍 Location Error: $e'),
+                                          backgroundColor: Colors.orange,
                                         ),
                                       );
+                                    }
+                                  }
                                 }
                               },
                         style: ElevatedButton.styleFrom(

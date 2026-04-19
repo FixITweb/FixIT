@@ -14,14 +14,16 @@ class WorkerBookingsBloc extends Bloc<WorkerBookingsEvent, WorkerBookingsState> 
         final bookings = await bookingRepository.getBookings();
         
         // Convert to worker booking models
-        final workerBookings = bookings.map((booking) => WorkerBookingModel(
-          id: booking.id.toString(),
-          serviceTitle: booking.service?.title ?? 'Unknown Service',
-          customerName: booking.customer?.username ?? 'Unknown Customer',
-          scheduledDate: booking.createdAt,
-          status: _capitalizeStatus(booking.status),
-          price: booking.service?.price ?? 0.0,
-        )).toList();
+        final workerBookings = bookings.map((booking) {
+          return WorkerBookingModel(
+            id: booking.id.toString(),
+            serviceTitle: booking.service.title,
+            customerName: booking.customer?.username ?? 'Unknown Customer',
+            scheduledDate: booking.createdAt,
+            status: _capitalizeStatus(booking.status),
+            price: booking.service.price,
+          );
+        }).toList();
         
         emit(WorkerBookingsLoaded(workerBookings));
       } catch (e) {

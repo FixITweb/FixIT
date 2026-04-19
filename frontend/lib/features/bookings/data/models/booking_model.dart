@@ -19,8 +19,18 @@ class BookingModel {
       service: ServiceInfo.fromJson(json['service'] ?? {}),
       customer: json['customer'] != null ? CustomerInfo.fromJson(json['customer']) : null,
       status: json['status'] ?? 'pending',
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: _parseDate(json['created_at']),
     );
+  }
+
+  static DateTime _parseDate(dynamic dateStr) {
+    if (dateStr == null) return DateTime.now();
+    try {
+      return DateTime.parse(dateStr.toString());
+    } catch (e) {
+      print("Error parsing date: $dateStr. Using current time.");
+      return DateTime.now();
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -54,12 +64,19 @@ class ServiceInfo {
   factory ServiceInfo.fromJson(Map<String, dynamic> json) {
     return ServiceInfo(
       id: json['id'] ?? 0,
-      title: json['title'] ?? '',
+      title: json['title'] ?? 'Unavailable Service',
       description: json['description'] ?? '',
       category: json['category'] ?? '',
-      price: (json['price'] ?? 0).toDouble(),
+      price: _toDouble(json['price']),
       worker: WorkerInfo.fromJson(json['worker'] ?? {}),
     );
+  }
+
+  static double _toDouble(dynamic val) {
+    if (val == null) return 0.0;
+    if (val is num) return val.toDouble();
+    if (val is String) return double.tryParse(val) ?? 0.0;
+    return 0.0;
   }
 
   Map<String, dynamic> toJson() {
@@ -86,7 +103,7 @@ class WorkerInfo {
   factory WorkerInfo.fromJson(Map<String, dynamic> json) {
     return WorkerInfo(
       id: json['id'] ?? 0,
-      username: json['username'] ?? '',
+      username: json['username'] ?? 'Unknown Worker',
     );
   }
 
@@ -110,7 +127,7 @@ class CustomerInfo {
   factory CustomerInfo.fromJson(Map<String, dynamic> json) {
     return CustomerInfo(
       id: json['id'] ?? 0,
-      username: json['username'] ?? '',
+      username: json['username'] ?? 'Unknown Customer',
     );
   }
 

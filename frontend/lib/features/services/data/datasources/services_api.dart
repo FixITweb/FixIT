@@ -46,6 +46,17 @@ class ServiceApi {
     }
   }
 
+  //  FETCH CATEGORIES
+  Future<List<String>> fetchCategories() async {
+    try {
+      final res = await client.get(Endpoints.categories);
+      final List data = res.data;
+      return data.map((e) => e.toString()).toList();
+    } catch (e) {
+      throw Exception("Fetch categories failed: $e");
+    }
+  }
+
   //  CREATE SERVICE
   Future<void> createService({
     required String title,

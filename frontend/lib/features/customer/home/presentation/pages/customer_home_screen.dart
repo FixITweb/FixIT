@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
-import '../../../../../shared/data/mock_data.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/filter_bottom_sheet.dart';
 import '../../../../../shared/widgets/theme_toggle_button.dart';
 import '../../../../../core/network/api_client.dart';
 import '../../../../services/data/datasources/services_api.dart';
@@ -89,7 +89,20 @@ class CustomerHomeView extends StatelessWidget {
                               const ThemeToggleButton(),
                               IconButton(
                                 icon: const Icon(Icons.tune, color: Colors.white),
-                                onPressed: () {},
+                                onPressed: () {
+                                  final homeBloc = context.read<HomeBloc>();
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                                    ),
+                                    builder: (context) => BlocProvider.value(
+                                      value: homeBloc,
+                                      child: FilterBottomSheet(state: state),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -151,9 +164,9 @@ class CustomerHomeView extends StatelessWidget {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: categories.length,
+                    itemCount: state.categories.length + 1,
                     itemBuilder: (context, index) {
-                      final cat = categories[index];
+                      final cat = index == 0 ? 'All' : state.categories[index - 1];
                       final isSelected = cat == state.selectedCategory;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8, top: 16),

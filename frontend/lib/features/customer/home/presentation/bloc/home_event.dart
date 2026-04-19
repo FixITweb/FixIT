@@ -11,3 +11,19 @@ class SearchServices extends HomeEvent {
   final String query;
   SearchServices(this.query);
 }
+
+class ApplyFilters extends HomeEvent {
+  final String? category;
+  final double? minPrice;
+  final double? maxPrice;
+  final double? radius;
+  final String? sort;
+
+  ApplyFilters({
+    this.category,
+    this.minPrice,
+    this.maxPrice,
+    this.radius,
+    this.sort,
+  });
+}

@@ -11,9 +11,13 @@ class BookingRepository {
     return data.map((e) => BookingModel.fromJson(e)).toList();
   }
 
-  Future<BookingModel> createBooking(int serviceId) async {
-    final data = await api.createBooking(serviceId);
-    return BookingModel.fromJson(data);
+  Future<bool> createBooking(int serviceId) async {
+    try {
+      await api.createBooking(serviceId);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<BookingModel> updateBooking(int bookingId, String status) async {

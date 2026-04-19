@@ -21,8 +21,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     on<CreateBooking>((event, emit) async {
       emit(BookingLoading());
       try {
-        final booking = await repo.createBooking(event.serviceId);
-        emit(BookingCreated(booking));
+        final success = await repo.createBooking(event.serviceId);
+        if (success) {
+          emit(BookingCreated());
+          add(LoadBookings()); // Refresh the list
+        } else {
+          emit(BookingError('Failed to create booking'));
+        }
       } catch (e) {
         emit(BookingError('Failed to create booking: ${e.toString()}'));
       }
