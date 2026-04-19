@@ -12,6 +12,7 @@ from .views import (
     update_booking,
     create_rating,
     get_ratings,
+    categories
 )
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
 
     # SERVICES
     path('services/', services),
+    path('categories/', categories),
     # SMART SEARCH
     path('search/', smart_search),
 

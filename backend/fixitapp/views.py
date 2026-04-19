@@ -50,6 +50,17 @@ def login(request):
 def profile(request):
     return Response(UserProfileSerializer(request.user).data)
 
+@api_view(['GET'])
+def categories(request):
+    categories = (
+        Service.objects
+        .exclude(category__isnull=True)
+        .exclude(category__exact='')
+        .values_list('category', flat=True)
+        .distinct()
+        .order_by('category')
+    )
+    return Response(categories)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
