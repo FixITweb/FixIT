@@ -14,6 +14,7 @@ class SearchServices extends HomeEvent {
 
 class ApplyFilters extends HomeEvent {
   final String? category;
+  final String? searchQuery;
   final double? minPrice;
   final double? maxPrice;
   final double? radius;
@@ -21,6 +22,7 @@ class ApplyFilters extends HomeEvent {
 
   ApplyFilters({
     this.category,
+    this.searchQuery,
     this.minPrice,
     this.maxPrice,
     this.radius,

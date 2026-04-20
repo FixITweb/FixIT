@@ -58,6 +58,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final currentState = state as HomeLoaded;
         add(ApplyFilters(
           category: event.category,
+          searchQuery: currentState.searchQuery,
           minPrice: currentState.minPrice,
           maxPrice: currentState.maxPrice,
           radius: currentState.radius,
@@ -71,6 +72,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final currentState = state as HomeLoaded;
         add(ApplyFilters(
           category: currentState.selectedCategory,
+          searchQuery: event.query,
           minPrice: currentState.minPrice,
           maxPrice: currentState.maxPrice,
           radius: currentState.radius,
@@ -99,12 +101,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }
         }
 
+        final currentQuery = event.searchQuery ?? currentState.searchQuery;
+        final actualRadius = event.radius == 50.0 ? null : event.radius;
+        final actualMaxPrice = event.maxPrice == 500.0 ? null : event.maxPrice;
+        final actualMinPrice = event.minPrice == 0.0 ? null : event.minPrice;
+
         final services = await serviceRepository.getServices(
-          search: currentState.searchQuery.isEmpty ? null : currentState.searchQuery,
+          search: currentQuery.isEmpty ? null : currentQuery,
           category: event.category == 'All' ? null : event.category,
-          minPrice: event.minPrice,
-          maxPrice: event.maxPrice,
-          radius: event.radius,
+          minPrice: actualMinPrice,
+          maxPrice: actualMaxPrice,
+          radius: actualRadius,
           sort: event.sort,
           lat: lat,
           lng: lng,
@@ -114,6 +121,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           services: services,
           filteredServices: services,
           selectedCategory: event.category,
+          searchQuery: currentQuery,
           minPrice: event.minPrice,
           maxPrice: event.maxPrice,
           radius: event.radius,
