@@ -26,7 +26,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       widget.state.minPrice ?? 0,
       widget.state.maxPrice ?? 500,
     );
-    _radius = widget.state.radius ?? 10;
+    _radius = widget.state.radius ?? 50;
     _sort = widget.state.sort;
   }
 
@@ -54,7 +54,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   setState(() {
                     _selectedCategory = 'All';
                     _priceRange = const RangeValues(0, 500);
-                    _radius = 10;
+                    _radius = 50;
                     _sort = null;
                   });
                 },
