@@ -64,7 +64,7 @@ class CustomerHomeView extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xFF14B8A6), Color(0xFFF97316)],
+                      colors: [Color(0xFF10B981), Color(0xFF3B82F6)],
                     ),
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(32),
@@ -141,12 +141,12 @@ class CustomerHomeView extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF14B8A6).withOpacity(0.1),
+                                  color: const Color(0xFF10B981).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: const Icon(
                                   Icons.arrow_forward,
-                                  color: Color(0xFF14B8A6),
+                                  color: Color(0xFF10B981),
                                   size: 18,
                                 ),
                               ),
@@ -208,7 +208,7 @@ class CustomerHomeView extends StatelessWidget {
                                 label: const Text('Post Job Request'),
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                                  backgroundColor: const Color(0xFF14B8A6),
+                                  backgroundColor: const Color(0xFF10B981),
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -239,7 +239,7 @@ class CustomerHomeView extends StatelessWidget {
                                 contentPadding: const EdgeInsets.all(12),
                                 leading: CircleAvatar(
                                   radius: 32,
-                                  backgroundColor: const Color(0xFF14B8A6),
+                                  backgroundColor: const Color(0xFF10B981),
                                   child: Text(
                                     service.category.substring(0, 1).toUpperCase(),
                                     style: const TextStyle(
@@ -279,7 +279,7 @@ class CustomerHomeView extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF14B8A6),
+                                    color: Color(0xFF10B981),
                                   ),
                                 ),
                                 onTap: () => Navigator.pushNamed(

@@ -43,7 +43,7 @@ class BookingsView extends StatelessWidget {
               background: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF14B8A6), Color(0xFFF97316)],
+                    colors: [Color(0xFF10B981), Color(0xFF3B82F6)],
                   ),
                 ),
               ),
@@ -154,10 +154,10 @@ class _BookingCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF14B8A6).withOpacity(0.1),
+                    color: const Color(0xFF10B981).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.work_outline, color: Color(0xFF14B8A6)),
+                  child: const Icon(Icons.work_outline, color: Color(0xFF10B981)),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -192,7 +192,7 @@ class _BookingCard extends StatelessWidget {
                     if (booking.service.price > 0)
                       Text(
                         "\$${booking.service.price.toStringAsFixed(0)}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF14B8A6)),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF10B981)),
                       )
                     else
                       const Text(
@@ -238,7 +238,7 @@ class _BookingCard extends StatelessWidget {
                     icon: const Icon(Icons.star_outline),
                     label: const Text('Rate Worker'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF97316),
+                      backgroundColor: const Color(0xFF3B82F6),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),

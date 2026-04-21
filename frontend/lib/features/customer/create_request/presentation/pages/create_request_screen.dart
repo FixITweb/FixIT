@@ -93,12 +93,12 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                   children: [
                     // Info Card
                     Card(
-                      color: const Color(0xFF14B8A6).withOpacity(0.1),
+                      color: const Color(0xFF10B981).withOpacity(0.1),
                       child: const Padding(
                         padding: EdgeInsets.all(16),
                         child: Row(
                           children: [
-                            Icon(Icons.info_outline, color: Color(0xFF14B8A6)),
+                            Icon(Icons.info_outline, color: Color(0xFF10B981)),
                             SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -248,7 +248,7 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                                 }
                               },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF14B8A6),
+                          backgroundColor: const Color(0xFF10B981),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

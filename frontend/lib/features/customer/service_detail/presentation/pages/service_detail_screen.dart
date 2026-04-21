@@ -46,10 +46,10 @@ class ServiceDetailView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF14B8A6).withOpacity(0.1),
+                  color: const Color(0xFF10B981).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle, color: Color(0xFF14B8A6), size: 64),
+                child: const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 64),
               ),
               const SizedBox(height: 24),
               const Text(
@@ -72,7 +72,7 @@ class ServiceDetailView extends StatelessWidget {
                     Navigator.pushReplacementNamed(context, '/bookings');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF14B8A6),
+                    backgroundColor: const Color(0xFF10B981),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -149,7 +149,7 @@ class ServiceDetailView extends StatelessWidget {
                     height: 280,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF14B8A6), Color(0xFFF97316)],
+                        colors: [Color(0xFF10B981), Color(0xFF3B82F6)],
                       ),
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(32),
@@ -317,7 +317,7 @@ class ServiceDetailView extends StatelessWidget {
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF14B8A6),
+                              backgroundColor: const Color(0xFF10B981),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               elevation: 2,

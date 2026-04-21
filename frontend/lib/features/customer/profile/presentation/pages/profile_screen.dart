@@ -68,7 +68,7 @@ class CustomerProfileView extends StatelessWidget {
                   child: ListTile(
                     leading: CircleAvatar(
                       radius: 40,
-                      backgroundColor: const Color(0xFF14B8A6),
+                      backgroundColor: const Color(0xFF10B981),
                       child: Text(
                         profile.username.substring(0, 1).toUpperCase(),
                         style: const TextStyle(

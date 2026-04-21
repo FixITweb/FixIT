@@ -88,8 +88,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         _selectedCategory = cat;
                       });
                     },
-                    selectedColor: const Color(0xFF14B8A6).withOpacity(0.2),
-                    checkmarkColor: const Color(0xFF14B8A6),
+                    selectedColor: const Color(0xFF10B981).withOpacity(0.2),
+                    checkmarkColor: const Color(0xFF10B981),
                   ),
                 );
               },
@@ -107,7 +107,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ),
               Text(
                 '\$${_priceRange.start.round()} - \$${_priceRange.end.round()}',
-                style: const TextStyle(color: Color(0xFF14B8A6), fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -120,7 +120,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               '\$${_priceRange.start.round()}',
               '\$${_priceRange.end.round()}',
             ),
-            activeColor: const Color(0xFF14B8A6),
+            activeColor: const Color(0xFF10B981),
             onChanged: (values) {
               setState(() {
                 _priceRange = values;
@@ -139,7 +139,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ),
               Text(
                 '${_radius.round()} km',
-                style: const TextStyle(color: Color(0xFF14B8A6), fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -149,7 +149,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             max: 50,
             divisions: 49,
             label: '${_radius.round()} km',
-            activeColor: const Color(0xFF14B8A6),
+            activeColor: const Color(0xFF10B981),
             onChanged: (value) {
               setState(() {
                 _radius = value;
@@ -206,7 +206,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF14B8A6),
+                backgroundColor: const Color(0xFF10B981),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -247,8 +247,8 @@ class _SortChip extends StatelessWidget {
       onSelected: (selected) {
         onSelected(selected ? value : null);
       },
-      selectedColor: const Color(0xFF14B8A6).withOpacity(0.2),
-      checkmarkColor: const Color(0xFF14B8A6),
+      selectedColor: const Color(0xFF10B981).withOpacity(0.2),
+      checkmarkColor: const Color(0xFF10B981),
     );
   }
 }

@@ -80,7 +80,7 @@ class WorkerDashboardView extends StatelessWidget {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF14B8A6), Color(0xFFF97316)],
+                          colors: [Color(0xFF10B981), Color(0xFF3B82F6)],
                         ),
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -388,7 +388,7 @@ class _ActionButton extends StatelessWidget {
           color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF14B8A6).withOpacity(0.3),
+            color: const Color(0xFF10B981).withOpacity(0.3),
           ),
           boxShadow: [
             BoxShadow(
@@ -402,7 +402,7 @@ class _ActionButton extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: const Color(0xFF14B8A6),
+              color: const Color(0xFF10B981),
               size: 28,
             ),
             const SizedBox(height: 8),
@@ -411,7 +411,7 @@ class _ActionButton extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF14B8A6),
+                color: Color(0xFF10B981),
               ),
             ),
           ],
