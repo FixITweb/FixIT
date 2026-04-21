@@ -7,6 +7,7 @@ import '../../data/repositories/booking_repository.dart';
 import '../../data/datasources/booking_api.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../customer/home/presentation/widgets/bottom_nav.dart';
+import '../../../ratings/presentation/pages/rating_page.dart';
 
 class BookingsScreen extends StatelessWidget {
   const BookingsScreen({super.key});
@@ -212,6 +213,40 @@ class _BookingCard extends StatelessWidget {
                 ),
               ],
             ),
+            if (booking.status.toLowerCase().contains('complet'))
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RatingPage(
+                            workerId: booking.service.worker.id ?? 0,
+                            workerName: booking.service.worker.username ?? 'Unknown',
+                            serviceName: booking.service.title ?? 'Service',
+                          ),
+                        ),
+                      ).then((result) {
+                        if (result == true) {
+                          context.read<BookingBloc>().add(LoadBookings());
+                        }
+                      });
+                    },
+                    icon: const Icon(Icons.star_outline),
+                    label: const Text('Rate Worker'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF97316),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

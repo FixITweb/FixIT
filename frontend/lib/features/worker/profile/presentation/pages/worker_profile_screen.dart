@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../../profile/presentation/bloc/profile_event.dart';
-import '../../../../profile/presentation/bloc/profile_state.dart';
-import '../../../../profile/data/repositories/profile_repository.dart';
-import '../../../../profile/data/datasources/profile_api.dart';
+import '../bloc/worker_profile_bloc.dart';
+import '../bloc/worker_profile_event.dart';
+import '../bloc/worker_profile_state.dart';
+import '../../data/repositories/worker_profile_repository.dart';
+import '../../data/datasources/worker_profile_api.dart';
 import '../../../../../core/network/api_client.dart';
 import '../../../dashboard/presentation/widgets/worker_bottom_nav.dart';
 import '../../../../../shared/widgets/theme_toggle_button.dart';
@@ -15,9 +15,9 @@ class WorkerProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProfileBloc(
-        ProfileRepository(ProfileApi(ApiClient())),
-      )..add(LoadProfile()),
+      create: (context) => WorkerProfileBloc(
+        WorkerProfileRepository(WorkerProfileApi(ApiClient())),
+      )..add(LoadWorkerProfile()),
       child: const WorkerProfileView(),
     );
   }
@@ -35,199 +35,253 @@ class WorkerProfileView extends StatelessWidget {
           ThemeToggleButton(),
         ],
       ),
-      body: BlocBuilder<ProfileBloc, ProfileState>(
+      body: BlocBuilder<WorkerProfileBloc, WorkerProfileState>(
         builder: (context, state) {
-          if (state is ProfileLoading) {
+          if (state is WorkerProfileLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state is ProfileError) {
+          if (state is WorkerProfileError) {
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text('Error: ${state.message}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => context.read<ProfileBloc>().add(LoadProfile()),
-                    child: const Text('Retry'),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    const Text('Failed to load profile.', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.message.split('\n').first,
+                      style: const TextStyle(color: Colors.red),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => context.read<WorkerProfileBloc>().add(LoadWorkerProfile()),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
               ),
             );
           }
 
-          if (state is ProfileLoaded) {
+          if (state is WorkerProfileLoaded) {
             final profile = state.profile;
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Card(
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 40,
-                      backgroundColor: const Color(0xFF14B8A6),
-                      child: Text(
-                        profile.username.substring(0, 1).toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<WorkerProfileBloc>().add(RefreshWorkerProfile());
+              },
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: const Color(0xFF14B8A6),
+                        child: Text(
+                          profile.username.substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-                    title: Text(
-                      profile.username,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      "WORKER • Joined ${_formatDate(profile.createdAt)}",
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                
-                // Worker Stats Card
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Worker Statistics",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard("Services", "3", Icons.work, Colors.blue),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildStatCard("Rating", "4.8", Icons.star, Colors.amber),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard("Bookings", "12", Icons.calendar_today, Colors.green),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildStatCard("Earnings", "\$2.4K", Icons.attach_money, Colors.teal),
-                            ),
-                          ],
-                        ),
-                      ],
+                      title: Text(
+                        profile.username,
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        "WORKER • Joined ${_formatDate(profile.createdAt)}",
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                
-                // Account Information Card
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Account Information",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow("Username", profile.username),
-                        _buildInfoRow("Role", "WORKER"),
-                        _buildInfoRow("Member Since", _formatDate(profile.createdAt)),
-                        _buildInfoRow("Worker ID", "#${profile.id}"),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                
-                const Divider(),
-                
-                // Menu Items
-                ListTile(
-                  leading: const Icon(Icons.work),
-                  title: const Text("Manage Services"),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/worker-services');
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.calendar_today),
-                  title: const Text("My Bookings"),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/worker-bookings');
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text("Account Settings"),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/settings');
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.notifications),
-                  title: const Text("Notifications"),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () => Navigator.pushNamed(context, '/worker-notifications'),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.help),
-                  title: const Text("Help & Support"),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    // Navigate to help
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Logout'),
-                        content: const Text('Are you sure you want to logout?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
+                  const SizedBox(height: 20),
+                  
+                  // Worker Stats Card
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Worker Statistics",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                '/login',
-                                (route) => false,
-                              );
-                            },
-                            child: const Text('Logout'),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  "Services",
+                                  profile.servicesCount.toString(),
+                                  Icons.work,
+                                  Colors.blue,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _buildStatCard(
+                                  "Rating",
+                                  profile.averageRating.toStringAsFixed(1),
+                                  Icons.star,
+                                  Colors.amber,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  "Bookings",
+                                  profile.bookingsCount.toString(),
+                                  Icons.calendar_today,
+                                  Colors.green,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _buildStatCard(
+                                  "Earnings",
+                                  "\$${profile.totalEarnings.toStringAsFixed(0)}",
+                                  Icons.attach_money,
+                                  Colors.teal,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
-              ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // Account Information Card
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Account Information",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildInfoRow("Username", profile.username),
+                          _buildInfoRow("Email", profile.email),
+                          _buildInfoRow("Role", profile.role.toUpperCase()),
+                          _buildInfoRow("Member Since", _formatDate(profile.createdAt)),
+                          _buildInfoRow("Worker ID", "#${profile.id}"),
+                          _buildInfoRow("Completed Jobs", profile.completedJobs.toString()),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  const Divider(),
+                  
+                  // Menu Items
+                  ListTile(
+                    leading: const Icon(Icons.work),
+                    title: const Text("Manage Services"),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/worker-services');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: const Text("My Bookings"),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/worker-bookings');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text("Account Settings"),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/settings');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.notifications),
+                    title: const Text("Notifications"),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () => Navigator.pushNamed(context, '/worker-notifications'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.star),
+                    title: const Text("View My Ratings"),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/worker-ratings',
+                        arguments: {
+                          'workerId': state.profile.id,
+                          'workerName': state.profile.username,
+                          'averageRating': state.profile.averageRating,
+                        },
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.help),
+                    title: const Text("Help & Support"),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Help & Support coming soon!')),
+                      );
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text(
+                      "Logout",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Logout'),
+                          content: const Text('Are you sure you want to logout?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/login',
+                                  (route) => false,
+                                );
+                              },
+                              child: const Text('Logout'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             );
           }
 

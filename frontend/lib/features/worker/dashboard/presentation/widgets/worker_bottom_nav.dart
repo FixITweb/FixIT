@@ -15,7 +15,7 @@ class WorkerBottomNav extends StatelessWidget {
       onTap: (index) {
         switch (index) {
           case 0:
-            Navigator.pushReplacementNamed(context, '/worker-dashboard');
+            Navigator.pushReplacementNamed(context, '/worker-home');
             break;
           case 1:
             Navigator.pushReplacementNamed(context, '/worker-services');

@@ -22,6 +22,7 @@ urlpatterns = [
 
     # SERVICES
     path('services/', services),
+    path('services/<int:service_id>/', services),
     # SMART SEARCH
     path('search/', smart_search),
 

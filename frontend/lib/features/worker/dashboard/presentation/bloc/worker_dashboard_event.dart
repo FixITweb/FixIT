@@ -1,5 +1,11 @@
-abstract class WorkerDashboardEvent {}
+abstract class WorkerDashboardEvent {
+  const WorkerDashboardEvent();
+}
 
-class LoadWorkerDashboard extends WorkerDashboardEvent {}
+class LoadWorkerDashboard extends WorkerDashboardEvent {
+  const LoadWorkerDashboard();
+}
 
-class RefreshDashboard extends WorkerDashboardEvent {}
+class RefreshWorkerDashboard extends WorkerDashboardEvent {
+  const RefreshWorkerDashboard();
+}

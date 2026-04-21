@@ -26,7 +26,7 @@ class WorkerOnboardingScreen extends StatelessWidget {
             ),
             const SizedBox(height: 60),
             ElevatedButton(
-              onPressed: () => Navigator.pushReplacementNamed(context, '/worker-dashboard'),
+              onPressed: () => Navigator.pushReplacementNamed(context, '/worker-home'),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),

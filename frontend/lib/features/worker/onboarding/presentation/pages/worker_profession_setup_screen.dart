@@ -150,7 +150,7 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
                     Expanded(
                       child: OutlinedButton(
                         onPressed: _isLoading ? null : () {
-                          Navigator.pushReplacementNamed(context, '/worker-dashboard');
+                          Navigator.pushReplacementNamed(context, '/worker-home');
                         },
                         child: const Text('Skip for Now'),
                       ),
@@ -206,7 +206,7 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
           ),
         );
         
-        Navigator.pushReplacementNamed(context, '/worker-dashboard');
+        Navigator.pushReplacementNamed(context, '/worker-home');
       }
     } catch (e) {
       if (mounted) {

@@ -1,31 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'worker_bookings_event.dart';
 import 'worker_bookings_state.dart';
-import '../../../../bookings/data/repositories/booking_repository.dart';
+import '../../data/repositories/worker_bookings_repository.dart';
+import '../../data/models/worker_booking_model.dart';
 
 class WorkerBookingsBloc extends Bloc<WorkerBookingsEvent, WorkerBookingsState> {
-  final BookingRepository bookingRepository;
+  final WorkerBookingsRepository repository;
 
-  WorkerBookingsBloc(this.bookingRepository) : super(WorkerBookingsInitial()) {
+  WorkerBookingsBloc(this.repository) : super(WorkerBookingsInitial()) {
     on<LoadWorkerBookings>((event, emit) async {
       emit(WorkerBookingsLoading());
       try {
-        // Load real bookings from API
-        final bookings = await bookingRepository.getBookings();
-        
-        // Convert to worker booking models
-        final workerBookings = bookings.map((booking) {
-          return WorkerBookingModel(
-            id: booking.id.toString(),
-            serviceTitle: booking.service.title,
-            customerName: booking.customer?.username ?? 'Unknown Customer',
-            scheduledDate: booking.createdAt,
-            status: _capitalizeStatus(booking.status),
-            price: booking.service.price,
-          );
-        }).toList();
-        
-        emit(WorkerBookingsLoaded(workerBookings));
+        final bookings = await repository.getWorkerBookings();
+        emit(WorkerBookingsLoaded(bookings));
       } catch (e) {
         emit(WorkerBookingsError('Failed to load bookings: ${e.toString()}'));
       }
@@ -33,9 +20,9 @@ class WorkerBookingsBloc extends Bloc<WorkerBookingsEvent, WorkerBookingsState> 
 
     on<AcceptBooking>((event, emit) async {
       try {
-        await bookingRepository.updateBooking(int.parse(event.bookingId), 'accepted');
+        await repository.acceptBooking(event.bookingId);
         emit(WorkerBookingUpdated('Booking accepted successfully!'));
-        add(LoadWorkerBookings()); // Reload bookings
+        add(LoadWorkerBookings());
       } catch (e) {
         emit(WorkerBookingsError('Failed to accept booking: ${e.toString()}'));
       }
@@ -43,9 +30,9 @@ class WorkerBookingsBloc extends Bloc<WorkerBookingsEvent, WorkerBookingsState> 
 
     on<RejectBooking>((event, emit) async {
       try {
-        await bookingRepository.updateBooking(int.parse(event.bookingId), 'rejected');
+        await repository.rejectBooking(event.bookingId);
         emit(WorkerBookingUpdated('Booking rejected'));
-        add(LoadWorkerBookings()); // Reload bookings
+        add(LoadWorkerBookings());
       } catch (e) {
         emit(WorkerBookingsError('Failed to reject booking: ${e.toString()}'));
       }
@@ -53,16 +40,12 @@ class WorkerBookingsBloc extends Bloc<WorkerBookingsEvent, WorkerBookingsState> 
 
     on<CompleteBooking>((event, emit) async {
       try {
-        await bookingRepository.updateBooking(int.parse(event.bookingId), 'completed');
+        await repository.completeBooking(event.bookingId);
         emit(WorkerBookingUpdated('Booking marked as completed!'));
-        add(LoadWorkerBookings()); // Reload bookings
+        add(LoadWorkerBookings());
       } catch (e) {
         emit(WorkerBookingsError('Failed to complete booking: ${e.toString()}'));
       }
     });
-  }
-
-  String _capitalizeStatus(String status) {
-    return status.substring(0, 1).toUpperCase() + status.substring(1);
   }
 }

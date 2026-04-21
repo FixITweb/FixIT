@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/worker_bookings_bloc.dart';
 import '../bloc/worker_bookings_event.dart';
 import '../bloc/worker_bookings_state.dart';
+import '../../data/models/worker_booking_model.dart';
+import '../../data/datasources/worker_bookings_api.dart';
+import '../../data/repositories/worker_bookings_repository.dart';
 import '../../../dashboard/presentation/widgets/worker_bottom_nav.dart';
-import '../../../../bookings/data/repositories/booking_repository.dart';
-import '../../../../bookings/data/datasources/booking_api.dart';
 import '../../../../../core/network/api_client.dart';
 
 class WorkerBookingsScreen extends StatelessWidget {
@@ -15,25 +16,40 @@ class WorkerBookingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => WorkerBookingsBloc(
-        BookingRepository(BookingApi(ApiClient())),
+        WorkerBookingsRepository(WorkerBookingsApi(ApiClient())),
       )..add(LoadWorkerBookings()),
       child: const WorkerBookingsView(),
     );
   }
 }
 
-class WorkerBookingsView extends StatelessWidget {
+class WorkerBookingsView extends StatefulWidget {
   const WorkerBookingsView({super.key});
 
   @override
+  State<WorkerBookingsView> createState() => _WorkerBookingsViewState();
+}
+
+class _WorkerBookingsViewState extends State<WorkerBookingsView> {
+  String _selectedFilter = 'all';
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[50],
       appBar: AppBar(
         title: const Text("Incoming Bookings", style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => context.read<WorkerBookingsBloc>().add(LoadWorkerBookings()),
+          ),
+        ],
       ),
       body: BlocConsumer<WorkerBookingsBloc, WorkerBookingsState>(
         listener: (context, state) {
@@ -84,7 +100,7 @@ class WorkerBookingsView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.calendar_today_outlined, size: 80, color: Colors.grey[300]),
+                    Icon(Icons.calendar_today_outlined, size: 80, color: Colors.grey[isDark ? 700 : 300]),
                     const SizedBox(height: 24),
                     const Text(
                       "No New Bookings",
@@ -100,17 +116,74 @@ class WorkerBookingsView extends StatelessWidget {
               );
             }
 
+            // Filter bookings based on selected filter
+            final filteredBookings = _selectedFilter == 'all'
+                ? state.bookings
+                : state.bookings.where((b) => b.status.toLowerCase() == _selectedFilter).toList();
+
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<WorkerBookingsBloc>().add(LoadWorkerBookings());
               },
-              child: ListView.builder(
-                padding: const EdgeInsets.all(20),
-                itemCount: state.bookings.length,
-                itemBuilder: (context, index) {
-                  final booking = state.bookings[index];
-                  return _WorkerBookingCard(booking: booking);
-                },
+              child: Column(
+                children: [
+                  // Filter chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        _FilterChip(
+                          label: 'All',
+                          isSelected: _selectedFilter == 'all',
+                          onTap: () => setState(() => _selectedFilter = 'all'),
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Pending',
+                          isSelected: _selectedFilter == 'pending',
+                          onTap: () => setState(() => _selectedFilter = 'pending'),
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Accepted',
+                          isSelected: _selectedFilter == 'accepted',
+                          onTap: () => setState(() => _selectedFilter = 'accepted'),
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Completed',
+                          isSelected: _selectedFilter == 'completed',
+                          onTap: () => setState(() => _selectedFilter = 'completed'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: filteredBookings.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[isDark ? 700 : 300]),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No ${_selectedFilter} bookings',
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(20),
+                            itemCount: filteredBookings.length,
+                            itemBuilder: (context, index) {
+                              final booking = filteredBookings[index];
+                              return _WorkerBookingCard(booking: booking);
+                            },
+                          ),
+                  ),
+                ],
               ),
             );
           }
@@ -129,17 +202,18 @@ class _WorkerBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     bool isPending = booking.status.toLowerCase() == 'pending';
     bool isAccepted = booking.status.toLowerCase() == 'accepted';
     
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -319,6 +393,45 @@ class _ActionRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF14B8A6) : (isDark ? const Color(0xFF2A2A2A) : Colors.white),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF14B8A6) : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.grey[700]),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

@@ -1,12 +1,20 @@
+import '../models/worker_dashboard_model.dart';
 import '../../../../../core/network/api_client.dart';
 
 class WorkerDashboardApi {
-  final ApiClient client;
+  final ApiClient apiClient;
 
-  WorkerDashboardApi(this.client);
+  WorkerDashboardApi(this.apiClient);
 
-  Future<Map<String, dynamic>> getDashboardStats() async {
-    final res = await client.get('worker/dashboard/');
-    return res.data;
+  Future<WorkerDashboardModel> getWorkerDashboard() async {
+    try {
+      final response = await apiClient.get(
+        'auth/profile/',
+        requireAuth: true,
+      );
+      return WorkerDashboardModel.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to load worker dashboard: $e');
+    }
   }
 }

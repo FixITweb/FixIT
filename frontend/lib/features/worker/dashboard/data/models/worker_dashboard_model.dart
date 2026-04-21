@@ -1,43 +1,39 @@
 class WorkerDashboardModel {
   final String username;
+  final double averageRating;
   final double totalEarnings;
-  final int activeBookings;
+  final int bookingsCount;
   final int completedJobs;
-  final double rating;
-  final int totalBookings;
-  final int totalServices;
+  final int servicesCount;
 
   WorkerDashboardModel({
     required this.username,
+    required this.averageRating,
     required this.totalEarnings,
-    required this.activeBookings,
+    required this.bookingsCount,
     required this.completedJobs,
-    required this.rating,
-    required this.totalBookings,
-    required this.totalServices,
+    required this.servicesCount,
   });
 
   factory WorkerDashboardModel.fromJson(Map<String, dynamic> json) {
     return WorkerDashboardModel(
       username: json['username'] ?? '',
+      averageRating: (json['average_rating'] ?? 0).toDouble(),
       totalEarnings: (json['total_earnings'] ?? 0).toDouble(),
-      activeBookings: json['active_bookings'] ?? 0,
+      bookingsCount: json['bookings_count'] ?? 0,
       completedJobs: json['completed_jobs'] ?? 0,
-      rating: (json['rating'] ?? 0).toDouble(),
-      totalBookings: json['total_bookings'] ?? 0,
-      totalServices: json['total_services'] ?? 0,
+      servicesCount: json['services_count'] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'username': username,
+      'average_rating': averageRating,
       'total_earnings': totalEarnings,
-      'active_bookings': activeBookings,
+      'bookings_count': bookingsCount,
       'completed_jobs': completedJobs,
-      'rating': rating,
-      'total_bookings': totalBookings,
-      'total_services': totalServices,
+      'services_count': servicesCount,
     };
   }
 }

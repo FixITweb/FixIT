@@ -13,11 +13,12 @@ import '../../features/bookings/presentation/pages/bookings_screen.dart';
 import '../../features/customer/profile/presentation/pages/profile_screen.dart';
 import '../../features/worker/onboarding/presentation/pages/worker_onboarding_screen.dart';
 import '../../features/worker/onboarding/presentation/pages/worker_profession_setup_screen.dart';
-import '../../features/worker/dashboard/presentation/pages/worker_dashboard_screen.dart';
+import '../../features/worker/dashboard/presentation/pages/worker_dashboard_screen.dart' as worker_home;
 import '../../features/worker/services/presentation/pages/worker_services_screen.dart';
 import '../../features/worker/bookings/presentation/pages/worker_bookings_screen.dart';
 import '../../features/worker/notifications/presentation/pages/worker_notifications_screen.dart';
 import '../../features/worker/profile/presentation/pages/worker_profile_screen.dart';
+import '../../features/ratings/presentation/pages/worker_ratings_page.dart';
 import '../../features/settings/presentation/pages/settings_screen.dart';
 
 class AppRouter {
@@ -56,8 +57,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const WorkerOnboardingScreen());
       case '/worker-profession-setup':
         return MaterialPageRoute(builder: (_) => const WorkerProfessionSetupScreen());
-      case '/worker-dashboard':
-        return MaterialPageRoute(builder: (_) => const WorkerDashboardScreen());
+      case '/worker-home':
+        return MaterialPageRoute(builder: (_) => const worker_home.WorkerDashboardScreen());
       case '/worker-services':
         return MaterialPageRoute(builder: (_) => const WorkerServicesScreen());
       case '/worker-bookings':
@@ -66,6 +67,15 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const WorkerNotificationsScreen());
       case '/worker-profile':
         return MaterialPageRoute(builder: (_) => const WorkerProfileScreen());
+      case '/worker-ratings':
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (_) => WorkerRatingsPage(
+            workerId: args?['workerId'] ?? 0,
+            workerName: args?['workerName'] ?? 'Worker',
+            averageRating: args?['averageRating'] ?? 0.0,
+          ),
+        );
       case '/settings':
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
       default:

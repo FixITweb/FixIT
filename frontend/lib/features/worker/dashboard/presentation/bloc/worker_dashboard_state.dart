@@ -1,31 +1,25 @@
-class WorkerDashboardData {
-  final double totalEarnings;
-  final int activeBookings;
-  final int completedJobs;
-  final double rating;
-  final String username;
+import '../../data/models/worker_dashboard_model.dart';
 
-  WorkerDashboardData({
-    required this.totalEarnings,
-    required this.activeBookings,
-    required this.completedJobs,
-    required this.rating,
-    required this.username,
-  });
+abstract class WorkerDashboardState {
+  const WorkerDashboardState();
 }
 
-abstract class WorkerDashboardState {}
+class WorkerDashboardInitial extends WorkerDashboardState {
+  const WorkerDashboardInitial();
+}
 
-class WorkerDashboardInitial extends WorkerDashboardState {}
-
-class WorkerDashboardLoading extends WorkerDashboardState {}
+class WorkerDashboardLoading extends WorkerDashboardState {
+  const WorkerDashboardLoading();
+}
 
 class WorkerDashboardLoaded extends WorkerDashboardState {
-  final WorkerDashboardData data;
-  WorkerDashboardLoaded(this.data);
+  final WorkerDashboardModel dashboard;
+
+  const WorkerDashboardLoaded({required this.dashboard});
 }
 
 class WorkerDashboardError extends WorkerDashboardState {
   final String message;
-  WorkerDashboardError(this.message);
+
+  const WorkerDashboardError({required this.message});
 }

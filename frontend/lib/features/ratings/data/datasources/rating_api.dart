@@ -1,26 +1,47 @@
 import '../../../../core/network/api_client.dart';
-import '../../../../core/network/endpoints.dart';
+import '../models/rating_model.dart';
 
 class RatingApi {
-  final ApiClient client;
+  final ApiClient apiClient;
 
-  RatingApi(this.client);
+  RatingApi(this.apiClient);
 
-  Future<Map<String, dynamic>> createRating({
+  Future<Map<String, dynamic>> submitRating({
     required int workerId,
     required double rating,
     required String review,
   }) async {
-    final res = await client.post(Endpoints.ratings, data: {
-      'worker_id': workerId,
-      'rating': rating,
-      'review': review,
-    });
-    return res.data;
+    try {
+      final response = await apiClient.post(
+        'ratings/',
+        data: {
+          'worker_id': workerId,
+          'rating': rating,
+          'review': review,
+        },
+        requireAuth: true,
+      );
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to submit rating: $e');
+    }
   }
 
-  Future<List<dynamic>> getWorkerRatings(int workerId) async {
-    final res = await client.get('${Endpoints.ratings}$workerId/');
-    return res.data;
+  Future<List<RatingModel>> getWorkerRatings(int workerId) async {
+    try {
+      final response = await apiClient.get(
+        'ratings/$workerId/',
+        requireAuth: false,
+      );
+      
+      if (response.data is List) {
+        return (response.data as List)
+            .map((json) => RatingModel.fromJson(json))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to load ratings: $e');
+    }
   }
 }

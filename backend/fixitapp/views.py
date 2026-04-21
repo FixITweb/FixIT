@@ -51,9 +51,47 @@ def profile(request):
     return Response(UserProfileSerializer(request.user).data)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def services(request):
+def services(request, service_id=None):
+
+    # DELETE SERVICE
+    if request.method == 'DELETE' and service_id:
+        service = get_object_or_404(Service, id=service_id)
+        
+        if service.worker != request.user:
+            return Response({"error": "Not allowed"}, status=403)
+        
+        # Check for active bookings
+        active_bookings = Booking.objects.filter(
+            service=service,
+            status__in=['pending', 'accepted']
+        ).count()
+        
+        if active_bookings > 0:
+            return Response({
+                "error": f"Cannot delete service with {active_bookings} active booking(s)"
+            }, status=400)
+        
+        service_title = service.title
+        service.delete()
+        
+        return Response({
+            "message": f"Service '{service_title}' deleted successfully"
+        })
+
+    # UPDATE SERVICE
+    if request.method == 'PUT' and service_id:
+        service = get_object_or_404(Service, id=service_id)
+        
+        if service.worker != request.user:
+            return Response({"error": "Not allowed"}, status=403)
+        
+        serializer = ServiceSerializer(service, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
 
     if request.method == 'POST':
         if request.user.role != 'worker':
@@ -250,15 +288,29 @@ def bookings(request):
 
     if request.method == 'GET':
         if request.user.role == 'customer':
-            data = Booking.objects.filter(customer=request.user)
+            data = Booking.objects.filter(customer=request.user).select_related('service', 'service__worker', 'customer')
         else:
-            data = Booking.objects.filter(service__worker=request.user)
+            data = Booking.objects.filter(service__worker=request.user).select_related('service', 'service__worker', 'customer')
 
         return Response([
             {
                 "id": b.id,
                 "status": b.status,
-                "created_at": b.created_at
+                "service": {
+                    "id": b.service.id,
+                    "title": b.service.title,
+                    "price": b.service.price,
+                    "worker": {
+                        "id": b.service.worker.id,
+                        "username": b.service.worker.username
+                    }
+                },
+                "customer": {
+                    "id": b.customer.id,
+                    "username": b.customer.username
+                },
+                "created_at": b.created_at,
+                "scheduled_date": b.scheduled_date
             } for b in data
         ])
 
@@ -283,7 +335,21 @@ def bookings(request):
         return Response({
             "id": booking.id,
             "status": booking.status,
-            "created_at": booking.created_at
+            "service": {
+                "id": booking.service.id,
+                "title": booking.service.title,
+                "price": booking.service.price,
+                "worker": {
+                    "id": booking.service.worker.id,
+                    "username": booking.service.worker.username
+                }
+            },
+            "customer": {
+                "id": booking.customer.id,
+                "username": booking.customer.username
+            },
+            "created_at": booking.created_at,
+            "scheduled_date": booking.scheduled_date
         }, status=201)
     
 # UPDATE BOOKINGS
@@ -380,8 +446,11 @@ def get_ratings(request, worker_id):
         "average_rating": avg or 0,
         "ratings": [
             {
+                "id": r.id,
                 "rating": r.rating,
                 "review": r.review,
+                "customer_id": r.customer.id if r.customer else None,
+                "customer_name": r.customer.username if r.customer else "Anonymous",
                 "created_at": r.created_at
             } for r in ratings
         ]
