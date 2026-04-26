@@ -262,7 +262,7 @@ def job_requests(request):
 @permission_classes([IsAuthenticated])
 def notifications_list(request):
 
-    data = Notification.objects.all()
+    data = Notification.objects.filter(user=request.user)
 
     return Response([
         {
