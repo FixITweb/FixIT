@@ -77,10 +77,8 @@ class NotificationSerializer(serializers.ModelSerializer):
         ]
         
 class BookingSerializer(serializers.ModelSerializer):
-    service_title = serializers.CharField(source='service.title', read_only=True)
-    service_price = serializers.FloatField(source='service.price', read_only=True)
-    worker_username = serializers.CharField(source='service.worker.username', read_only=True)
-    customer_username = serializers.CharField(source='customer.username', read_only=True)
+    service = ServiceSerializer(read_only=True)
+    customer = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -89,12 +87,14 @@ class BookingSerializer(serializers.ModelSerializer):
             "status",
             "created_at",
             "service",
-            "service_title",
-            "service_price",
-            "worker_username",
-            "customer",
-            "customer_username"
+            "customer"
         ]
+
+    def get_customer(self, obj):
+        return {
+            "id": obj.customer.id,
+            "username": obj.customer.username
+        }
 
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
