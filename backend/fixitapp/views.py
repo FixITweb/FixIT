@@ -336,7 +336,7 @@ def bookings(request):
         )
 
         serializer = BookingSerializer(booking)
-        return Response(serializer.data, status=201)
+        return Response([serializer.data], status=201)
 
 
 # UPDATE BOOKING
