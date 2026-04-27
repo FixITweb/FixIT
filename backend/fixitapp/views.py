@@ -14,7 +14,8 @@ from .serializers import (
     JobRequestSerializer,
     RegisterSerializer,
     UserProfileSerializer,
-    ServiceSerializer
+    ServiceSerializer,
+    BookingSerializer
 )
 from .utils import match_services, calculate_distance,is_match
 from .permissions import IsWorker
@@ -287,49 +288,51 @@ def mark_as_read(request, id):
     notification.save() 
     return Response({"message": "Marked as read"})
 
-# BOOKINGS 
+# BOOKINGS
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def bookings(request):
 
+    # ---------------- GET ----------------
     if request.method == 'GET':
+
         if request.user.role == 'customer':
-            data = Booking.objects.filter(customer=request.user).select_related('service', 'service__worker', 'customer')
+            data = Booking.objects.filter(
+                customer=request.user
+            ).select_related('service', 'service__worker', 'customer')
         else:
-            data = Booking.objects.filter(service__worker=request.user).select_related('service', 'service__worker', 'customer')
+            data = Booking.objects.filter(
+                service__worker=request.user
+            ).select_related('service', 'service__worker', 'customer')
 
-        return Response([
-            {
-                "id": b.id,
-                "status": b.status,
-                "service": {
-                    "id": b.service.id,
-                    "title": b.service.title,
-                    "price": b.service.price,
-                    "worker": {
-                        "id": b.service.worker.id,
-                        "username": b.service.worker.username
-                    }
-                },
-                "customer": {
-                    "id": b.customer.id,
-                    "username": b.customer.username
-                },
-                "created_at": b.created_at,
-                "scheduled_date": b.scheduled_date
-            } for b in data
-        ])
+        serializer = BookingSerializer(data, many=True)
 
+        return Response({
+            "count": len(serializer.data),
+            "results": serializer.data
+        })
+
+
+    # ---------------- POST ----------------
     if request.method == 'POST':
+
         if request.user.role != 'customer':
             return Response({"error": "Only customers can book"}, status=403)
 
-        service_id = request.data.get('service_id')
+        # accept both service_id or service
+        service_id = request.data.get('service_id') or request.data.get('service')
+
+        if not service_id:
+            return Response({"error": "service_id is required"}, status=400)
+
         service = get_object_or_404(Service, id=service_id)
+
+        scheduled_date = request.data.get('scheduled_date')
 
         booking = Booking.objects.create(
             service=service,
-            customer=request.user
+            customer=request.user,
+            scheduled_date=scheduled_date if scheduled_date else None
         )
 
         Notification.objects.create(
@@ -338,27 +341,11 @@ def bookings(request):
             message="New booking request"
         )
 
-        return Response({
-            "id": booking.id,
-            "status": booking.status,
-            "service": {
-                "id": booking.service.id,
-                "title": booking.service.title,
-                "price": booking.service.price,
-                "worker": {
-                    "id": booking.service.worker.id,
-                    "username": booking.service.worker.username
-                }
-            },
-            "customer": {
-                "id": booking.customer.id,
-                "username": booking.customer.username
-            },
-            "created_at": booking.created_at,
-            "scheduled_date": booking.scheduled_date
-        }, status=201)
-    
-# UPDATE BOOKINGS
+        serializer = BookingSerializer(booking)
+        return Response(serializer.data, status=201)
+
+
+# UPDATE BOOKING
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_booking(request, id):
@@ -382,11 +369,8 @@ def update_booking(request, id):
         message=f"Booking {new_status}"
     )
 
-    return Response({
-        "id": booking.id,
-        "status": booking.status
-    })
-
+    serializer = BookingSerializer(booking)
+    return Response(serializer.data)
 
 # RATINGS 
 @api_view(['POST'])

@@ -75,17 +75,26 @@ class NotificationSerializer(serializers.ModelSerializer):
             "created_at",
             "is_read"
         ]
-
-
 class BookingSerializer(serializers.ModelSerializer):
+    service_title = serializers.CharField(source='service.title', read_only=True)
+    service_price = serializers.DecimalField(source='service.price', max_digits=10, decimal_places=2, read_only=True)
+    worker_username = serializers.CharField(source='service.worker.username', read_only=True)
+    customer_username = serializers.CharField(source='customer.username', read_only=True)
+
     class Meta:
         model = Booking
         fields = [
             "id",
             "status",
-            "created_at"
+            "created_at",
+            "scheduled_date",
+            "service",
+            "service_title",
+            "service_price",
+            "worker_username",
+            "customer",
+            "customer_username"
         ]
-
 
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
