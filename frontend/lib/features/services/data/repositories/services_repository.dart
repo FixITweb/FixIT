@@ -33,6 +33,10 @@ class ServiceRepository {
     );
   }
 
+  Future<List<ServiceModel>> getMyServices() async {
+    return await api.fetchMyServices();
+  }
+
   //  FETCH CATEGORIES
   Future<List<String>> getCategories() async {
     return await api.fetchCategories();

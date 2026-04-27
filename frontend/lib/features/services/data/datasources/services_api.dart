@@ -46,6 +46,16 @@ class ServiceApi {
     }
   }
 
+  Future<List<ServiceModel>> fetchMyServices() async {
+    try {
+      final res = await client.get(Endpoints.myServices);
+      final List data = res.data;
+      return data.map((e) => ServiceModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception("Fetch my services failed: $e");
+    }
+  }
+
   //  FETCH CATEGORIES
   Future<List<String>> fetchCategories() async {
     try {

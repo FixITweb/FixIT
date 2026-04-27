@@ -18,7 +18,7 @@ class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> 
   Future<void> _onLoad(LoadWorkerServices event, Emitter emit) async {
     emit(WorkerServicesLoading());
     try {
-      final services = await serviceRepository.getServices();
+      final services = await serviceRepository.getMyServices();
       _services = services;
       emit(WorkerServicesLoaded(_services));
     } catch (e) {
@@ -38,7 +38,7 @@ class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> 
         longitude: 0.0,
       );
       emit(WorkerServiceAdded('Service added successfully!'));
-      final services = await serviceRepository.getServices();
+      final services = await serviceRepository.getMyServices();
       _services = services;
       emit(WorkerServicesLoaded(_services));
     } catch (e) {
@@ -57,7 +57,7 @@ class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> 
         price: event.price,
       );
       emit(WorkerServiceUpdated('Service updated successfully!'));
-      final services = await serviceRepository.getServices();
+      final services = await serviceRepository.getMyServices();
       _services = services;
       emit(WorkerServicesLoaded(_services));
     } catch (e) {
@@ -70,7 +70,7 @@ class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> 
     try {
       await serviceRepository.deleteService(event.id);
       emit(WorkerServiceDeleted('Service deleted.'));
-      final services = await serviceRepository.getServices();
+      final services = await serviceRepository.getMyServices();
       _services = services;
       emit(WorkerServicesLoaded(_services));
     } catch (e) {
