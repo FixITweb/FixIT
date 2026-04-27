@@ -461,3 +461,18 @@ def get_ratings(request, worker_id):
             } for r in ratings
         ]
     })
+
+@api_view(['GET'])
+def categories(request):
+    categories = (
+        Service.objects
+        .exclude(category__isnull=True)
+        .exclude(category__exact='')
+        .values_list('category', flat=True)
+        .distinct()
+        .order_by('category')
+    )
+    return Response(categories)
+
+
+

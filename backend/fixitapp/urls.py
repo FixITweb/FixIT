@@ -13,6 +13,7 @@ from .views import (
     create_rating,
     get_ratings,
     my_services, 
+    categories,
 )
 
 urlpatterns = [
@@ -43,4 +44,7 @@ urlpatterns = [
     # RATINGS
     path('ratings/', create_rating),
     path('ratings/<int:worker_id>/', get_ratings),
+
+    # CATEGORIES
+    path('categories/', categories), 
 ]
