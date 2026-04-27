@@ -17,7 +17,7 @@ from .serializers import (
     ServiceSerializer
 )
 from .utils import match_services, calculate_distance,is_match
-
+from .permissions import IsWorker
 
 @api_view(['POST'])
 def register(request):
@@ -50,6 +50,12 @@ def login(request):
 def profile(request):
     return Response(UserProfileSerializer(request.user).data)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsWorker])
+def my_services(request):
+    services = Service.objects.filter(worker=request.user)
+    serializer = ServiceSerializer(services, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])

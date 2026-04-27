@@ -12,6 +12,7 @@ from .views import (
     update_booking,
     create_rating,
     get_ratings,
+    my_services, 
 )
 
 urlpatterns = [
@@ -23,6 +24,8 @@ urlpatterns = [
     # SERVICES
     path('services/', services),
     path('services/<int:service_id>/', services),
+    path('my-services/', my_services), 
+
     # SMART SEARCH
     path('search/', smart_search),
 
@@ -31,7 +34,6 @@ urlpatterns = [
 
     # NOTIFICATIONS 
     path('notifications/', notifications_list),
-
     path('notifications/<int:id>/', mark_as_read),
 
     # BOOKINGS
