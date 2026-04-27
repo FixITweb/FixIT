@@ -75,9 +75,10 @@ class NotificationSerializer(serializers.ModelSerializer):
             "created_at",
             "is_read"
         ]
+        
 class BookingSerializer(serializers.ModelSerializer):
     service_title = serializers.CharField(source='service.title', read_only=True)
-    service_price = serializers.DecimalField(source='service.price', max_digits=10, decimal_places=2, read_only=True)
+    service_price = serializers.FloatField(source='service.price', read_only=True)
     worker_username = serializers.CharField(source='service.worker.username', read_only=True)
     customer_username = serializers.CharField(source='customer.username', read_only=True)
 
@@ -87,7 +88,6 @@ class BookingSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "created_at",
-            "scheduled_date",
             "service",
             "service_title",
             "service_price",

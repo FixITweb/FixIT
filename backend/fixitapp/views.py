@@ -327,13 +327,11 @@ def bookings(request):
 
         service = get_object_or_404(Service, id=service_id)
 
-        scheduled_date = request.data.get('scheduled_date')
 
         booking = Booking.objects.create(
-            service=service,
-            customer=request.user,
-            scheduled_date=scheduled_date if scheduled_date else None
-        )
+                service=service,
+                customer=request.user
+            )
 
         Notification.objects.create(
             user=service.worker,
