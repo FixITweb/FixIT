@@ -15,9 +15,18 @@ class BookingModel {
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      id: json['id'],
-      service: ServiceInfo.fromJson(json['service'] ?? {}),
-      customer: json['customer'] != null ? CustomerInfo.fromJson(json['customer']) : null,
+      id: json['id'] ?? 0,
+
+      // SAFE SERVICE PARSING (fixes your crash)
+      service: (json['service'] is Map<String, dynamic>)
+          ? ServiceInfo.fromJson(json['service'])
+          : ServiceInfo.empty(),
+
+      // SAFE CUSTOMER PARSING
+      customer: (json['customer'] is Map<String, dynamic>)
+          ? CustomerInfo.fromJson(json['customer'])
+          : null,
+
       status: json['status'] ?? 'pending',
       createdAt: _parseDate(json['created_at']),
     );
@@ -28,7 +37,6 @@ class BookingModel {
     try {
       return DateTime.parse(dateStr.toString());
     } catch (e) {
-      print("Error parsing date: $dateStr. Using current time.");
       return DateTime.now();
     }
   }
@@ -68,7 +76,10 @@ class ServiceInfo {
       description: json['description'] ?? '',
       category: json['category'] ?? '',
       price: _toDouble(json['price']),
-      worker: WorkerInfo.fromJson(json['worker'] ?? {}),
+
+      worker: (json['worker'] is Map<String, dynamic>)
+          ? WorkerInfo.fromJson(json['worker'])
+          : WorkerInfo.empty(),
     );
   }
 
@@ -89,6 +100,18 @@ class ServiceInfo {
       'worker': worker.toJson(),
     };
   }
+
+  // 🔥 EMPTY FALLBACK (VERY IMPORTANT)
+  factory ServiceInfo.empty() {
+    return ServiceInfo(
+      id: 0,
+      title: 'Unavailable Service',
+      description: '',
+      category: '',
+      price: 0.0,
+      worker: WorkerInfo.empty(),
+    );
+  }
 }
 
 class WorkerInfo {
@@ -104,6 +127,13 @@ class WorkerInfo {
     return WorkerInfo(
       id: json['id'] ?? 0,
       username: json['username'] ?? 'Unknown Worker',
+    );
+  }
+
+  factory WorkerInfo.empty() {
+    return WorkerInfo(
+      id: 0,
+      username: 'Unknown Worker',
     );
   }
 
@@ -128,6 +158,13 @@ class CustomerInfo {
     return CustomerInfo(
       id: json['id'] ?? 0,
       username: json['username'] ?? 'Unknown Customer',
+    );
+  }
+
+  factory CustomerInfo.empty() {
+    return CustomerInfo(
+      id: 0,
+      username: 'Unknown Customer',
     );
   }
 
