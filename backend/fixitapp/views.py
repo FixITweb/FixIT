@@ -297,20 +297,16 @@ def bookings(request):
     if request.method == 'GET':
 
         if request.user.role == 'customer':
-            data = Booking.objects.filter(
+            bookings_qs = Booking.objects.filter(
                 customer=request.user
             ).select_related('service', 'service__worker', 'customer')
         else:
-            data = Booking.objects.filter(
+            bookings_qs = Booking.objects.filter(
                 service__worker=request.user
             ).select_related('service', 'service__worker', 'customer')
 
-        serializer = BookingSerializer(data, many=True)
-
-        return Response({
-            "count": len(serializer.data),
-            "results": serializer.data
-        })
+        serializer = BookingSerializer(bookings_qs, many=True)
+        return Response(serializer.data)
 
 
     # ---------------- POST ----------------
