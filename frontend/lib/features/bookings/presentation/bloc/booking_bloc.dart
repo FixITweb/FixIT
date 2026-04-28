@@ -42,5 +42,22 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         emit(BookingError('Failed to update booking: ${e.toString()}'));
       }
     });
+
+    //new
+    on<DeleteBooking>((event, emit) async {
+  emit(BookingDeleteLoading()); // new (small loader only)
+
+  try {
+    final success = await repo.deleteBooking(event.bookingId);
+
+    if (success) {
+      add(LoadBookings());
+    } else {
+      emit(BookingError("Failed to delete booking"));
+    }
+  } catch (e) {
+    emit(BookingError(e.toString()));
+  }
+});
   }
 }

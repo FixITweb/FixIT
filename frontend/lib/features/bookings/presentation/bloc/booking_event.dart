@@ -12,3 +12,10 @@ class UpdateBooking extends BookingEvent {
   final String status;
   UpdateBooking(this.bookingId, this.status);
 }
+
+//new
+class DeleteBooking extends BookingEvent {
+  final int bookingId;
+
+  DeleteBooking(this.bookingId);
+}

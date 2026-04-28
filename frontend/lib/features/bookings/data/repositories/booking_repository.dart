@@ -24,4 +24,15 @@ class BookingRepository {
     final data = await api.updateBooking(bookingId, status);
     return BookingModel.fromJson(data);
   }
+
+//new
+  Future<bool> deleteBooking(int bookingId) async {
+  try {
+    await api.deleteBooking(bookingId);
+    return true;
+  } catch (e) {
+    print("Delete booking error: $e");
+    return false;
+  }
+}
 }

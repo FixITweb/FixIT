@@ -31,4 +31,9 @@ class BookingApi {
     });
     return res.data as Map<String, dynamic>;
   }
+
+  //new
+  Future<void> deleteBooking(int id) async {
+  await client.delete('${Endpoints.deleteBooking}$id/');
+}
 }

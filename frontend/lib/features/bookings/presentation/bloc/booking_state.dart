@@ -22,3 +22,10 @@ class BookingError extends BookingState {
   final String message;
   BookingError(this.message);
 }
+
+//new
+class BookingDeleted extends BookingState {
+  final String message;
+
+  BookingDeleted(this.message);
+}
