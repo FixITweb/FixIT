@@ -2,17 +2,30 @@ from rest_framework import serializers
 from .models import JobRequest, Notification, Booking, Rating, User, Service
 
 
+# class RegisterSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True)
+
+#     role = serializers.ChoiceField(
+#         choices=User.ROLE_CHOICES,
+#         required=True
+#     )
+
+#     class Meta:
+#         model = User
+#         fields = ['username', 'password', 'role']
+
+#     def create(self, validated_data):
+#         return User.objects.create_user(**validated_data)
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    phone_number = serializers.CharField(required=False, allow_blank=True)
 
-    role = serializers.ChoiceField(
-        choices=User.ROLE_CHOICES,
-        required=True
-    )
+    role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'role']
+        fields = ['username', 'password', 'role', 'phone_number']
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
@@ -79,6 +92,8 @@ class NotificationSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     service = ServiceSerializer(read_only=True)
     customer = serializers.SerializerMethodField()
+    worker_phone = serializers.SerializerMethodField()
+    customer_phone = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -88,7 +103,8 @@ class BookingSerializer(serializers.ModelSerializer):
             "created_at",
             "service",
             "customer",
-            "phone_number"
+            "customer_phone",
+            "worker_phone"
         ]
 
     def get_customer(self, obj):
@@ -97,6 +113,31 @@ class BookingSerializer(serializers.ModelSerializer):
             "username": obj.customer.username
         }
 
+    def get_customer_phone(self, obj):
+        request = self.context.get("request")
+        if not request:
+            return None
+
+        if obj.status != "accepted":
+            return None
+
+        if request.user.role == "worker":
+            return obj.customer.phone_number
+
+        return None
+
+    def get_worker_phone(self, obj):
+        request = self.context.get("request")
+        if not request:
+            return None
+
+        if obj.status != "accepted":
+            return None
+
+        if request.user.role == "customer":
+            return obj.service.worker.phone_number
+
+        return None
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating

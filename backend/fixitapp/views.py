@@ -305,7 +305,14 @@ def bookings(request):
                 service__worker=request.user
             ).select_related('service', 'service__worker', 'customer')
 
-        serializer = BookingSerializer(bookings_qs, many=True)
+        # serializer = BookingSerializer(bookings_qs, many=True)
+        # return Response(serializer.data)
+
+        serializer = BookingSerializer(
+            bookings_qs,
+            many=True,
+            context={"request": request}
+        )
         return Response(serializer.data)
 
 
@@ -325,10 +332,9 @@ def bookings(request):
 
 
         booking = Booking.objects.create(
-                service=service,
-                customer=request.user,
-                phone_number=request.data.get('phone_number')  
-            )
+            service=service,
+            customer=request.user
+        )
 
         Notification.objects.create(
             user=service.worker,
@@ -336,8 +342,14 @@ def bookings(request):
             message="New booking request"
         )
 
-        serializer = BookingSerializer(booking)
-        return Response([serializer.data], status=201)
+        # serializer = BookingSerializer(booking)
+        # return Response([serializer.data], status=201)
+        serializer = BookingSerializer(
+            booking,
+            context={"request": request}
+        )
+
+        return Response(serializer.data, status=201)
 
 
 # UPDATE BOOKING
@@ -364,7 +376,10 @@ def update_booking(request, id):
         message=f"Booking {new_status}"
     )
 
-    serializer = BookingSerializer(booking)
+    serializer = BookingSerializer(
+        booking,
+        context={"request": request}
+    )
     return Response(serializer.data)
 
 #Delete Booking
