@@ -178,9 +178,34 @@ class _BookingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                _StatusChip(status: booking.status, color: statusColor),
+                //_StatusChip(status: booking.status, color: statusColor),
+              
               ],
             ),
+
+            //new
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _StatusChip(
+              status: booking.status,
+              color: _getStatusColor(booking.status),
+            ),
+
+            if (booking.status.toLowerCase().contains("pend"))
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  context.read<BookingBloc>().add(DeleteBooking(booking.id)); // new
+                },
+              ),
+          ],
+        ),
+
+
             const Divider(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,6 +238,7 @@ class _BookingCard extends StatelessWidget {
                 ),
               ],
             ),
+            
             if (booking.status.toLowerCase().contains('complet'))
               Padding(
                 padding: const EdgeInsets.only(top: 16),

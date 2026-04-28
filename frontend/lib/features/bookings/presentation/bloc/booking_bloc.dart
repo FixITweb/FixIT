@@ -45,13 +45,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
     //new
     on<DeleteBooking>((event, emit) async {
-  emit(BookingDeleteLoading()); // new (small loader only)
-
   try {
     final success = await repo.deleteBooking(event.bookingId);
 
     if (success) {
-      add(LoadBookings());
+      add(LoadBookings()); 
     } else {
       emit(BookingError("Failed to delete booking"));
     }
