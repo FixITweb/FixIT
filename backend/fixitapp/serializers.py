@@ -87,7 +87,8 @@ class BookingSerializer(serializers.ModelSerializer):
             "status",
             "created_at",
             "service",
-            "customer"
+            "customer",
+            "phone_number"
         ]
 
     def get_customer(self, obj):

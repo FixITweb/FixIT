@@ -14,6 +14,7 @@ from .views import (
     get_ratings,
     my_services, 
     categories,
+    delete_booking,
 )
 
 urlpatterns = [
@@ -40,6 +41,7 @@ urlpatterns = [
     # BOOKINGS
     path('bookings/', bookings),
     path('bookings/<int:id>/', update_booking),
+    path('booking/delete/<int:id>/', delete_booking),
 
     # RATINGS
     path('ratings/', create_rating),

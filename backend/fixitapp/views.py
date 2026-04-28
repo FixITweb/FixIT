@@ -326,7 +326,8 @@ def bookings(request):
 
         booking = Booking.objects.create(
                 service=service,
-                customer=request.user
+                customer=request.user,
+                phone_number=request.data.get('phone_number')  
             )
 
         Notification.objects.create(
@@ -365,6 +366,23 @@ def update_booking(request, id):
 
     serializer = BookingSerializer(booking)
     return Response(serializer.data)
+
+#Delete Booking
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_booking(request, id):
+
+    booking = get_object_or_404(Booking, id=id)
+
+    if booking.customer != request.user:
+        return Response({"error": "Not allowed"}, status=403)
+
+    if booking.status == 'accepted':
+        return Response({"error": "Cannot delete accepted booking"}, status=400)
+
+    booking.delete()
+
+    return Response({"message": "Booking deleted successfully"}, status=200)
 
 # RATINGS 
 @api_view(['POST'])
