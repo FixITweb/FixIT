@@ -8,6 +8,7 @@ import '../../data/datasources/booking_api.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../customer/home/presentation/widgets/bottom_nav.dart';
 import '../../../ratings/presentation/pages/rating_page.dart';
+import '../../data/models/booking_model.dart';
 
 class BookingsScreen extends StatelessWidget {
   const BookingsScreen({super.key});
@@ -171,9 +172,6 @@ class _BookingCard extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       //new
-if (booking.service != null &&
-    booking.service.worker != null &&
-    booking.service.worker.username != null)
   Text(
     "Worker: ${booking.service.worker.username}",
     style: TextStyle(color: Colors.grey[600]),
@@ -211,7 +209,7 @@ if (booking.status.toLowerCase().contains("accepted")) ...[
               color: _getStatusColor(booking.status),
             ),
 
-            if (booking.status.toLowerCase().contains("pend"))
+            if (booking.status.toLowerCase() == "pending")
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -268,9 +266,9 @@ if (booking.status.toLowerCase().contains("accepted")) ...[
                         context,
                         MaterialPageRoute(
                           builder: (context) => RatingPage(
-                            workerId: booking.service.worker.id ?? 0,
-                            workerName: booking.service.worker.username ?? 'Unknown',
-                            serviceName: booking.service.title ?? 'Service',
+                            workerId: booking.service.worker.id,
+                            workerName: booking.service.worker.username,
+                            serviceName: booking.service.title,
                           ),
                         ),
                       ).then((result) {
@@ -299,9 +297,9 @@ if (booking.status.toLowerCase().contains("accepted")) ...[
 
   Color _getStatusColor(String status) {
     status = status.toLowerCase();
-    if (status.contains('accept')) return Colors.green;
-    if (status.contains('pend')) return Colors.orange;
-    if (status.contains('complet')) return Colors.blue;
+    if (status.contains('accepted')) return Colors.green;
+    if (status.contains('pending')) return Colors.orange;
+    if (status.contains('completed')) return Colors.blue;
     return Colors.red;
   }
 }
