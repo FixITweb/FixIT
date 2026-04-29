@@ -39,8 +39,8 @@ class BookingModel {
         json['createdAt'] ?? json['created_at'],
       ),
 
-      customerPhone: json['customerPhone'],
-      workerPhone: json['workerPhone'],
+      customerPhone: json['customerPhone']?.toString() ?? json['customer_phone']?.toString(),
+      workerPhone: json['workerPhone']?.toString() ?? json['worker_phone']?.toString(),
     );
   }
 

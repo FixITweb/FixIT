@@ -12,7 +12,12 @@ class BookingApi {
 
     //new
     print("==== BOOKINGS API RESPONSE ===="); 
-    print(res.data); 
+    print("🔥 RAW BOOKINGS RESPONSE:");
+    print(res.data);
+
+    for (var b in res.data) {
+      print("📦 booking item: $b");
+    } 
 
     return (res.data as List)
       .map((e) => Map<String, dynamic>.from(e))

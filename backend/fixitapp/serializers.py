@@ -142,35 +142,15 @@ class BookingSerializer(serializers.ModelSerializer):
         ]
 
     def get_customerPhone(self, obj):
-        request = self.context.get("request")
+        return getattr(obj.customer, "phone_number", None)
 
-        if not request or not request.user.is_authenticated:
-            return None
-
-        user = request.user
-
-        if str(getattr(user, "role", "")).strip().lower() == "worker":
-            return getattr(obj.customer, "phone_number", None)
-
-        return None
-
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        print("BOOKING SERIALIZER OUTPUT:", data)
+        return data
 
     def get_workerPhone(self, obj):
-        request = self.context.get("request")
-
-        if not request or not request.user.is_authenticated:
-            return None
-
-        user = request.user
-        role = str(getattr(user, "role", "")).strip().lower()
-
-        if role == "customer" and obj.status == "accepted":
-            return getattr(obj.service.worker, "phone_number", None)
-
-        if role == "worker":
-            return getattr(obj.service.worker, "phone_number", None)
-
-        return None
+        return getattr(obj.service.worker, "phone_number", None)
         
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
