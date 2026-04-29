@@ -41,6 +41,7 @@ from .models import JobRequest, Notification, Booking, Rating, User, Service
 
 #         user.save()
 #         return user
+
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -119,48 +120,68 @@ class NotificationSerializer(serializers.ModelSerializer):
         
 
 class BookingSerializer(serializers.ModelSerializer):
+    # nested data
     service = ServiceSerializer(read_only=True)
     customer = UserProfileSerializer(read_only=True)
 
-    customer_phone = serializers.SerializerMethodField()
-    worker_phone = serializers.SerializerMethodField()
+    # 🔥 rename fields to match Flutter
+    createdAt = serializers.DateTimeField(source="created_at", read_only=True)
+    customerPhone = serializers.SerializerMethodField()
+    workerPhone = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
         fields = [
             "id",
             "status",
-            "created_at",
+            "createdAt",      # ✅ camelCase for Flutter
             "service",
             "customer",
-            "customer_phone",
-            "worker_phone"
+            "customerPhone",  # ✅ camelCase
+            "workerPhone",    # ✅ camelCase
         ]
 
-    def get_customer_phone(self, obj):
+    # ===============================
+    # CUSTOMER PHONE (worker sees it)
+    # ===============================
+    def get_customerPhone(self, obj):
         request = self.context.get("request")
 
-        print("USER:", request.user)
-        print("ROLE:", request.user.role)
-        print("SERVICE WORKER:", obj.service.worker)
+        if not request or not hasattr(request, "user"):
+            return None
 
-        if request.user.role == "worker":
-            return obj.customer.phone_number
+        user = request.user
+
+        # only workers see customer phone
+        if getattr(user, "role", None) == "worker":
+            if obj.customer and obj.customer.phone_number:
+                return obj.customer.phone_number
 
         return None
 
-    def get_worker_phone(self, obj):
+    # ===============================
+    # WORKER PHONE (customer sees it)
+    # ===============================
+    def get_workerPhone(self, obj):
         request = self.context.get("request")
 
-        if not request:
+        if not request or not hasattr(request, "user"):
             return None
 
+        user = request.user
+
+        # only booking owner customer sees worker phone
         if (
-            request.user.role == "customer"
-            and obj.customer == request.user
-            and obj.status == "accepted"
+            getattr(user, "role", None) == "customer"
+            and obj.customer_id == user.id
+            and obj.status.lower() == "accepted"
         ):
-            return obj.service.worker.phone_number
+            if (
+                obj.service
+                and obj.service.worker
+                and obj.service.worker.phone_number
+            ):
+                return obj.service.worker.phone_number
 
         return None
         
