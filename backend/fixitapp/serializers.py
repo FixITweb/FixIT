@@ -134,57 +134,44 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "status",
-            "createdAt",      # ✅ camelCase for Flutter
+            "createdAt",      # camelCase for Flutter
             "service",
             "customer",
-            "customerPhone",  # ✅ camelCase
-            "workerPhone",    # ✅ camelCase
+            "customerPhone",  # camelCase
+            "workerPhone",    # camelCase
         ]
 
-    # ===============================
-    # CUSTOMER PHONE (worker sees it)
-    # ===============================
     def get_customerPhone(self, obj):
-        # request = self.context.get("request")
+        request = self.context.get("request")
 
-        # if not request or not hasattr(request, "user"):
-        #     return None
+        if not request or not request.user.is_authenticated:
+            return None
 
-        # user = request.user
+        user = request.user
 
-        # if getattr(user, "role", None) == "worker":
-        #     if obj.status and obj.status.lower().strip() == "accepted":
-        #         if obj.customer and obj.customer.phone_number:
-        #             return obj.customer.phone_number
+        # ONLY WORKER sees customer phone
+        if getattr(user, "role", None) == "worker":
+            return obj.customer.phone_number
 
-        # return None
-        return  obj.customer.phone_number
+        return None
 
-    # ===============================
-    # WORKER PHONE (customer sees it)
-    # ===============================
+
     def get_workerPhone(self, obj):
-        # request = self.context.get("request")
+        request = self.context.get("request")
 
-        # if not request or not hasattr(request, "user"):
-        #     return None
+        if not request or not request.user.is_authenticated:
+            return None
 
-        # user = request.user
+        user = request.user
 
-        # # only booking owner customer sees worker phone
-        # if (
-        #     getattr(user, "role", None) == "customer"
-        #     and obj.customer_id == user.id
-        #     and obj.status.lower() == "accepted"
-        # ):
-        #     if (
-        #         obj.service
-        #         and obj.service.worker
-        #         and obj.service.worker.phone_number
-        #     ):
-        #         return obj.service.worker.phone_number
+        # ONLY CUSTOMER sees worker phone (after accepted)
+        if (
+            getattr(user, "role", None) == "customer"
+            and obj.status.lower() == "accepted"
+        ):
+            return obj.service.worker.phone_number
 
-        return obj.service.worker.phone_number
+        return None
         
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
