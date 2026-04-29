@@ -124,26 +124,33 @@ class BookingSerializer(serializers.ModelSerializer):
     def get_customer_phone(self, obj):
         request = self.context.get("request")
 
-        # 👇 WORKER must see customer phone ALWAYS
-        if request and request.user.role == "worker":
-            return getattr(obj.customer, "phone_number", "")
+        if not request:
+            return None
 
-        # 👇 CUSTOMER sees their own phone
-        if request and request.user.role == "customer":
-            return getattr(obj.customer, "phone_number", "")
+        # Only the worker of THIS service
+        if (
+            request.user.role == "worker"
+            and obj.service.worker == request.user
+        ):
+            return obj.customer.phone_number
 
-        return ""
+        return None
 
     def get_worker_phone(self, obj):
         request = self.context.get("request")
 
-        # 👇 CUSTOMER sees worker phone ONLY after acceptance
-        if request and request.user.role == "customer":
-            if obj.status == "accepted":
-                return getattr(obj.service.worker, "phone_number", "")
+        if not request:
+            return None
 
-        return ""
-    
+        if (
+            request.user.role == "customer"
+            and obj.customer == request.user
+            and obj.status == "accepted"
+        ):
+            return obj.service.worker.phone_number
+
+        return None
+        
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
