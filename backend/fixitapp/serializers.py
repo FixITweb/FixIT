@@ -17,29 +17,45 @@ from .models import JobRequest, Notification, Booking, Rating, User, Service
 #     def create(self, validated_data):
 #         return User.objects.create_user(**validated_data)
 
+# class RegisterSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True)
+#     phone_number = serializers.CharField(required=False, allow_blank=True)
+
+#     role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
+
+#     class Meta:
+#         model = User
+#         fields = ['username', 'password', 'role', 'phone_number']
+
+#     def create(self, validated_data):
+#         password = validated_data.pop('password')
+
+#         # FIX HERE 
+#         phone = validated_data.pop('phone_number', None)
+
+#         user = User(**validated_data)
+#         user.set_password(password)
+
+#         if phone:
+#             user.phone_number = phone
+
+#         user.save()
+#         return user
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    phone_number = serializers.CharField(required=False, allow_blank=True)
-
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
-
     class Meta:
         model = User
-        fields = ['username', 'password', 'role', 'phone_number']
+        fields = ["username", "password", "role", "phone_number"]
+        extra_kwargs = {
+            "password": {"write_only": True}
+        }
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
-
-        # FIX HERE 👇
-        phone = validated_data.pop('phone_number', None)
-
-        user = User(**validated_data)
-        user.set_password(password)
-
-        if phone:
-            user.phone_number = phone
-
-        user.save()
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            password=validated_data["password"],
+            role=validated_data["role"],
+            phone_number=validated_data.get("phone_number")
+        )
         return user
 
 
@@ -124,14 +140,11 @@ class BookingSerializer(serializers.ModelSerializer):
     def get_customer_phone(self, obj):
         request = self.context.get("request")
 
-        if not request:
-            return None
+        print("USER:", request.user)
+        print("ROLE:", request.user.role)
+        print("SERVICE WORKER:", obj.service.worker)
 
-        # Only the worker of THIS service
-        if (
-            request.user.role == "worker"
-            and obj.service.worker == request.user
-        ):
+        if request.user.role == "worker":
             return obj.customer.phone_number
 
         return None
