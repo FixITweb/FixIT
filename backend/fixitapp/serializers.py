@@ -152,7 +152,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
         user = request.user
 
-        # only workers see customer phone
         if getattr(user, "role", None) == "worker":
             if obj.customer and obj.customer.phone_number:
                 return obj.customer.phone_number
