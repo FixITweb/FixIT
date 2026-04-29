@@ -145,45 +145,46 @@ class BookingSerializer(serializers.ModelSerializer):
     # CUSTOMER PHONE (worker sees it)
     # ===============================
     def get_customerPhone(self, obj):
-        request = self.context.get("request")
+        # request = self.context.get("request")
 
-        if not request or not hasattr(request, "user"):
-            return None
+        # if not request or not hasattr(request, "user"):
+        #     return None
 
-        user = request.user
+        # user = request.user
 
-        if getattr(user, "role", None) == "worker":
-            if obj.status and obj.status.lower().strip() == "accepted":
-                if obj.customer and obj.customer.phone_number:
-                    return obj.customer.phone_number
+        # if getattr(user, "role", None) == "worker":
+        #     if obj.status and obj.status.lower().strip() == "accepted":
+        #         if obj.customer and obj.customer.phone_number:
+        #             return obj.customer.phone_number
 
-        return None
+        # return None
+        return  obj.customer.phone_number
 
     # ===============================
     # WORKER PHONE (customer sees it)
     # ===============================
     def get_workerPhone(self, obj):
-        request = self.context.get("request")
+        # request = self.context.get("request")
 
-        if not request or not hasattr(request, "user"):
-            return None
+        # if not request or not hasattr(request, "user"):
+        #     return None
 
-        user = request.user
+        # user = request.user
 
-        # only booking owner customer sees worker phone
-        if (
-            getattr(user, "role", None) == "customer"
-            and obj.customer_id == user.id
-            and obj.status.lower() == "accepted"
-        ):
-            if (
-                obj.service
-                and obj.service.worker
-                and obj.service.worker.phone_number
-            ):
-                return obj.service.worker.phone_number
+        # # only booking owner customer sees worker phone
+        # if (
+        #     getattr(user, "role", None) == "customer"
+        #     and obj.customer_id == user.id
+        #     and obj.status.lower() == "accepted"
+        # ):
+        #     if (
+        #         obj.service
+        #         and obj.service.worker
+        #         and obj.service.worker.phone_number
+        #     ):
+        #         return obj.service.worker.phone_number
 
-        return None
+        return obj.service.worker.phone_number
         
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
