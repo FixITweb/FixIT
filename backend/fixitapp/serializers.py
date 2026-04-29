@@ -149,9 +149,8 @@ class BookingSerializer(serializers.ModelSerializer):
 
         user = request.user
 
-        # ONLY WORKER sees customer phone
-        if getattr(user, "role", None) == "worker":
-            return obj.customer.phone_number
+        if str(getattr(user, "role", "")).strip().lower() == "worker":
+            return getattr(obj.customer, "phone_number", None)
 
         return None
 
@@ -163,13 +162,13 @@ class BookingSerializer(serializers.ModelSerializer):
             return None
 
         user = request.user
+        role = str(getattr(user, "role", "")).strip().lower()
 
-        # ONLY CUSTOMER sees worker phone (after accepted)
-        if (
-            getattr(user, "role", None) == "customer"
-            and obj.status.lower() == "accepted"
-        ):
-            return obj.service.worker.phone_number
+        if role == "customer" and obj.status == "accepted":
+            return getattr(obj.service.worker, "phone_number", None)
+
+        if role == "worker":
+            return getattr(obj.service.worker, "phone_number", None)
 
         return None
         
