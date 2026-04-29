@@ -28,7 +28,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'password', 'role', 'phone_number']
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -89,7 +93,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             "is_read"
         ]
         
-class BookingSerializer(serializers.ModelSerializer):
+
 class BookingSerializer(serializers.ModelSerializer):
     customer_phone = serializers.SerializerMethodField()
     worker_phone = serializers.SerializerMethodField()
