@@ -29,8 +29,16 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password')
+
+        # FIX HERE 👇
+        phone = validated_data.pop('phone_number', None)
+
         user = User(**validated_data)
         user.set_password(password)
+
+        if phone:
+            user.phone_number = phone
+
         user.save()
         return user
 
@@ -113,13 +121,15 @@ class BookingSerializer(serializers.ModelSerializer):
         ]
 
     def get_customer_phone(self, obj):
-        return obj.customer.phone_number
+        if obj.customer and obj.customer.phone_number:
+            return obj.customer.phone_number
+        return ""
 
     def get_worker_phone(self, obj):
-        # only show after accepted
         if obj.status == "accepted":
-            return obj.service.worker.phone_number
-        return None
+            if obj.service and obj.service.worker and obj.service.worker.phone_number:
+                return obj.service.worker.phone_number
+        return ""
     
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
