@@ -90,10 +90,8 @@ class NotificationSerializer(serializers.ModelSerializer):
         ]
         
 class BookingSerializer(serializers.ModelSerializer):
-    service = ServiceSerializer(read_only=True)
-    customer = serializers.SerializerMethodField()
-    worker_phone = serializers.SerializerMethodField()
     customer_phone = serializers.SerializerMethodField()
+    worker_phone = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -107,37 +105,18 @@ class BookingSerializer(serializers.ModelSerializer):
             "worker_phone"
         ]
 
-    def get_customer(self, obj):
-        return {
-            "id": obj.customer.id,
-            "username": obj.customer.username
-        }
-
     def get_customer_phone(self, obj):
-        request = self.context.get("request")
-        if not request:
-            return None
-
-        if obj.status != "accepted":
-            return None
-
-        if request.user.role == "worker":
-            return obj.customer.phone_number
-
-        return None
+        return obj.customer.phone_number
 
     def get_worker_phone(self, obj):
         request = self.context.get("request")
-        if not request:
-            return None
 
-        if obj.status != "accepted":
-            return None
-
-        if request.user.role == "customer":
+        # show only after accepted
+        if obj.status == "accepted":
             return obj.service.worker.phone_number
 
         return None
+    
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
