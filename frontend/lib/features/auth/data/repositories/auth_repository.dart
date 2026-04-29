@@ -17,18 +17,24 @@ class AuthRepository {
   }
 
   // ================= REGISTER =================
-  Future<AuthModel> register(String username, String password, String role) async {
-    try {
-      // First register the user
-      final registerData = await api.register(username, password, role);
-      
-      // Then automatically log them in to get JWT tokens
-      final loginData = await api.login(username, password);
-      return AuthModel.fromJson(loginData);
-    } catch (e) {
-      throw Exception("Register failed: $e");
-    }
+Future<AuthModel> register(
+  String username,
+  String password,
+  String role,
+  String phone,
+) async {
+  try {
+    // register user WITH phone
+    final registerData = await api.register(username, password, role, phone);
+
+    // auto login
+    final loginData = await api.login(username, password);
+
+    return AuthModel.fromJson(loginData);
+  } catch (e) {
+    throw Exception("Register failed: $e");
   }
+}
 
   // ================= PROFILE =================
   Future<Map<String, dynamic>> getProfile() async {

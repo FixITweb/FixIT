@@ -9,6 +9,11 @@ class BookingApi {
   // GET bookings — backend endpoint: GET /api/bookings/
   Future<List<dynamic>> fetchBookings() async {
     final res = await client.get(Endpoints.bookings);
+
+    //new
+    print("==== BOOKINGS API RESPONSE ===="); 
+    print(res.data); 
+
     return res.data as List<dynamic>;
   }
 

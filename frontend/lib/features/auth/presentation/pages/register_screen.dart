@@ -12,6 +12,9 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  //new
+  final _phoneController = TextEditingController();
+
   String role = 'customer';
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -23,6 +26,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    //new
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -127,6 +132,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 28),
+                const SizedBox(height: 20),
+
+const Text("Phone Number", style: TextStyle(fontWeight: FontWeight.w600)),
+const SizedBox(height: 8),
+
+TextField(
+  controller: _phoneController,
+  keyboardType: TextInputType.phone,
+  decoration: InputDecoration(
+    hintText: "Enter your phone number",
+    prefixIcon: const Icon(Icons.phone),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+),
 
                 // Role selector
                 const Text("I am a", style: TextStyle(fontWeight: FontWeight.w600)),
@@ -218,9 +239,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       return;
     }
+final phone = _phoneController.text.trim();
+
 
     context.read<AuthBloc>().add(
-          RegisterEvent(username, username, password, role),
+          // RegisterEvent(username, username, password, role),
+          RegisterEvent(username, password, role, phone),
         );
   }
 }

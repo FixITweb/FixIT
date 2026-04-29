@@ -170,11 +170,29 @@ class _BookingCard extends StatelessWidget {
                             : booking.service.title,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      if (booking.service.worker.username != 'Unknown Worker')
-                        Text(
-                          "Worker: ${booking.service.worker.username}",
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
+                      //new
+if (booking.service != null &&
+    booking.service.worker != null &&
+    booking.service.worker.username != null)
+  Text(
+    "Worker: ${booking.service.worker.username}",
+    style: TextStyle(color: Colors.grey[600]),
+  ),
+
+                        //new 🔥 PHONE NUMBERS SHOW HERE
+if (booking.status.toLowerCase().contains("accept")) ...[
+  if (booking.workerPhone != null)
+    Text(
+      "Worker Phone: ${booking.workerPhone}",
+      style: TextStyle(color: Colors.grey[600]),
+    ),
+
+  if (booking.customerPhone != null)
+    Text(
+      "Customer Phone: ${booking.customerPhone}",
+      style: TextStyle(color: Colors.grey[600]),
+    ),
+],
                     ],
                   ),
                 ),

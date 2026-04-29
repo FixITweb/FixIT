@@ -11,7 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         // Login to get JWT tokens
-        final authModel = await repo.login(event.email, event.password);
+        final authModel = await repo.login(event.username, event.password);
         
         // Fetch user profile to get the role
         final profile = await repo.getProfile();
@@ -27,7 +27,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         // Register and automatically login to get JWT tokens
-        final authModel = await repo.register(event.name, event.password, event.role);
+        // final authModel = await repo.register(event.name, event.password, event.role);
+
+        final authModel = await repo.register(
+              event.username,
+              event.password,
+              event.role,
+              event.phone,
+            );
         
         // User is now registered AND logged in with JWT tokens
         // Role is already known from registration

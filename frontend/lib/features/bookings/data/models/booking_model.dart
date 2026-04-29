@@ -4,7 +4,9 @@ class BookingModel {
   final CustomerInfo? customer;
   final String status;
   final DateTime createdAt;
-  final String? phoneNumber; // new
+  //new
+  final String? customerPhone;
+  final String? workerPhone;
 
   BookingModel({
     required this.id,
@@ -12,7 +14,9 @@ class BookingModel {
     this.customer,
     required this.status,
     required this.createdAt,
-    this.phoneNumber, // new
+    //new
+    this.customerPhone,
+    this.workerPhone,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
@@ -31,7 +35,10 @@ class BookingModel {
 
       status: json['status'] ?? 'pending',
       createdAt: _parseDate(json['created_at']),
-      phoneNumber: json['phone_number'], // new
+
+      //new
+      customerPhone: json['customer_phone'],
+      workerPhone: json['worker_phone'], 
     );
   }
 
@@ -52,7 +59,9 @@ class BookingModel {
       'status': status,
       'created_at': createdAt.toIso8601String(),
 
-      'phone_number': phoneNumber, // new
+      //new
+      'customer_phone': customerPhone,
+      'worker_phone': workerPhone,
     };
   }
 }
