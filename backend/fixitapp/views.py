@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
-from django.db.models import Avg
+from django.db.models import Avg, Sum, Count
 from django.utils.timezone import now
 from datetime import timedelta
 
@@ -485,5 +485,47 @@ def categories(request):
     )
     return Response(categories)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def worker_dashboard(request):
 
+    user = request.user
 
+    if user.role != "worker":
+        return Response({"error": "Only workers can access dashboard"}, status=403)
+
+    # ---------------- SERVICES ----------------
+    services = Service.objects.filter(worker=user)
+
+    total_services = services.count()
+
+    # ---------------- BOOKINGS ----------------
+    bookings = Booking.objects.filter(service__worker=user)
+
+    active_bookings = bookings.filter(status__in=["pending", "accepted"]).count()
+    completed_bookings = bookings.filter(status="completed").count()
+
+    # ---------------- EARNINGS ----------------
+    # Only completed bookings count as earnings
+    total_earnings = bookings.filter(status="completed").aggregate(
+        total=Sum("service__price")
+    )["total"] or 0
+
+    # ---------------- RATINGS ----------------
+    ratings_qs = Rating.objects.filter(worker=user)
+
+    rating_data = ratings_qs.aggregate(
+        avg_rating=Avg("rating"),
+        total_ratings=Count("id")
+    )
+
+    # ---------------- RESPONSE ----------------
+    return Response({
+        "username": user.username,
+        "rating": rating_data["avg_rating"] or 0,
+        "total_ratings": rating_data.get("total_ratings", 0),
+        "total_earnings": total_earnings,
+        "active_bookings": active_bookings,
+        "completed_bookings": completed_bookings,
+        "total_services": total_services,
+    })
