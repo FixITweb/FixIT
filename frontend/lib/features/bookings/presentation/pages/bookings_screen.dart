@@ -177,20 +177,23 @@ class _BookingCard extends StatelessWidget {
     style: TextStyle(color: Colors.grey[600]),
   ),
 
-  //new 🔥 PHONE NUMBERS SHOW HERE
-if (booking.status.toLowerCase().contains("accepted")) ...[
-  if (booking.workerPhone != null)
-    Text(
-      "Worker Phone: ${booking.workerPhone}",
-      style: TextStyle(color: Colors.grey[600]),
-    ),
+        //new 🔥 PHONE NUMBERS SHOW HERE
+      if (booking.status.toLowerCase() == "accepted") ...[
+        
+        // WORKER VIEW → show customer phone ONLY
+        if (booking.customerPhone != null)
+          Text(
+            "Customer Phone: ${booking.customerPhone}",
+            style: TextStyle(color: Colors.grey[600]),
+          ),
 
-  if (booking.customerPhone != null)
-    Text(
-      "Customer Phone: ${booking.customerPhone}",
-      style: TextStyle(color: Colors.grey[600]),
-    ),
-],
+        // OPTIONAL: worker sees own phone if needed
+        if (booking.workerPhone != null)
+          Text(
+            "Worker Phone: ${booking.workerPhone}",
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+      ],
                     ],
                   ),
                 ),
@@ -255,7 +258,7 @@ if (booking.status.toLowerCase().contains("accepted")) ...[
               ],
             ),
             
-            if (booking.status.toLowerCase().contains('complet'))
+            if (booking.status.toLowerCase() == 'completed')
               Padding(
                 padding: const EdgeInsets.only(top: 16),
                 child: SizedBox(
@@ -297,9 +300,9 @@ if (booking.status.toLowerCase().contains("accepted")) ...[
 
   Color _getStatusColor(String status) {
     status = status.toLowerCase();
-    if (status.contains('accepted')) return Colors.green;
-    if (status.contains('pending')) return Colors.orange;
-    if (status.contains('completed')) return Colors.blue;
+    if (status == 'accepted') return Colors.green;
+    if (status == 'pending') return Colors.orange;
+    if (status == 'completed') return Colors.blue;
     return Colors.red;
   }
 }
