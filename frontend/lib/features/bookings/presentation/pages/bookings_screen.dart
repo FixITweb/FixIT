@@ -178,22 +178,24 @@ class _BookingCard extends StatelessWidget {
   ),
 
         //new 🔥 PHONE NUMBERS SHOW HERE
-      if (booking.status.toLowerCase() == "accepted") ...[
-        
-        // WORKER VIEW → show customer phone ONLY
-        if (booking.customerPhone != null)
-          Text(
-            "Customer Phone: ${booking.customerPhone}",
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
-        // OPTIONAL: worker sees own phone if needed
-        if (booking.workerPhone != null)
-          Text(
-            "Worker Phone: ${booking.workerPhone}",
-            style: TextStyle(color: Colors.grey[600]),
-          ),
-      ],
+          if (booking.customerPhone != null)
+            Text(
+              "Customer Phone: ${booking.customerPhone}",
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+
+          if (booking.workerPhone != null)
+            Text(
+              "Worker Phone: ${booking.workerPhone}",
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+
+        ],
+      ),
                     ],
                   ),
                 ),
