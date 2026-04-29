@@ -34,11 +34,18 @@ class BookingModel {
           : null,
 
       status: json['status'] ?? 'pending',
-      createdAt: _parseDate(json['created_at']),
 
-      //new
-      customerPhone: json['customer_phone'],
-      workerPhone: json['worker_phone'], 
+      createdAt: _parseDate(
+        json['createdAt'] ?? json['created_at'],
+      ),
+
+      customerPhone: json.containsKey('customerPhone')
+          ? json['customerPhone']
+          : json['customer_phone'],
+
+      workerPhone: json.containsKey('workerPhone')
+          ? json['workerPhone']
+          : json['worker_phone'],
     );
   }
 

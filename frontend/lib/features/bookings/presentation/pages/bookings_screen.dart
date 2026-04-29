@@ -134,7 +134,7 @@ class BookingsView extends StatelessWidget {
 }
 
 class _BookingCard extends StatelessWidget {
-  final dynamic booking;
+  final BookingModel booking;
   const _BookingCard({required this.booking});
 
   @override
@@ -179,8 +179,8 @@ if (booking.service != null &&
     style: TextStyle(color: Colors.grey[600]),
   ),
 
-                        //new 🔥 PHONE NUMBERS SHOW HERE
-if (booking.status.toLowerCase().contains("accept")) ...[
+  //new 🔥 PHONE NUMBERS SHOW HERE
+if (booking.status.toLowerCase().contains("accepted")) ...[
   if (booking.workerPhone != null)
     Text(
       "Worker Phone: ${booking.workerPhone}",

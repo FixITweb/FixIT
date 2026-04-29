@@ -8,7 +8,9 @@ class BookingRepository {
 
   Future<List<BookingModel>> getBookings() async {
     final data = await api.fetchBookings();
-    return data.map((e) => BookingModel.fromJson(e)).toList();
+    return data
+      .map((e) => BookingModel.fromJson(Map<String, dynamic>.from(e)))
+      .toList();
   }
 
   Future<bool> createBooking(int serviceId) async {

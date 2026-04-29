@@ -14,7 +14,9 @@ class BookingApi {
     print("==== BOOKINGS API RESPONSE ===="); 
     print(res.data); 
 
-    return res.data as List<dynamic>;
+    return (res.data as List)
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
   }
 
   // POST create booking — backend endpoint: POST /api/bookings/
