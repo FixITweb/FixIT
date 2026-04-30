@@ -12,6 +12,6 @@ class Endpoints {
   static const String ratings = "ratings/";
   static const String search = "search/";
   static const String categories = "categories/";
-  //new 
+  //new
   static const deleteBooking = "/booking/delete/";
 }

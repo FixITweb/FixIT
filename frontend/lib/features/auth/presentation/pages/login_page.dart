@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import '../../data/repositories/auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +18,105 @@ class _LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController(); 
   final passwordController = TextEditingController();
   String loginAs = 'customer';
+  bool _isUpdatingLocation = false;
+
+  Future<void> _showLocationSettingsDialog() async {
+    if (!mounted) return;
+
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Location is blocked in your browser. In Microsoft Edge, click the lock icon near the address bar and allow Location for this site, then refresh.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Location Access"),
+        content: const Text(
+          "Please enable location services and allow permission to improve nearby service matching.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Skip"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await Geolocator.openLocationSettings();
+            },
+            child: const Text("Open settings"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<Position?> _requestLocationAfterLogin() async {
+    if (kIsWeb) {
+      try {
+        return await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+      } catch (_) {
+        await _showLocationSettingsDialog();
+        return null;
+      }
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      await _showLocationSettingsDialog();
+      return null;
+    }
+
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await _showLocationSettingsDialog();
+      return null;
+    }
+
+    return Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
+
+  Future<void> _captureAndSaveLocationIfMissing() async {
+    final repo = context.read<AuthBloc>().repo;
+    final profile = await repo.getProfile();
+    final hasLocation = profile['latitude'] != null && profile['longitude'] != null;
+
+    if (hasLocation) {
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() => _isUpdatingLocation = true);
+
+    try {
+      final position = await _requestLocationAfterLogin();
+      if (position != null) {
+        await repo.updateLocation(position.latitude, position.longitude);
+      }
+    } catch (_) {
+      // Non-blocking: login navigation should continue even if location update fails.
+    } finally {
+      if (mounted) {
+        setState(() => _isUpdatingLocation = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +124,14 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            if (state.role == 'worker') {
-              Navigator.pushReplacementNamed(context, '/worker-home');
-            } else {
-              Navigator.pushReplacementNamed(context, '/customer-home');
-            }
+            _captureAndSaveLocationIfMissing().whenComplete(() {
+              if (!mounted) return;
+              if (state.role == 'worker') {
+                Navigator.pushReplacementNamed(context, '/worker-home');
+              } else {
+                Navigator.pushReplacementNamed(context, '/customer-home');
+              }
+            });
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
@@ -101,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 40),
 
-                  if (state is AuthLoading)
+                  if (state is AuthLoading || _isUpdatingLocation)
                     const CircularProgressIndicator()
                   else
                     ElevatedButton(

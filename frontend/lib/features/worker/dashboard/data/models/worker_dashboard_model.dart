@@ -32,7 +32,8 @@ class WorkerDashboardModel {
       averageRating: toDouble(json['rating'] ?? json['average_rating']),
       totalEarnings: toDouble(json['total_earnings']),
       bookingsCount: toInt(json['active_bookings'] ?? json['bookings_count']),
-      completedJobs: toInt(json['completed_bookings'] ?? json['completed_jobs']),
+      completedJobs:
+          toInt(json['completed_bookings'] ?? json['completed_jobs']),
       servicesCount: toInt(json['total_services'] ?? json['services_count']),
     );
   }

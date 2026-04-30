@@ -24,7 +24,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _isFetchingLocation = false;
 
-  Future<void> _showLocationSettingsDialog({required bool permanentlyDenied}) async {
+  Future<void> _showLocationSettingsDialog(
+      {required bool permanentlyDenied}) async {
     if (!mounted) return;
 
     if (kIsWeb) {
@@ -288,7 +289,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // On web, calling getCurrentPosition will trigger the browser permission prompt.
     if (kIsWeb) {
       try {
-        return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        return await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
       } catch (e) {
         await _showLocationSettingsDialog(permanentlyDenied: false);
         return null;

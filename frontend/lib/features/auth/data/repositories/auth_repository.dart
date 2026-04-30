@@ -55,6 +55,17 @@ Future<AuthModel> register(
     }
   }
 
+  Future<void> updateLocation(double latitude, double longitude) async {
+    try {
+      await api.updateProfileLocation(
+        latitude: latitude,
+        longitude: longitude,
+      );
+    } catch (e) {
+      throw Exception("Failed to update location: $e");
+    }
+  }
+
   // ================= FORGOT PASSWORD =================
   Future<String> forgotPassword(String email) async {
     try {

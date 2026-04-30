@@ -77,6 +77,24 @@ Future<Map<String, dynamic>> register(
     }
   }
 
+  Future<Map<String, dynamic>> updateProfileLocation({
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      final res = await client.put(
+        Endpoints.profile,
+        data: {
+          "latitude": latitude,
+          "longitude": longitude,
+        },
+      );
+      return res.data;
+    } catch (e) {
+      throw Exception("Update profile location failed: $e");
+    }
+  }
+
   //  FORGOT PASSWORD
   Future<Map<String, dynamic>> forgotPassword(String email) async {
     try {

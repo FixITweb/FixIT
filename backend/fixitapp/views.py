@@ -46,9 +46,21 @@ def login(request):
     return Response({"error": "Invalid credentials"}, status=400)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
 def profile(request):
+    if request.method == 'PUT':
+        latitude = request.data.get('latitude', None)
+        longitude = request.data.get('longitude', None)
+
+        if latitude is not None:
+            request.user.latitude = latitude
+
+        if longitude is not None:
+            request.user.longitude = longitude
+
+        request.user.save(update_fields=['latitude', 'longitude', 'updated_at'])
+
     return Response(UserProfileSerializer(request.user).data)
 
 @api_view(['GET'])
