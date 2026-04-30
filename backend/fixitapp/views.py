@@ -8,6 +8,10 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Sum, Count
 from django.utils.timezone import now
 from datetime import timedelta
+import os
+import google.generativeai as genai
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .models import JobRequest, Notification, Booking, Rating, Service, User
 from .serializers import (
@@ -523,3 +527,29 @@ def worker_dashboard(request):
         "completed_bookings": completed_bookings,
         "total_services": total_services,
     })
+
+# ... (existing views) ...
+
+@api_view(['POST'])
+def ai_guide(request):
+    user_prompt = request.data.get('user_prompt')
+    if not user_prompt:
+        return Response({"status": "error", "message": "user_prompt is required"}, status=400)
+
+    try:
+        # Assumes GEMINI_API_KEY is available in your environment variables
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+        model = genai.GenerativeModel('gemini-1.5-pro')
+
+        system_instruction = "You are an expert DIY repair assistant. The user will provide a household or electronic issue. You must respond strictly with a step-by-step checklist to fix the problem safely. Use Markdown bullet points or numbered lists. Do NOT include long conversational introductions or conclusions. If the fix is highly dangerous (like high-voltage electrical work), make step 1 a strong warning."
+        final_prompt = system_instruction + "\n\nUser Issue: " + user_prompt
+
+        response = model.generate_content(final_prompt)
+        
+        return Response({
+            "status": "success", 
+            "guide": response.text
+        })
+    except Exception as e:
+        return Response({"status": "error", "message": str(e)}, status=500)
+
