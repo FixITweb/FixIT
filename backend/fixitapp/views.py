@@ -535,7 +535,7 @@ def ai_guide(request):
         return Response({"status": "error", "message": "user_prompt is required"}, status=400)
 
     try:
-        genai.configure(api_key="AIzaSyBYI8czVajfs0W90pKByMxDvr5Ah2TEDIc")
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
         model = genai.GenerativeModel('gemini-2.5-flash')
 
         system_instruction = "You are an expert DIY repair assistant. The user will provide a household or electronic issue. You must respond strictly with a valid JSON array of objects. Each object must represent one step of the fix and contain two keys: 'title' (a short, bold-worthy title without markdown symbols) and 'description' (the detailed action required, plain text, no markdown). Do not include any conversational text outside the JSON array."
