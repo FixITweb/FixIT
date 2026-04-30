@@ -21,12 +21,15 @@ class BottomNav extends StatelessWidget {
             Navigator.pushReplacementNamed(context, '/requests');
             break;
           case 2:
-            Navigator.pushReplacementNamed(context, '/notifications');
+            Navigator.pushReplacementNamed(context, '/ai-guide');
             break;
           case 3:
-            Navigator.pushReplacementNamed(context, '/bookings');
+            Navigator.pushReplacementNamed(context, '/notifications');
             break;
           case 4:
+            Navigator.pushReplacementNamed(context, '/bookings');
+            break;
+          case 5:
             Navigator.pushReplacementNamed(context, '/customer-profile');
             break;
         }
@@ -39,6 +42,10 @@ class BottomNav extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.list_alt),
           label: 'Requests',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.smart_toy),
+          label: 'AI Guide',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.notifications),
