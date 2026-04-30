@@ -74,14 +74,12 @@ def my_services(request):
 @permission_classes([IsAuthenticated])
 def services(request, service_id=None):
 
-    # DELETE SERVICE
     if request.method == 'DELETE' and service_id:
         service = get_object_or_404(Service, id=service_id)
         
         if service.worker != request.user:
             return Response({"error": "Not allowed"}, status=403)
-        
-        # Check for active bookings
+
         active_bookings = Booking.objects.filter(
             service=service,
             status__in=['pending', 'accepted']
@@ -99,7 +97,6 @@ def services(request, service_id=None):
             "message": f"Service '{service_title}' deleted successfully"
         })
 
-    # UPDATE SERVICE
     if request.method == 'PUT' and service_id:
         service = get_object_or_404(Service, id=service_id)
         
@@ -126,7 +123,6 @@ def services(request, service_id=None):
         return Response(serializer.errors, status=400)
 
     services = Service.objects.all()
-
     search = request.GET.get('search')
     category = request.GET.get('category')
     min_price = request.GET.get('min_price')
@@ -305,7 +301,7 @@ def mark_as_read(request, id):
 @permission_classes([IsAuthenticated])
 def bookings(request):
 
-    # ---------------- GET ----------------
+    #GET
     if request.method == 'GET':
 
         if request.user.role == 'customer':
@@ -317,9 +313,6 @@ def bookings(request):
                 service__worker=request.user
             ).select_related('service', 'service__worker', 'customer')
 
-        # serializer = BookingSerializer(bookings_qs, many=True)
-        # return Response(serializer.data)
-
         serializer = BookingSerializer(
             bookings_qs,
             many=True,
@@ -328,13 +321,12 @@ def bookings(request):
         return Response(serializer.data)
 
 
-    # ---------------- POST ----------------
+    # POST 
     if request.method == 'POST':
 
         if request.user.role != 'customer':
             return Response({"error": "Only customers can book"}, status=403)
 
-        # accept both service_id or service
         service_id = request.data.get('service_id') or request.data.get('service')
 
         if not service_id:
@@ -354,8 +346,6 @@ def bookings(request):
             message="New booking request"
         )
 
-        # serializer = BookingSerializer(booking)
-        # return Response([serializer.data], status=201)
         serializer = BookingSerializer(
             booking,
             context={"request": request}
@@ -505,25 +495,18 @@ def worker_dashboard(request):
 
     if user.role != "worker":
         return Response({"error": "Only workers can access dashboard"}, status=403)
-
-    # ---------------- SERVICES ----------------
     services = Service.objects.filter(worker=user)
 
     total_services = services.count()
 
-    # ---------------- BOOKINGS ----------------
     bookings = Booking.objects.filter(service__worker=user)
-
     active_bookings = bookings.filter(status__in=["pending", "accepted"]).count()
     completed_bookings = bookings.filter(status="completed").count()
 
-    # ---------------- EARNINGS ----------------
-    # Only completed bookings count as earnings
     total_earnings = bookings.filter(status="completed").aggregate(
         total=Sum("service__price")
     )["total"] or 0
 
-    # ---------------- RATINGS ----------------
     ratings_qs = Rating.objects.filter(worker=user)
 
     rating_data = ratings_qs.aggregate(
@@ -531,7 +514,6 @@ def worker_dashboard(request):
         total_ratings=Count("id")
     )
 
-    # ---------------- RESPONSE ----------------
     return Response({
         "username": user.username,
         "rating": rating_data["avg_rating"] or 0,
