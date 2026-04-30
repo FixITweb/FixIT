@@ -528,7 +528,6 @@ def worker_dashboard(request):
         "total_services": total_services,
     })
 
-# ... (existing views) ...
 
 @api_view(['POST'])
 def ai_guide(request):
@@ -538,8 +537,8 @@ def ai_guide(request):
 
     try:
         # Assumes GEMINI_API_KEY is available in your environment variables
-        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        genai.configure(api_key="AIzaSyBYI8czVajfs0W90pKByMxDvr5Ah2TEDIc")
+        model = genai.GenerativeModel('gemini-2.5-flash')
 
         system_instruction = "You are an expert DIY repair assistant. The user will provide a household or electronic issue. You must respond strictly with a step-by-step checklist to fix the problem safely. Use Markdown bullet points or numbered lists. Do NOT include long conversational introductions or conclusions. If the fix is highly dangerous (like high-voltage electrical work), make step 1 a strong warning."
         final_prompt = system_instruction + "\n\nUser Issue: " + user_prompt
