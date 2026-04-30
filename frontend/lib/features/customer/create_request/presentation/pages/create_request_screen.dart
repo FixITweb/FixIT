@@ -67,7 +67,7 @@ class _CreateRequestViewState extends State<CreateRequestView> {
           } else if (state is CreateRequestSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('✅ Request posted! You\'ll be notified when workers are available.'),
+                content: Text('Request posted! You\'ll be notified when workers are available.'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 3),
               ),
@@ -76,7 +76,7 @@ class _CreateRequestViewState extends State<CreateRequestView> {
           } else if (state is CreateRequestError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('❌ ${state.message}'),
+                content: Text(' ${state.message}'),
                 backgroundColor: Colors.red,
               ),
             );

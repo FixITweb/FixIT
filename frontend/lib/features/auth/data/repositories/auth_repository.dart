@@ -6,7 +6,7 @@ class AuthRepository {
 
   AuthRepository(this.api);
 
-  // ================= LOGIN =================
+  //LOGIN
   Future<AuthModel> login(String username, String password) async {
     try {
       final data = await api.login(username, password);
@@ -16,7 +16,7 @@ class AuthRepository {
     }
   }
 
-  // ================= REGISTER =================
+  //REGISTER
   Future<AuthModel> register(
     String username,
     String password,
@@ -45,7 +45,7 @@ class AuthRepository {
     }
   }
 
-  // ================= PROFILE =================
+  // PROFILE 
   Future<Map<String, dynamic>> getProfile() async {
     try {
       return await api.getProfile();
@@ -65,7 +65,7 @@ class AuthRepository {
     }
   }
 
-  // ================= FORGOT PASSWORD =================
+  // FORGOT PASSWORD
   Future<String> forgotPassword(String email) async {
     try {
       final data = await api.forgotPassword(email);
