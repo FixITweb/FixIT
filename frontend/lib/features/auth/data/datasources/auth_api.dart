@@ -38,15 +38,14 @@ class AuthApi {
   }
 
   // REGISTER
-Future<Map<String, dynamic>> register(
-  String username,
-  String password,
-  String role,
-  String phone,
-    {double? latitude,
+  Future<Map<String, dynamic>> register(
+    String username,
+    String password,
+    String role,
+    String phone, {
+    double? latitude,
     double? longitude,
-    }
-) async {
+  }) async {
     try {
       final res = await client.post(
         Endpoints.register,
@@ -54,11 +53,11 @@ Future<Map<String, dynamic>> register(
           "username": username,
           "password": password,
           "role": role,
-            "phone_number": phone,
-            if (latitude != null) "latitude": latitude,
-            if (longitude != null) "longitude": longitude,
+          "phone_number": phone,
+          if (latitude != null) "latitude": latitude,
+          if (longitude != null) "longitude": longitude,
         },
-        requireAuth: false, 
+        requireAuth: false,
       );
 
       return res.data;

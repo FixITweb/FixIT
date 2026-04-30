@@ -17,34 +17,33 @@ class AuthRepository {
   }
 
   // ================= REGISTER =================
-Future<AuthModel> register(
-  String username,
-  String password,
-  String role,
-  String phone,
-  {double? latitude,
-  double? longitude,
-  }
-) async {
-  try {
-    // register user WITH phone
-    await api.register(
-      username,
-      password,
-      role,
-      phone,
-      latitude: latitude,
-      longitude: longitude,
-    );
+  Future<AuthModel> register(
+    String username,
+    String password,
+    String role,
+    String phone, {
+    double? latitude,
+    double? longitude,
+  }) async {
+    try {
+      // register user WITH phone
+      await api.register(
+        username,
+        password,
+        role,
+        phone,
+        latitude: latitude,
+        longitude: longitude,
+      );
 
-    // auto login
-    final loginData = await api.login(username, password);
+      // auto login
+      final loginData = await api.login(username, password);
 
-    return AuthModel.fromJson(loginData);
-  } catch (e) {
-    throw Exception("Register failed: $e");
+      return AuthModel.fromJson(loginData);
+    } catch (e) {
+      throw Exception("Register failed: $e");
+    }
   }
-}
 
   // ================= PROFILE =================
   Future<Map<String, dynamic>> getProfile() async {

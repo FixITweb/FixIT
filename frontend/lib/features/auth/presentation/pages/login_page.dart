@@ -15,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final usernameController = TextEditingController(); 
+  final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   String loginAs = 'customer';
   bool _isUpdatingLocation = false;
@@ -95,7 +95,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _captureAndSaveLocationIfMissing() async {
     final repo = context.read<AuthBloc>().repo;
     final profile = await repo.getProfile();
-    final hasLocation = profile['latitude'] != null && profile['longitude'] != null;
+    final hasLocation =
+        profile['latitude'] != null && profile['longitude'] != null;
 
     if (hasLocation) {
       return;
@@ -162,8 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? const Color(0xFF14B8A6)
                                 : Colors.grey[300],
                           ),
-                          onPressed: () =>
-                              setState(() => loginAs = 'customer'),
+                          onPressed: () => setState(() => loginAs = 'customer'),
                           child: const Text("Customer"),
                         ),
                       ),
@@ -175,8 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? const Color(0xFF14B8A6)
                                 : Colors.grey[300],
                           ),
-                          onPressed: () =>
-                              setState(() => loginAs = 'worker'),
+                          onPressed: () => setState(() => loginAs = 'worker'),
                           child: const Text("Worker"),
                         ),
                       ),
@@ -223,11 +222,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
 
                         context.read<AuthBloc>().add(
-                              LoginEvent(username, password), 
+                              LoginEvent(username, password),
                             );
                       },
-                      child: const Text("Login",
-                          style: TextStyle(fontSize: 18)),
+                      child:
+                          const Text("Login", style: TextStyle(fontSize: 18)),
                     ),
 
                   TextButton(
