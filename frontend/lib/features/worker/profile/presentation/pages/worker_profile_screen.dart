@@ -8,18 +8,26 @@ import '../../data/datasources/worker_profile_api.dart';
 import '../../../../../core/network/api_client.dart';
 import '../../../dashboard/presentation/widgets/worker_bottom_nav.dart';
 import '../../../../../shared/widgets/theme_toggle_button.dart';
+import '../../../dashboard/data/datasources/worker_dashboard_api.dart';
 
 class WorkerProfileScreen extends StatelessWidget {
   const WorkerProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => WorkerProfileBloc(
-        WorkerProfileRepository(WorkerProfileApi(ApiClient())),
-      )..add(LoadWorkerProfile()),
-      child: const WorkerProfileView(),
-    );
+      return BlocProvider(
+  create: (context) {
+    final apiClient = ApiClient();
+
+    return WorkerProfileBloc(
+      WorkerProfileRepository(
+        WorkerProfileApi(apiClient),
+        WorkerDashboardApi(apiClient),
+      ),
+    )..add(LoadWorkerProfile());
+  },
+  child: const WorkerProfileView(),
+);
   }
 }
 
