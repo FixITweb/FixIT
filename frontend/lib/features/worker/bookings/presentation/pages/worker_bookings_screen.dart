@@ -36,18 +36,20 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[50],
       appBar: AppBar(
-        title: const Text("Incoming Bookings", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Incoming Bookings",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<WorkerBookingsBloc>().add(LoadWorkerBookings()),
+            onPressed: () =>
+                context.read<WorkerBookingsBloc>().add(LoadWorkerBookings()),
           ),
         ],
       ),
@@ -86,7 +88,9 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
                   Text('Error: ${state.message}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<WorkerBookingsBloc>().add(LoadWorkerBookings()),
+                    onPressed: () => context
+                        .read<WorkerBookingsBloc>()
+                        .add(LoadWorkerBookings()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -100,11 +104,13 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.calendar_today_outlined, size: 80, color: Colors.grey[isDark ? 700 : 300]),
+                    Icon(Icons.calendar_today_outlined,
+                        size: 80, color: Colors.grey[isDark ? 700 : 300]),
                     const SizedBox(height: 24),
                     const Text(
                       "No New Bookings",
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     const Text(
@@ -119,7 +125,9 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
             // Filter bookings based on selected filter
             final filteredBookings = _selectedFilter == 'all'
                 ? state.bookings
-                : state.bookings.where((b) => b.status.toLowerCase() == _selectedFilter).toList();
+                : state.bookings
+                    .where((b) => b.status.toLowerCase() == _selectedFilter)
+                    .toList();
 
             return RefreshIndicator(
               onRefresh: () async {
@@ -130,7 +138,8 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
                   // Filter chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     child: Row(
                       children: [
                         _FilterChip(
@@ -142,19 +151,22 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
                         _FilterChip(
                           label: 'Pending',
                           isSelected: _selectedFilter == 'pending',
-                          onTap: () => setState(() => _selectedFilter = 'pending'),
+                          onTap: () =>
+                              setState(() => _selectedFilter = 'pending'),
                         ),
                         const SizedBox(width: 8),
                         _FilterChip(
                           label: 'Accepted',
                           isSelected: _selectedFilter == 'accepted',
-                          onTap: () => setState(() => _selectedFilter = 'accepted'),
+                          onTap: () =>
+                              setState(() => _selectedFilter = 'accepted'),
                         ),
                         const SizedBox(width: 8),
                         _FilterChip(
                           label: 'Completed',
                           isSelected: _selectedFilter == 'completed',
-                          onTap: () => setState(() => _selectedFilter = 'completed'),
+                          onTap: () =>
+                              setState(() => _selectedFilter = 'completed'),
                         ),
                       ],
                     ),
@@ -165,7 +177,9 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[isDark ? 700 : 300]),
+                                Icon(Icons.inbox_outlined,
+                                    size: 64,
+                                    color: Colors.grey[isDark ? 700 : 300]),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No ${_selectedFilter} bookings',
@@ -205,7 +219,7 @@ class _WorkerBookingCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     bool isPending = booking.status.toLowerCase() == 'pending';
     bool isAccepted = booking.status.toLowerCase() == 'accepted';
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -252,22 +266,39 @@ class _WorkerBookingCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  booking.serviceTitle == 'Unavailable Service' 
-                      ? 'Booking #${booking.id}' 
+                  booking.serviceTitle == 'Unavailable Service'
+                      ? 'Booking #${booking.id}'
                       : booking.serviceTitle,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     if (booking.customerName != 'Unknown Customer') ...[
-                      const Icon(Icons.person_outline, size: 16, color: Colors.grey),
+                      const Icon(Icons.person_outline,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
-                      Text(booking.customerName, style: const TextStyle(color: Colors.black87)),
-                      const Spacer(),
+                      Text(booking.customerName,
+                          style: const TextStyle(color: Colors.black87)),
+                      const SizedBox(width: 12),
+                    ],
+                    if (booking.customerPhone != null &&
+                        booking.customerPhone!.isNotEmpty) ...[
+                      const Icon(Icons.phone_outlined,
+                          size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          booking.customerPhone!,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.black87),
+                        ),
+                      ),
                     ] else
                       const Spacer(),
-                    const Icon(Icons.event_outlined, size: 16, color: Colors.grey),
+                    const Icon(Icons.event_outlined,
+                        size: 16, color: Colors.grey),
                     const SizedBox(width: 4),
                     Text(
                       "${booking.scheduledDate.day}/${booking.scheduledDate.month}",
@@ -283,10 +314,14 @@ class _WorkerBookingCard extends StatelessWidget {
               leftLabel: "Reject",
               leftColor: Colors.red[50]!,
               leftTextColor: Colors.red,
-              onLeft: () => context.read<WorkerBookingsBloc>().add(RejectBooking(booking.id)),
+              onLeft: () => context
+                  .read<WorkerBookingsBloc>()
+                  .add(RejectBooking(booking.id)),
               rightLabel: "Accept Job",
               rightColor: const Color(0xFF14B8A6),
-              onRight: () => context.read<WorkerBookingsBloc>().add(AcceptBooking(booking.id)),
+              onRight: () => context
+                  .read<WorkerBookingsBloc>()
+                  .add(AcceptBooking(booking.id)),
             )
           else if (isAccepted)
             _ActionRow(
@@ -296,7 +331,9 @@ class _WorkerBookingCard extends StatelessWidget {
               onLeft: () {},
               rightLabel: "Complete Job",
               rightColor: const Color(0xFFF97316),
-              onRight: () => context.read<WorkerBookingsBloc>().add(CompleteBooking(booking.id)),
+              onRight: () => context
+                  .read<WorkerBookingsBloc>()
+                  .add(CompleteBooking(booking.id)),
             ),
         ],
       ),
@@ -312,11 +349,20 @@ class _StatusTag extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color;
     switch (status.toLowerCase()) {
-      case 'pending': color = Colors.orange; break;
-      case 'accepted': color = Colors.green; break;
-      case 'completed': color = Colors.blue; break;
-      case 'rejected': color = Colors.red; break;
-      default: color = Colors.grey;
+      case 'pending':
+        color = Colors.orange;
+        break;
+      case 'accepted':
+        color = Colors.green;
+        break;
+      case 'completed':
+        color = Colors.blue;
+        break;
+      case 'rejected':
+        color = Colors.red;
+        break;
+      default:
+        color = Colors.grey;
     }
 
     return Container(
@@ -327,7 +373,8 @@ class _StatusTag extends StatelessWidget {
       ),
       child: Text(
         status,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+        style:
+            TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -368,7 +415,8 @@ class _ActionRow extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   leftLabel,
-                  style: TextStyle(color: leftTextColor, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: leftTextColor, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -383,11 +431,13 @@ class _ActionRow extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: rightColor,
-                  borderRadius: const BorderRadius.only(bottomRight: Radius.circular(24)),
+                  borderRadius:
+                      const BorderRadius.only(bottomRight: Radius.circular(24)),
                 ),
                 child: Text(
                   rightLabel,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -397,7 +447,6 @@ class _ActionRow extends StatelessWidget {
     );
   }
 }
-
 
 class _FilterChip extends StatelessWidget {
   final String label;
@@ -413,22 +462,28 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF14B8A6) : (isDark ? const Color(0xFF2A2A2A) : Colors.white),
+          color: isSelected
+              ? const Color(0xFF14B8A6)
+              : (isDark ? const Color(0xFF2A2A2A) : Colors.white),
           border: Border.all(
-            color: isSelected ? const Color(0xFF14B8A6) : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+            color: isSelected
+                ? const Color(0xFF14B8A6)
+                : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
           ),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.grey[700]),
+            color: isSelected
+                ? Colors.white
+                : (isDark ? Colors.white70 : Colors.grey[700]),
             fontWeight: FontWeight.w500,
           ),
         ),

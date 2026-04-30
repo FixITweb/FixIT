@@ -3,6 +3,7 @@ class WorkerBookingModel {
   final String status;
   final String serviceTitle;
   final String customerName;
+  final String? customerPhone;
   final double price;
   final DateTime scheduledDate;
   final DateTime createdAt;
@@ -12,6 +13,7 @@ class WorkerBookingModel {
     required this.status,
     required this.serviceTitle,
     required this.customerName,
+    this.customerPhone,
     required this.price,
     required this.scheduledDate,
     required this.createdAt,
@@ -21,12 +23,14 @@ class WorkerBookingModel {
     return WorkerBookingModel(
       id: json['id'] as int,
       status: json['status'] as String? ?? 'pending',
-      serviceTitle: json['service'] != null 
+      serviceTitle: json['service'] != null
           ? json['service']['title'] as String? ?? 'Unknown Service'
           : 'Unknown Service',
       customerName: json['customer'] != null
           ? json['customer']['username'] as String? ?? 'Unknown Customer'
           : 'Unknown Customer',
+      customerPhone: json['customerPhone']?.toString() ??
+          json['customer_phone']?.toString(),
       price: json['service'] != null
           ? (json['service']['price'] as num?)?.toDouble() ?? 0.0
           : 0.0,
@@ -50,6 +54,7 @@ class WorkerBookingModel {
       'customer': {
         'username': customerName,
       },
+      'customer_phone': customerPhone,
       'scheduled_date': scheduledDate.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
     };

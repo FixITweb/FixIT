@@ -2,6 +2,7 @@ class Endpoints {
   static const String services = "services/";
   static const String myServices = "my-services/";
   static const String bookings = "bookings/";
+  static const String workerDashboard = "worker/dashboard/";
   static const String profile = "auth/profile/";
   static const String login = "auth/login/";
   static const String register = "auth/register/";

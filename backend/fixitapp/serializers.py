@@ -45,7 +45,7 @@ from .models import JobRequest, Notification, Booking, Rating, User, Service
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "password", "role", "phone_number"]
+        fields = ["username", "password", "role", "phone_number", "latitude", "longitude"]
         extra_kwargs = {
             "password": {"write_only": True}
         }
@@ -55,7 +55,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             password=validated_data["password"],
             role=validated_data["role"],
-            phone_number=validated_data.get("phone_number")
+            phone_number=validated_data.get("phone_number"),
+            latitude=validated_data.get("latitude"),
+            longitude=validated_data.get("longitude")
         )
         return user
 

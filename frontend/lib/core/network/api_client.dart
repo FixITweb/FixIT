@@ -7,7 +7,7 @@ class ApiClient {
   ApiClient({String? baseUrl})
       : _dio = Dio(
           BaseOptions(
-            baseUrl: baseUrl ?? 'https://fixit-zysg.onrender.com/api/',
+            baseUrl: baseUrl ?? const String.fromEnvironment('API_BASE_URL', defaultValue: 'https://fixit-zysg.onrender.com/api/'),
             connectTimeout: const Duration(seconds: 30),
             receiveTimeout: const Duration(seconds: 30),
             headers: {

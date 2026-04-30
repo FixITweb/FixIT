@@ -43,6 +43,9 @@ Future<Map<String, dynamic>> register(
   String password,
   String role,
   String phone,
+    {double? latitude,
+    double? longitude,
+    }
 ) async {
     try {
       final res = await client.post(
@@ -51,7 +54,9 @@ Future<Map<String, dynamic>> register(
           "username": username,
           "password": password,
           "role": role,
-          "phone": phone,
+            "phone_number": phone,
+            if (latitude != null) "latitude": latitude,
+            if (longitude != null) "longitude": longitude,
         },
         requireAuth: false, 
       );

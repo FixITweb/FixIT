@@ -22,10 +22,20 @@ Future<AuthModel> register(
   String password,
   String role,
   String phone,
+  {double? latitude,
+  double? longitude,
+  }
 ) async {
   try {
     // register user WITH phone
-    final registerData = await api.register(username, password, role, phone);
+    await api.register(
+      username,
+      password,
+      role,
+      phone,
+      latitude: latitude,
+      longitude: longitude,
+    );
 
     // auto login
     final loginData = await api.login(username, password);

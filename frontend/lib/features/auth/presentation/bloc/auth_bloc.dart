@@ -12,11 +12,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         // Login to get JWT tokens
         final authModel = await repo.login(event.username, event.password);
-        
+
         // Fetch user profile to get the role
         final profile = await repo.getProfile();
         final role = profile['role'] ?? 'customer';
-        
+
         emit(AuthSuccess(authModel.accessToken, role));
       } catch (e) {
         emit(AuthError('Login failed: ${e.toString()}'));
@@ -30,12 +30,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // final authModel = await repo.register(event.name, event.password, event.role);
 
         final authModel = await repo.register(
-              event.username,
-              event.password,
-              event.role,
-              event.phone,
-            );
-        
+          event.username,
+          event.password,
+          event.role,
+          event.phone,
+          latitude: event.latitude,
+          longitude: event.longitude,
+        );
+
         // User is now registered AND logged in with JWT tokens
         // Role is already known from registration
         emit(AuthSuccess(authModel.accessToken, event.role));
