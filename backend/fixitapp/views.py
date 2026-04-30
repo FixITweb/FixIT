@@ -528,7 +528,6 @@ def worker_dashboard(request):
         "total_services": total_services,
     })
 
-
 @api_view(['POST'])
 def ai_guide(request):
     user_prompt = request.data.get('user_prompt')
@@ -536,18 +535,28 @@ def ai_guide(request):
         return Response({"status": "error", "message": "user_prompt is required"}, status=400)
 
     try:
-        # Assumes GEMINI_API_KEY is available in your environment variables
         genai.configure(api_key="AIzaSyBYI8czVajfs0W90pKByMxDvr5Ah2TEDIc")
         model = genai.GenerativeModel('gemini-2.5-flash')
 
-        system_instruction = "You are an expert DIY repair assistant. The user will provide a household or electronic issue. You must respond strictly with a step-by-step checklist to fix the problem safely. Use Markdown bullet points or numbered lists. Do NOT include long conversational introductions or conclusions. If the fix is highly dangerous (like high-voltage electrical work), make step 1 a strong warning."
+        system_instruction = "You are an expert DIY repair assistant. The user will provide a household or electronic issue. You must respond strictly with a valid JSON array of objects. Each object must represent one step of the fix and contain two keys: 'title' (a short, bold-worthy title without markdown symbols) and 'description' (the detailed action required, plain text, no markdown). Do not include any conversational text outside the JSON array."
         final_prompt = system_instruction + "\n\nUser Issue: " + user_prompt
 
         response = model.generate_content(final_prompt)
         
+        import json
+        raw_text = response.text.strip()
+        if raw_text.startswith("```json"):
+            raw_text = raw_text[7:]
+        if raw_text.startswith("```"):
+            raw_text = raw_text[3:]
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]
+            
+        guide_data = json.loads(raw_text.strip())
+        
         return Response({
             "status": "success", 
-            "guide": response.text
+            "guide": guide_data
         })
     except Exception as e:
         return Response({"status": "error", "message": str(e)}, status=500)
