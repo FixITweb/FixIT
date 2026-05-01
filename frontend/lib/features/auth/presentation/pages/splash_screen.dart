@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateToOnboarding() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 5));
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/onboarding');
     }
