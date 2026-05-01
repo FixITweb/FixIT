@@ -3,7 +3,7 @@
 # FixIT – Smart Local Service Marketplace
 
 <p align="center">
-	<img src="frontend/assets/splash_screen.png" alt="FixIT Splash Screen" width="250" />
+	<img src="frontend/assets/splash-screen.png" alt="FixIT Splash Screen" width="250" />
 </p>
 
 ![Status](https://img.shields.io/badge/status-Production%20Ready-brightgreen)  
@@ -133,7 +133,6 @@ flutter run
 ---
 
 
----
 
 ## ❓ FAQ
 
@@ -151,15 +150,6 @@ A: Run `python manage.py flush` in the backend directory (this will delete all d
 
 ---
 
-## 🛣️ Roadmap
-
-- [ ] Multi-language support
-- [ ] In-app chat between customers and workers
-- [ ] Payment gateway integration
-- [ ] Push notifications
-- [ ] Admin dashboard for analytics
-
----
 
 ## 🙏 Credits
 
