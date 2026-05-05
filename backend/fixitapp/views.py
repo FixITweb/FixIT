@@ -23,7 +23,7 @@ from .serializers import (
     ServiceSerializer,
     BookingSerializer
 )
-from .utils import match_services, calculate_distance,is_match
+from .utils import match_services, calculate_distance,is_match, match_services_title
 from .permissions import IsWorker
 
 @api_view(['POST'])
@@ -272,7 +272,7 @@ def job_requests(request):
     if serializer.is_valid():
         job_request = serializer.save(customer=request.user)
 
-        match_services(job_request)
+        match_services_title(job_request)
 
         return Response(JobRequestSerializer(job_request).data, status=201)
 
