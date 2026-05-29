@@ -55,7 +55,7 @@ FixIT/
 
 ---
 
-## ⚡ Quick Start
+Quick Start
 
 ### 1. Backend (Django)
 
