@@ -1,47 +1,6 @@
 from rest_framework import serializers
 from .models import JobRequest, Notification, Booking, Rating, User, Service
 
-
-# class RegisterSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(write_only=True)
-
-#     role = serializers.ChoiceField(
-#         choices=User.ROLE_CHOICES,
-#         required=True
-#     )
-
-#     class Meta:
-#         model = User
-#         fields = ['username', 'password', 'role']
-
-#     def create(self, validated_data):
-#         return User.objects.create_user(**validated_data)
-
-# class RegisterSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(write_only=True)
-#     phone_number = serializers.CharField(required=False, allow_blank=True)
-
-#     role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
-
-#     class Meta:
-#         model = User
-#         fields = ['username', 'password', 'role', 'phone_number']
-
-#     def create(self, validated_data):
-#         password = validated_data.pop('password')
-
-#         # FIX HERE 
-#         phone = validated_data.pop('phone_number', None)
-
-#         user = User(**validated_data)
-#         user.set_password(password)
-
-#         if phone:
-#             user.phone_number = phone
-
-#         user.save()
-#         return user
-
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -122,11 +81,9 @@ class NotificationSerializer(serializers.ModelSerializer):
         
 
 class BookingSerializer(serializers.ModelSerializer):
-    # nested data
     service = ServiceSerializer(read_only=True)
     customer = UserProfileSerializer(read_only=True)
 
-    # 🔥 rename fields to match Flutter
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
     customerPhone = serializers.SerializerMethodField()
     workerPhone = serializers.SerializerMethodField()
@@ -136,11 +93,11 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "status",
-            "createdAt",      # camelCase for Flutter
+            "createdAt",      
             "service",
             "customer",
-            "customerPhone",  # camelCase
-            "workerPhone",    # camelCase
+            "customerPhone",  
+            "workerPhone",    
         ]
 
     def get_customerPhone(self, obj):

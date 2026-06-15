@@ -2,7 +2,6 @@ class AuthModel {
   final String accessToken;
   final String refreshToken;
 
-  // Optional user info (in case backend sends it)
   final int? userId;
   final String? username;
 
@@ -18,7 +17,6 @@ class AuthModel {
       accessToken: json['access'] ?? '',
       refreshToken: json['refresh'] ?? '',
 
-      // Optional parsing (safe)
       userId: json['user'] != null ? json['user']['id'] : null,
       username: json['user'] != null ? json['user']['username'] : null,
     );

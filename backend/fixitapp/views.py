@@ -1,3 +1,5 @@
+import os
+import google.generativeai as genai
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +10,10 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Sum, Count
 from django.utils.timezone import now
 from datetime import timedelta
+import os
+import google.generativeai as genai
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .models import JobRequest, Notification, Booking, Rating, Service, User
 from .serializers import (
@@ -17,7 +23,7 @@ from .serializers import (
     ServiceSerializer,
     BookingSerializer
 )
-from .utils import match_services, calculate_distance,is_match
+from .utils import match_services, calculate_distance,is_match, match_services_title
 from .permissions import IsWorker
 
 @api_view(['POST'])
@@ -74,14 +80,12 @@ def my_services(request):
 @permission_classes([IsAuthenticated])
 def services(request, service_id=None):
 
-    # DELETE SERVICE
     if request.method == 'DELETE' and service_id:
         service = get_object_or_404(Service, id=service_id)
         
         if service.worker != request.user:
             return Response({"error": "Not allowed"}, status=403)
-        
-        # Check for active bookings
+
         active_bookings = Booking.objects.filter(
             service=service,
             status__in=['pending', 'accepted']
@@ -99,7 +103,6 @@ def services(request, service_id=None):
             "message": f"Service '{service_title}' deleted successfully"
         })
 
-    # UPDATE SERVICE
     if request.method == 'PUT' and service_id:
         service = get_object_or_404(Service, id=service_id)
         
@@ -126,7 +129,6 @@ def services(request, service_id=None):
         return Response(serializer.errors, status=400)
 
     services = Service.objects.all()
-
     search = request.GET.get('search')
     category = request.GET.get('category')
     min_price = request.GET.get('min_price')
@@ -270,7 +272,7 @@ def job_requests(request):
     if serializer.is_valid():
         job_request = serializer.save(customer=request.user)
 
-        match_services(job_request)
+        match_services_title(job_request)
 
         return Response(JobRequestSerializer(job_request).data, status=201)
 
@@ -305,7 +307,7 @@ def mark_as_read(request, id):
 @permission_classes([IsAuthenticated])
 def bookings(request):
 
-    # ---------------- GET ----------------
+    #GET
     if request.method == 'GET':
 
         if request.user.role == 'customer':
@@ -317,9 +319,6 @@ def bookings(request):
                 service__worker=request.user
             ).select_related('service', 'service__worker', 'customer')
 
-        # serializer = BookingSerializer(bookings_qs, many=True)
-        # return Response(serializer.data)
-
         serializer = BookingSerializer(
             bookings_qs,
             many=True,
@@ -328,13 +327,12 @@ def bookings(request):
         return Response(serializer.data)
 
 
-    # ---------------- POST ----------------
+    # POST 
     if request.method == 'POST':
 
         if request.user.role != 'customer':
             return Response({"error": "Only customers can book"}, status=403)
 
-        # accept both service_id or service
         service_id = request.data.get('service_id') or request.data.get('service')
 
         if not service_id:
@@ -354,8 +352,6 @@ def bookings(request):
             message="New booking request"
         )
 
-        # serializer = BookingSerializer(booking)
-        # return Response([serializer.data], status=201)
         serializer = BookingSerializer(
             booking,
             context={"request": request}
@@ -505,25 +501,18 @@ def worker_dashboard(request):
 
     if user.role != "worker":
         return Response({"error": "Only workers can access dashboard"}, status=403)
-
-    # ---------------- SERVICES ----------------
     services = Service.objects.filter(worker=user)
 
     total_services = services.count()
 
-    # ---------------- BOOKINGS ----------------
     bookings = Booking.objects.filter(service__worker=user)
-
     active_bookings = bookings.filter(status__in=["pending", "accepted"]).count()
     completed_bookings = bookings.filter(status="completed").count()
 
-    # ---------------- EARNINGS ----------------
-    # Only completed bookings count as earnings
     total_earnings = bookings.filter(status="completed").aggregate(
         total=Sum("service__price")
     )["total"] or 0
 
-    # ---------------- RATINGS ----------------
     ratings_qs = Rating.objects.filter(worker=user)
 
     rating_data = ratings_qs.aggregate(
@@ -531,7 +520,6 @@ def worker_dashboard(request):
         total_ratings=Count("id")
     )
 
-    # ---------------- RESPONSE ----------------
     return Response({
         "username": user.username,
         "rating": rating_data["avg_rating"] or 0,
@@ -541,3 +529,37 @@ def worker_dashboard(request):
         "completed_bookings": completed_bookings,
         "total_services": total_services,
     })
+
+@api_view(['POST'])
+def ai_guide(request):
+    user_prompt = request.data.get('user_prompt')
+    if not user_prompt:
+        return Response({"status": "error", "message": "user_prompt is required"}, status=400)
+
+    try:
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+        model = genai.GenerativeModel('gemini-2.5-flash')
+
+        system_instruction = "You are an expert DIY repair assistant. The user will provide a household or electronic issue. You must respond strictly with a valid JSON array of objects. Each object must represent one step of the fix and contain two keys: 'title' (a short, bold-worthy title without markdown symbols) and 'description' (the detailed action required, plain text, no markdown). Do not include any conversational text outside the JSON array."
+        final_prompt = system_instruction + "\n\nUser Issue: " + user_prompt
+
+        response = model.generate_content(final_prompt)
+        
+        import json
+        raw_text = response.text.strip()
+        if raw_text.startswith("```json"):
+            raw_text = raw_text[7:]
+        if raw_text.startswith("```"):
+            raw_text = raw_text[3:]
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]
+            
+        guide_data = json.loads(raw_text.strip())
+        
+        return Response({
+            "status": "success", 
+            "guide": guide_data
+        })
+    except Exception as e:
+        return Response({"status": "error", "message": str(e)}, status=500)
+

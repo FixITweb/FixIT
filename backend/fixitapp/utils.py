@@ -99,3 +99,69 @@ def is_match(query, text):
         fuzz.partial_ratio(query, text) > 70 or
         fuzz.token_set_ratio(query, text) > 60
     )
+
+
+def match_services_title(obj):
+
+    if isinstance(obj, JobRequest):
+
+        services = Service.objects.all()
+        matched = False
+
+        for service in services:
+
+            score = fuzz.token_set_ratio(
+                obj.title.lower(),
+                service.title.lower()
+            )
+
+            # Match condition (title only)
+            if score > 75:
+
+                exists = Notification.objects.filter(
+                    user=obj.customer,
+                    service=service,
+                    message__icontains=obj.title
+                ).exists()
+
+                if not exists:
+                    Notification.objects.create(
+                        user=obj.customer,
+                        service=service,
+                        message=f"Service matching '{obj.title}' is available!"
+                    )
+
+                matched = True
+
+        if matched:
+            obj.status = "matched"
+            obj.save()
+    else:
+
+        requests = JobRequest.objects.filter(status="waiting")
+
+        for req in requests:
+
+            score = fuzz.token_set_ratio(
+                req.title.lower(),
+                obj.title.lower()
+            )
+
+            # Match condition (title only)
+            if score > 75:
+
+                exists = Notification.objects.filter(
+                    user=req.customer,
+                    service=obj,
+                    message__icontains=req.title
+                ).exists()
+
+                if not exists:
+                    Notification.objects.create(
+                        user=req.customer,
+                        service=obj,
+                        message=f"Service matching '{req.title}' is available!"
+                    )
+
+                req.status = "matched"
+                req.save()

@@ -60,8 +60,6 @@ class BookingModel {
       'customer': customer?.toJson(),
       'status': status,
       'created_at': createdAt.toIso8601String(),
-
-      //new
       'customer_phone': customerPhone,
       'worker_phone': workerPhone,
     };
@@ -117,7 +115,6 @@ class ServiceInfo {
     };
   }
 
-  // 🔥 EMPTY FALLBACK (VERY IMPORTANT)
   factory ServiceInfo.empty() {
     return ServiceInfo(
       id: 0,

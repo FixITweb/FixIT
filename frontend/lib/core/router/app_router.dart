@@ -11,6 +11,7 @@ import '../../features/search/presentation/pages/enhanced_search_screen.dart';
 import '../../features/notifications/presentation/pages/notifications_screen.dart';
 import '../../features/bookings/presentation/pages/bookings_screen.dart';
 import '../../features/customer/profile/presentation/pages/profile_screen.dart';
+import '../../features/customer/ai_guide/presentation/screens/ai_guide_screen.dart';
 import '../../features/worker/onboarding/presentation/pages/worker_onboarding_screen.dart';
 import '../../features/worker/onboarding/presentation/pages/worker_profession_setup_screen.dart';
 import '../../features/worker/dashboard/presentation/pages/worker_dashboard_screen.dart' as worker_home;
@@ -47,6 +48,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const EnhancedSearchScreen());
       case '/requests':
         return MaterialPageRoute(builder: (_) => const RequestsScreen());
+      case '/ai-guide':
+        return MaterialPageRoute(builder: (_) => const AIGuideScreen());
       case '/notifications':
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());
       case '/bookings':

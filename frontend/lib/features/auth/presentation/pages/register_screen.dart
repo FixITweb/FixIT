@@ -14,7 +14,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  //new
   final _phoneController = TextEditingController();
 
   String role = 'customer';
@@ -286,7 +285,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<Position?> _getCurrentLocation() async {
-    // On web, calling getCurrentPosition will trigger the browser permission prompt.
     if (kIsWeb) {
       try {
         return await Geolocator.getCurrentPosition(

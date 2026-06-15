@@ -15,7 +15,8 @@ from .views import (
     my_services, 
     categories,
     delete_booking,
-    worker_dashboard, 
+    worker_dashboard,
+    ai_guide,
 )
 
 urlpatterns = [
@@ -51,4 +52,5 @@ urlpatterns = [
     # CATEGORIES
     path('categories/', categories), 
     path('worker/dashboard/', worker_dashboard), 
+    path('ai-guide/', ai_guide),
 ]

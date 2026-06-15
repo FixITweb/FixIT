@@ -171,13 +171,11 @@ class _BookingCard extends StatelessWidget {
                             : booking.service.title,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      //new
   Text(
     "Worker: ${booking.service.worker.username}",
     style: TextStyle(color: Colors.grey[600]),
   ),
 
-        //new 🔥 PHONE NUMBERS SHOW HERE
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -199,12 +197,10 @@ class _BookingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                //_StatusChip(status: booking.status, color: statusColor),
               
               ],
             ),
 
-            //new
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,

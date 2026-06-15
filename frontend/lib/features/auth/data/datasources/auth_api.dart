@@ -28,7 +28,6 @@ class AuthApi {
         throw Exception("Token not found in response");
       }
 
-      // 💾 save token
       await client.saveToken(token);
 
       return data;
@@ -66,7 +65,7 @@ class AuthApi {
     }
   }
 
-  // 👤 PROFILE (Protected)
+  // PROFILE 
   Future<Map<String, dynamic>> getProfile() async {
     try {
       final res = await client.get(Endpoints.profile);
