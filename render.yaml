@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: fixit-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true          # Render auto-generates a strong secret key
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "fixit-zysg.onrender.com"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      # Database vars — fill these in Render dashboard or use a Render Postgres addon
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      # Gemini AI key
+      - key: GEMINI_API_KEY
+        sync: false
+      # If using Render Postgres (DATABASE_URL is set automatically)
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: fixit-db
+      #     property: connectionString
+
+# Optional: Uncomment to provision a Render-managed Postgres database
+# databases:
+#   - name: fixit-db
+#     databaseName: fixit
+#     user: fixit_user
+#     plan: free
