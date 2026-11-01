@@ -85,6 +85,7 @@ class BookingSerializer(serializers.ModelSerializer):
     customer = UserProfileSerializer(read_only=True)
 
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
     customerPhone = serializers.SerializerMethodField()
     workerPhone = serializers.SerializerMethodField()
 
@@ -93,11 +94,13 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "status",
-            "createdAt",      
+            "is_rated",
+            "createdAt",
+            "created_at",
             "service",
             "customer",
-            "customerPhone",  
-            "workerPhone",    
+            "customerPhone",
+            "workerPhone",
         ]
 
     def get_customerPhone(self, obj):
