@@ -20,6 +20,7 @@ from .views import (
     forgot_password,
 )
 
+urlpatterns = [
     # AUTH
     path('auth/register/', register),
     path('auth/login/', login),
