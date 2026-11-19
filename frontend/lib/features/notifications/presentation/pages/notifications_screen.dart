@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/notifications_bloc.dart';
 import '../bloc/notifications_event.dart';
 import '../bloc/notifications_state.dart';
-import '../../../customer/home/presentation/widgets/bottom_nav.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../notifications/data/datasources/notifications_api.dart';
 import '../../../notifications/data/repositories/notifications_repository.dart';
@@ -33,7 +32,8 @@ class NotificationsView extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<NotificationsBloc>().add(LoadNotifications()),
+            onPressed: () =>
+                context.read<NotificationsBloc>().add(LoadNotifications()),
           ),
         ],
       ),
@@ -53,7 +53,9 @@ class NotificationsView extends StatelessWidget {
                   Text('Error: ${state.message}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<NotificationsBloc>().add(LoadNotifications()),
+                    onPressed: () => context
+                        .read<NotificationsBloc>()
+                        .add(LoadNotifications()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -67,11 +69,13 @@ class NotificationsView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.notifications_none, size: 80, color: Colors.grey),
+                    Icon(Icons.notifications_none,
+                        size: 80, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
                       'No notifications yet',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 8),
                     Text(
@@ -93,12 +97,12 @@ class NotificationsView extends StatelessWidget {
                 itemCount: state.notifications.length,
                 itemBuilder: (context, index) {
                   final notification = state.notifications[index];
-                  
+
                   // Determine icon and color based on notification type
                   IconData icon = Icons.notifications;
                   Color iconColor = Colors.teal;
-                  
-                  if (notification.message.contains('available') || 
+
+                  if (notification.message.contains('available') ||
                       notification.message.contains('now offering')) {
                     icon = Icons.new_releases;
                     iconColor = Colors.green;
@@ -116,7 +120,9 @@ class NotificationsView extends StatelessWidget {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
                     elevation: notification.isRead ? 0 : 2,
-                    color: notification.isRead ? null : Colors.teal.withOpacity(0.05),
+                    color: notification.isRead
+                        ? null
+                        : Colors.teal.withOpacity(0.05),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: iconColor.withOpacity(0.2),
@@ -125,20 +131,28 @@ class NotificationsView extends StatelessWidget {
                       title: Text(
                         notification.message,
                         style: TextStyle(
-                          fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
+                          fontWeight: notification.isRead
+                              ? FontWeight.normal
+                              : FontWeight.bold,
                         ),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (notification.user != null && notification.user!.isNotEmpty)
-                            Text("From: ${notification.user}", style: const TextStyle(fontWeight: FontWeight.w500)),
-                          Text(_formatDate(notification.createdAt), style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                          if (notification.user != null &&
+                              notification.user!.isNotEmpty)
+                            Text("From: ${notification.user}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500)),
+                          Text(_formatDate(notification.createdAt),
+                              style: TextStyle(
+                                  color: Colors.grey.shade600, fontSize: 12)),
                         ],
                       ),
                       trailing: notification.isRead
                           ? null
-                          : const Icon(Icons.circle, size: 8, color: Colors.teal),
+                          : const Icon(Icons.circle,
+                              size: 8, color: Colors.teal),
                       onTap: () {
                         if (!notification.isRead) {
                           context.read<NotificationsBloc>().add(
@@ -164,7 +178,6 @@ class NotificationsView extends StatelessWidget {
           return const Center(child: Text('No data'));
         },
       ),
-      bottomNavigationBar: const BottomNav(currentIndex: 3),
     );
   }
 

@@ -48,7 +48,8 @@ class CustomerHomeView extends StatelessWidget {
                   Text('Error: ${state.message}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<HomeBloc>().add(LoadServices()),
+                    onPressed: () =>
+                        context.read<HomeBloc>().add(LoadServices()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -76,32 +77,49 @@ class CustomerHomeView extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "Find Services",
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          const Flexible(
+                            child: Text(
+                              "Find Services",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           Row(
                             children: [
                               const ThemeToggleButton(),
                               IconButton(
-                                icon: const Icon(Icons.tune, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.tune, color: Colors.white),
                                 onPressed: () {
                                   final homeBloc = context.read<HomeBloc>();
                                   showModalBottomSheet(
                                     context: context,
                                     isScrollControlled: true,
                                     shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(32)),
                                     ),
                                     builder: (context) => BlocProvider.value(
                                       value: homeBloc,
                                       child: FilterBottomSheet(state: state),
                                     ),
                                   );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.notifications_none,
+                                  color: Colors.white,
+                                ),
+                                tooltip: 'Notifications',
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, '/notifications');
                                 },
                               ),
                             ],
@@ -114,7 +132,8 @@ class CustomerHomeView extends StatelessWidget {
                           Navigator.pushNamed(context, '/search');
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -141,7 +160,8 @@ class CustomerHomeView extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981).withOpacity(0.1),
+                                  color:
+                                      const Color(0xFF10B981).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: const Icon(
@@ -166,14 +186,16 @@ class CustomerHomeView extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: state.categories.length + 1,
                     itemBuilder: (context, index) {
-                      final cat = index == 0 ? 'All' : state.categories[index - 1];
+                      final cat =
+                          index == 0 ? 'All' : state.categories[index - 1];
                       final isSelected = cat == state.selectedCategory;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8, top: 16),
                         child: FilterChip(
                           selected: isSelected,
                           label: Text(cat),
-                          onSelected: (_) => context.read<HomeBloc>().add(FilterServices(cat)),
+                          onSelected: (_) =>
+                              context.read<HomeBloc>().add(FilterServices(cat)),
                         ),
                       );
                     },
@@ -187,11 +209,13 @@ class CustomerHomeView extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.search_off, size: 64, color: Colors.grey),
+                              const Icon(Icons.search_off,
+                                  size: 64, color: Colors.grey),
                               const SizedBox(height: 16),
                               const Text(
                                 'No services found',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 8),
                               const Text(
@@ -202,12 +226,14 @@ class CustomerHomeView extends StatelessWidget {
                               const SizedBox(height: 24),
                               ElevatedButton.icon(
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/create-request');
+                                  Navigator.pushNamed(
+                                      context, '/create-request');
                                 },
                                 icon: const Icon(Icons.add_circle_outline),
                                 label: const Text('Post Job Request'),
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 32, vertical: 16),
                                   backgroundColor: const Color(0xFF10B981),
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
@@ -241,7 +267,9 @@ class CustomerHomeView extends StatelessWidget {
                                   radius: 32,
                                   backgroundColor: const Color(0xFF10B981),
                                   child: Text(
-                                    service.category.substring(0, 1).toUpperCase(),
+                                    service.category
+                                        .substring(0, 1)
+                                        .toUpperCase(),
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
@@ -251,17 +279,21 @@ class CustomerHomeView extends StatelessWidget {
                                 ),
                                 title: Text(
                                   service.title,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("${service.worker.username} • ${service.distance.toStringAsFixed(1)} km"),
+                                    Text(
+                                        "${service.worker.username} • ${service.distance.toStringAsFixed(1)} km"),
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                                        Text(" ${service.rating.toStringAsFixed(1)}"),
+                                        const Icon(Icons.star,
+                                            color: Colors.amber, size: 16),
+                                        Text(
+                                            " ${service.rating.toStringAsFixed(1)}"),
                                         const SizedBox(width: 8),
                                         Text(
                                           service.category,
