@@ -283,23 +283,26 @@ def job_requests(request):
 @permission_classes([IsAuthenticated])
 def notifications_list(request):
 
-    data = Notification.objects.filter(user=request.user)
+    data = Notification.objects.filter(user=request.user).order_by('-created_at')
 
     return Response([
         {
             "id": n.id,
             "user": n.user.username,
-            "message": n.message
+            "message": n.message,
+            "service_id": n.service.id if n.service else None,
+            "is_read": n.is_read,
+            "created_at": n.created_at,
         }
         for n in data
     ])
- 
-@api_view(['PUT']) 
-@permission_classes([IsAuthenticated]) 
-def mark_as_read(request, id): 
-    notification = get_object_or_404(Notification, id=id, user=request.user) 
-    notification.is_read = True 
-    notification.save() 
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def mark_as_read(request, id):
+    notification = get_object_or_404(Notification, id=id, user=request.user)
+    notification.is_read = True
+    notification.save()
     return Response({"message": "Marked as read"})
 
 # BOOKINGS
@@ -467,19 +470,24 @@ def get_ratings(request, worker_id):
 
     avg = ratings.aggregate(Avg("rating"))["rating__avg"]
 
-    return Response({
-        "average_rating": avg or 0,
-        "ratings": [
-            {
-                "id": r.id,
-                "rating": r.rating,
-                "review": r.review,
-                "customer_id": r.customer.id if r.customer else None,
-                "customer_name": r.customer.username if r.customer else "Anonymous",
-                "created_at": r.created_at
-            } for r in ratings
-        ]
-    })
+    # Return a flat list so Flutter can parse directly with `if response.data is List`
+    # Average rating is embedded in each item and also exposed as X-Average-Rating header.
+    ratings_list = [
+        {
+            "id": r.id,
+            "worker_id": worker_id,
+            "rating": r.rating,
+            "review": r.review,
+            "customer_id": r.customer.id if r.customer else None,
+            "customer_name": r.customer.username if r.customer else "Anonymous",
+            "created_at": r.created_at
+        } for r in ratings
+    ]
+
+    response = Response(ratings_list)
+    response['X-Average-Rating'] = str(avg or 0)
+    response['X-Total-Ratings'] = str(ratings.count())
+    return response
 
 @api_view(['GET'])
 def categories(request):
@@ -529,6 +537,18 @@ def worker_dashboard(request):
         "completed_bookings": completed_bookings,
         "total_services": total_services,
     })
+
+@api_view(['POST'])
+def forgot_password(request):
+    """Stub endpoint — Flutter calls auth/forgot-password/ so we must have it.
+    In a real implementation this would send a reset email.
+    """
+    email = request.data.get('email', '').strip()
+    if not email:
+        return Response({"error": "email is required"}, status=400)
+    # Always return success to avoid user enumeration
+    return Response({"message": "If an account exists with that email, a reset link has been sent."})
+
 
 @api_view(['POST'])
 def ai_guide(request):

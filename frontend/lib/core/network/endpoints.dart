@@ -12,6 +12,5 @@ class Endpoints {
   static const String ratings = "ratings/";
   static const String search = "search/";
   static const String categories = "categories/";
-  //new
-  static const deleteBooking = "/booking/delete/";
+  static const String deleteBooking = "booking/delete/"; // Fixed: removed leading slash
 }

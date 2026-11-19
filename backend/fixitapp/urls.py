@@ -12,11 +12,12 @@ from .views import (
     update_booking,
     create_rating,
     get_ratings,
-    my_services, 
+    my_services,
     categories,
     delete_booking,
     worker_dashboard,
     ai_guide,
+    forgot_password,
 )
 
 urlpatterns = [
@@ -24,11 +25,12 @@ urlpatterns = [
     path('auth/register/', register),
     path('auth/login/', login),
     path('auth/profile/', profile),
+    path('auth/forgot-password/', forgot_password),
 
     # SERVICES
     path('services/', services),
     path('services/<int:service_id>/', services),
-    path('my-services/', my_services), 
+    path('my-services/', my_services),
 
     # SMART SEARCH
     path('search/', smart_search),
@@ -36,7 +38,7 @@ urlpatterns = [
     # JOB REQUESTS
     path('requests/', job_requests),
 
-    # NOTIFICATIONS 
+    # NOTIFICATIONS
     path('notifications/', notifications_list),
     path('notifications/<int:id>/', mark_as_read),
 
@@ -50,7 +52,7 @@ urlpatterns = [
     path('ratings/<int:worker_id>/', get_ratings),
 
     # CATEGORIES
-    path('categories/', categories), 
-    path('worker/dashboard/', worker_dashboard), 
+    path('categories/', categories),
+    path('worker/dashboard/', worker_dashboard),
     path('ai-guide/', ai_guide),
 ]
