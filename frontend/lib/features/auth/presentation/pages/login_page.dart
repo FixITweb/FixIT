@@ -5,7 +5,6 @@ import 'package:geolocator/geolocator.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-import '../../data/repositories/auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

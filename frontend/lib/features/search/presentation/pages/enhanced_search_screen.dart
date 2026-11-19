@@ -136,11 +136,11 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
         children: [
           // Trending Searches
           if (trending.isNotEmpty) ...[
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.trending_up, color: Color(0xFF14B8A6)),
-                const SizedBox(width: 8),
-                const Text(
+                Icon(Icons.trending_up, color: Color(0xFF14B8A6)),
+                SizedBox(width: 8),
+                Text(
                   'Trending Searches',
                   style: TextStyle(
                     fontSize: 18,
@@ -170,11 +170,11 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
 
           // Popular Categories
           if (categories.isNotEmpty) ...[
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.category, color: Color(0xFF14B8A6)),
-                const SizedBox(width: 8),
-                const Text(
+                Icon(Icons.category, color: Color(0xFF14B8A6)),
+                SizedBox(width: 8),
+                Text(
                   'Popular Categories',
                   style: TextStyle(
                     fontSize: 18,
@@ -241,11 +241,11 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
 
           // Search Suggestions
           if (suggestions.isNotEmpty) ...[
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.lightbulb_outline, color: Color(0xFF14B8A6)),
-                const SizedBox(width: 8),
-                const Text(
+                Icon(Icons.lightbulb_outline, color: Color(0xFF14B8A6)),
+                SizedBox(width: 8),
+                Text(
                   'Suggested Searches',
                   style: TextStyle(
                     fontSize: 18,
@@ -440,11 +440,11 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 16),
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.recommend, color: Color(0xFF14B8A6)),
-                const SizedBox(width: 8),
-                const Text(
+                Icon(Icons.recommend, color: Color(0xFF14B8A6)),
+                SizedBox(width: 8),
+                Text(
                   'Related Searches',
                   style: TextStyle(
                     fontSize: 16,

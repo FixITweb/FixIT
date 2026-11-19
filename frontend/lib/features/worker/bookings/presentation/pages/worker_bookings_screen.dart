@@ -182,7 +182,7 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
                                     color: Colors.grey[isDark ? 700 : 300]),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'No ${_selectedFilter} bookings',
+                                  'No $_selectedFilter bookings',
                                   style: const TextStyle(color: Colors.grey),
                                 ),
                               ],

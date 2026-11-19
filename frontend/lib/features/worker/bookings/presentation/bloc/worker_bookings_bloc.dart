@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'worker_bookings_event.dart';
 import 'worker_bookings_state.dart';
 import '../../data/repositories/worker_bookings_repository.dart';
-import '../../data/models/worker_booking_model.dart';
 
 class WorkerBookingsBloc extends Bloc<WorkerBookingsEvent, WorkerBookingsState> {
   final WorkerBookingsRepository repository;

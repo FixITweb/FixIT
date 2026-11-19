@@ -113,9 +113,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 const SizedBox(height: 24),
                 // Logo
-                Center(
+                const Center(
                   child: Column(
-                    children: const [
+                    children: [
                       Icon(Icons.build, size: 64, color: Color(0xFF14B8A6)),
                       SizedBox(height: 8),
                       Text(
