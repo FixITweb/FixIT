@@ -151,8 +151,14 @@ class ApiClient {
               'The server took too long to respond. If this was signup, try logging in before registering again.');
 
         case DioExceptionType.badResponse:
-          return Exception(
-              'Server error: ${error.response?.statusCode} - ${error.response?.data}');
+          final statusCode = error.response?.statusCode;
+          final responseMessage = _responseMessage(error.response?.data);
+          if (responseMessage.isEmpty) {
+            return Exception(
+              'Server returned HTTP ${statusCode ?? 'error'}. Please try again later.',
+            );
+          }
+          return Exception('Server error: $statusCode - $responseMessage');
 
         case DioExceptionType.cancel:
           return Exception('Request cancelled');
@@ -162,5 +168,20 @@ class ApiClient {
       }
     }
     return Exception('Unknown error');
+  }
+
+  String _responseMessage(dynamic data) {
+    if (data is Map) {
+      final message = data['detail'] ?? data['error'];
+      return message?.toString() ?? data.toString();
+    }
+
+    if (data is String) {
+      final message = data.trim();
+      if (message.toLowerCase().startsWith('<')) return '';
+      return message;
+    }
+
+    return data?.toString() ?? '';
   }
 }

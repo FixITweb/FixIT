@@ -21,8 +21,6 @@ class AuthApi {
 
       final data = res.data;
 
-      print("LOGIN RESPONSE: $data");
-
       final token = data['access'] ?? data['token'];
 
       if (token == null) {

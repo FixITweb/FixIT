@@ -4,21 +4,23 @@ class AuthModel {
 
   final int? userId;
   final String? username;
+  final String? role;
 
   AuthModel({
     required this.accessToken,
     required this.refreshToken,
     this.userId,
     this.username,
+    this.role,
   });
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {
     return AuthModel(
       accessToken: json['access'] ?? '',
       refreshToken: json['refresh'] ?? '',
-
       userId: json['user'] != null ? json['user']['id'] : null,
       username: json['user'] != null ? json['user']['username'] : null,
+      role: json['role'] as String?,
     );
   }
 
@@ -26,6 +28,7 @@ class AuthModel {
     return {
       "access": accessToken,
       "refresh": refreshToken,
+      "role": role,
       "user": userId != null
           ? {
               "id": userId,

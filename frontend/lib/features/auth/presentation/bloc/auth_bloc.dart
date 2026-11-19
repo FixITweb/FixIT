@@ -12,9 +12,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final authModel = await repo.login(event.username, event.password);
 
-        // Fetch user profile to get the role
-        final profile = await repo.getProfile();
-        final role = profile['role'] ?? 'customer';
+        var role = authModel.role;
+        if (role == null || role.isEmpty) {
+          final profile = await repo.getProfile();
+          role = profile['role'] is String ? profile['role'] as String : null;
+        }
+        if (role == null) {
+          throw Exception('The server did not return an account role.');
+        }
+        if (role != 'customer' && role != 'worker') {
+          throw Exception('The server did not return a valid account role.');
+        }
 
         emit(AuthSuccess(authModel.accessToken, role));
       } catch (e) {
@@ -25,7 +33,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>((event, emit) async {
       emit(AuthLoading());
       try {
-
         final authModel = await repo.register(
           event.username,
           event.password,

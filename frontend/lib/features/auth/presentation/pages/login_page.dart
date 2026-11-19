@@ -94,7 +94,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _captureAndSaveLocationIfMissing() async {
     final repo = context.read<AuthBloc>().repo;
-    final profile = await repo.getProfile();
+    late final Map<String, dynamic> profile;
+    try {
+      profile = await repo.getProfile();
+    } on Exception catch (error) {
+      debugPrint('Skipping location sync because profile load failed: $error');
+      return;
+    }
     final hasLocation =
         profile['latitude'] != null && profile['longitude'] != null;
 
