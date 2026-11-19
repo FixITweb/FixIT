@@ -165,3 +165,31 @@ def match_services_title(obj):
 
                 req.status = "matched"
                 req.save()
+
+
+def match_job_request_for_booking(customer, service):
+    requests = JobRequest.objects.filter(customer=customer, status="waiting")
+    matches = []
+
+    for job_request in requests:
+        title_score = fuzz.token_set_ratio(
+            job_request.title.lower(),
+            service.title.lower(),
+        )
+        category_score = fuzz.token_set_ratio(
+            job_request.category.lower(),
+            service.category.lower(),
+        )
+        category_match = (
+            job_request.category.strip().lower()
+            == service.category.strip().lower()
+        )
+        score = max(title_score, category_score)
+
+        if (category_match and score > 60) or score > 80:
+            matches.append((title_score, category_match, job_request))
+
+    if matches:
+        _, _, job_request = max(matches, key=lambda match: (match[0], match[1]))
+        job_request.status = "matched"
+        job_request.save(update_fields=["status", "updated_at"])

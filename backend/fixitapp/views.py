@@ -23,7 +23,13 @@ from .serializers import (
     ServiceSerializer,
     BookingSerializer
 )
-from .utils import match_services, calculate_distance,is_match, match_services_title
+from .utils import (
+    match_services,
+    calculate_distance,
+    is_match,
+    match_services_title,
+    match_job_request_for_booking,
+)
 from .permissions import IsWorker
 
 @api_view(['POST'])
@@ -349,6 +355,7 @@ def bookings(request):
             service=service,
             customer=request.user
         )
+        match_job_request_for_booking(request.user, service)
 
         Notification.objects.create(
             user=service.worker,

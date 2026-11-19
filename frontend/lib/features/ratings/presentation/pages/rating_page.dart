@@ -127,20 +127,26 @@ class _RatingPageState extends State<RatingPage> {
                   child: Column(
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(5, (index) {
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _rating = (index + 1).toDouble();
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(
-                                index < _rating ? Icons.star : Icons.star_outline,
-                                size: 48,
-                                color: const Color(0xFFF97316),
+                          return Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                setState(() {
+                                  _rating = (index + 1).toDouble();
+                                });
+                              },
+                              child: SizedBox(
+                                height: 56,
+                                child: Center(
+                                  child: Icon(
+                                    index < _rating
+                                        ? Icons.star
+                                        : Icons.star_outline,
+                                    size: 40,
+                                    color: const Color(0xFFF97316),
+                                  ),
+                                ),
                               ),
                             ),
                           );
