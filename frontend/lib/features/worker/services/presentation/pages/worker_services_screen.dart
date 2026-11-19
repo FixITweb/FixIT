@@ -8,6 +8,9 @@ import '../../../../../core/network/api_client.dart';
 import '../../../../services/data/datasources/services_api.dart';
 import '../../../../services/data/repositories/services_repository.dart';
 import '../../../../services/data/models/service_model.dart';
+import '../../../../../core/utils/location_helper.dart';
+import '../../../../../shared/widgets/service_location_selector.dart';
+import 'package:latlong2/latlong.dart';
 
 class WorkerServicesScreen extends StatelessWidget {
   const WorkerServicesScreen({super.key});
@@ -34,7 +37,8 @@ class WorkerServicesView extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<WorkerServicesBloc>().add(LoadWorkerServices()),
+            onPressed: () =>
+                context.read<WorkerServicesBloc>().add(LoadWorkerServices()),
           ),
         ],
       ),
@@ -53,7 +57,8 @@ class WorkerServicesView extends StatelessWidget {
             );
           } else if (state is WorkerServicesError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              SnackBar(
+                  content: Text(state.message), backgroundColor: Colors.red),
             );
           }
         },
@@ -72,7 +77,9 @@ class WorkerServicesView extends StatelessWidget {
                   Text(state.message),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<WorkerServicesBloc>().add(LoadWorkerServices()),
+                    onPressed: () => context
+                        .read<WorkerServicesBloc>()
+                        .add(LoadWorkerServices()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -86,11 +93,13 @@ class WorkerServicesView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.work_outline, size: 80, color: Colors.grey),
+                    const Icon(Icons.work_outline,
+                        size: 80, color: Colors.grey),
                     const SizedBox(height: 16),
                     const Text(
                       "No Services Yet",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     const Text(
@@ -145,10 +154,24 @@ class WorkerServicesView extends StatelessWidget {
         text: service != null ? service.price.toStringAsFixed(0) : '');
     final descCtrl = TextEditingController(text: service?.description ?? '');
     String selectedCategory = service?.category ?? 'Plumbing';
+    LatLng? selectedLocation = service != null &&
+            LocationHelper.isValidCoordinates(
+              service.latitude,
+              service.longitude,
+            )
+        ? LatLng(service.latitude, service.longitude)
+        : null;
 
     final categories = [
-      'Plumbing', 'Electrical', 'Cleaning', 'Carpentry',
-      'Painting', 'Moving', 'Gardening', 'Appliance Repair', 'Other'
+      'Plumbing',
+      'Electrical',
+      'Cleaning',
+      'Carpentry',
+      'Painting',
+      'Moving',
+      'Gardening',
+      'Appliance Repair',
+      'Other'
     ];
 
     showDialog(
@@ -170,7 +193,7 @@ class WorkerServicesView extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: selectedCategory,
+                  initialValue: selectedCategory,
                   decoration: const InputDecoration(
                     labelText: 'Category',
                     border: OutlineInputBorder(),
@@ -179,6 +202,12 @@ class WorkerServicesView extends StatelessWidget {
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
                   onChanged: (v) => setState(() => selectedCategory = v!),
+                ),
+                const SizedBox(height: 12),
+                ServiceLocationSelector(
+                  location: selectedLocation,
+                  onChanged: (location) =>
+                      setState(() => selectedLocation = location),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -218,6 +247,18 @@ class WorkerServicesView extends StatelessWidget {
                   );
                   return;
                 }
+                if (selectedLocation == null ||
+                    !LocationHelper.isValidCoordinates(
+                      selectedLocation!.latitude,
+                      selectedLocation!.longitude,
+                    )) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Choose a valid service location'),
+                    ),
+                  );
+                  return;
+                }
                 final price = double.tryParse(priceCtrl.text) ?? 0.0;
                 if (isEdit) {
                   context.read<WorkerServicesBloc>().add(UpdateWorkerService(
@@ -226,6 +267,8 @@ class WorkerServicesView extends StatelessWidget {
                         category: selectedCategory,
                         price: price,
                         description: descCtrl.text,
+                        latitude: selectedLocation!.latitude,
+                        longitude: selectedLocation!.longitude,
                       ));
                 } else {
                   context.read<WorkerServicesBloc>().add(AddWorkerService(
@@ -233,6 +276,8 @@ class WorkerServicesView extends StatelessWidget {
                         category: selectedCategory,
                         price: price,
                         description: descCtrl.text,
+                        latitude: selectedLocation!.latitude,
+                        longitude: selectedLocation!.longitude,
                       ));
                 }
                 Navigator.pop(dialogCtx);
@@ -259,7 +304,9 @@ class WorkerServicesView extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              context.read<WorkerServicesBloc>().add(DeleteWorkerService(service.id));
+              context
+                  .read<WorkerServicesBloc>()
+                  .add(DeleteWorkerService(service.id));
               Navigator.pop(dialogCtx);
             },
             child: const Text('Delete', style: TextStyle(color: Colors.white)),

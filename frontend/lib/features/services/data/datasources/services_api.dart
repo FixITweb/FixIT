@@ -59,7 +59,10 @@ class ServiceApi {
   //  FETCH CATEGORIES
   Future<List<String>> fetchCategories() async {
     try {
-      final res = await client.get(Endpoints.categories);
+      final res = await client.get(
+        Endpoints.categories,
+        receiveTimeout: const Duration(seconds: 120),
+      );
       final List data = res.data;
       return data.map((e) => e.toString()).toList();
     } catch (e) {
@@ -100,6 +103,8 @@ class ServiceApi {
     required String description,
     required String category,
     required double price,
+    required double latitude,
+    required double longitude,
   }) async {
     try {
       await client.put(
@@ -109,6 +114,8 @@ class ServiceApi {
           "description": description,
           "category": category,
           "price": price,
+          "latitude": latitude,
+          "longitude": longitude,
         },
       );
     } catch (e) {

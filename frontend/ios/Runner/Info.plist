@@ -46,6 +46,6 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>FixIT uses your location to match nearby services during registration.</string>
+	<string>FixIT uses your location when you choose it as your service location.</string>
 </dict>
 </plist>

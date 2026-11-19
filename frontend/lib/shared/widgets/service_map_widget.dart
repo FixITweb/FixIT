@@ -149,10 +149,10 @@ class ServiceMapWidget extends StatelessWidget {
   String _getStaticMapUrl() {
     // Using Google Static Maps API
     // Note: In production, you should use your own API key
-    final apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with actual key
-    final zoom = 14;
-    final size = '600x300';
-    final markerColor = '0xFF14B8A6';
+    const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with actual key
+    const zoom = 14;
+    const size = '600x300';
+    const markerColor = '0xFF14B8A6';
     
     return 'https://maps.googleapis.com/maps/api/staticmap?'
         'center=$latitude,$longitude'

@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../../services/data/repositories/services_repository.dart';
 import '../../../../services/data/datasources/services_api.dart';
 import '../../../../../core/network/api_client.dart';
+import '../../../../../core/utils/location_helper.dart';
+import '../../../../../shared/widgets/service_location_selector.dart';
 
 class WorkerProfessionSetupScreen extends StatefulWidget {
   const WorkerProfessionSetupScreen({super.key});
 
   @override
-  State<WorkerProfessionSetupScreen> createState() => _WorkerProfessionSetupScreenState();
+  State<WorkerProfessionSetupScreen> createState() =>
+      _WorkerProfessionSetupScreenState();
 }
 
-class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScreen> {
+class _WorkerProfessionSetupScreenState
+    extends State<WorkerProfessionSetupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
-  
+
   String _selectedCategory = 'Plumbing';
   bool _isLoading = false;
+  LatLng? _serviceLocation;
 
   final List<String> _categories = [
     'Plumbing',
@@ -57,7 +62,7 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 30),
-                
+
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
@@ -78,10 +83,10 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
                           },
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Category Dropdown
                         DropdownButtonFormField<String>(
-                          value: _selectedCategory,
+                          initialValue: _selectedCategory,
                           decoration: const InputDecoration(
                             labelText: 'Category *',
                             border: OutlineInputBorder(),
@@ -99,7 +104,13 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
                           },
                         ),
                         const SizedBox(height: 16),
-                        
+                        ServiceLocationSelector(
+                          location: _serviceLocation,
+                          onChanged: (location) =>
+                              setState(() => _serviceLocation = location),
+                        ),
+                        const SizedBox(height: 16),
+
                         // Price
                         TextFormField(
                           controller: _priceController,
@@ -121,7 +132,7 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
                           },
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Description
                         TextFormField(
                           controller: _descriptionController,
@@ -143,15 +154,18 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
                     ),
                   ),
                 ),
-                
+
                 // Buttons
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _isLoading ? null : () {
-                          Navigator.pushReplacementNamed(context, '/worker-home');
-                        },
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/worker-home');
+                              },
                         child: const Text('Skip for Now'),
                       ),
                     ),
@@ -164,7 +178,8 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Text('Create Service'),
                       ),
@@ -181,6 +196,16 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
 
   Future<void> _createService() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_serviceLocation == null ||
+        !LocationHelper.isValidCoordinates(
+          _serviceLocation!.latitude,
+          _serviceLocation!.longitude,
+        )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Choose a valid service location')),
+      );
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -188,14 +213,14 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
 
     try {
       final repository = ServiceRepository(ServiceApi(ApiClient()));
-      
+
       await repository.createService(
         title: _titleController.text,
         description: _descriptionController.text,
         category: _selectedCategory,
         price: double.parse(_priceController.text),
-        latitude: 40.7128, // Default location - should be user's location
-        longitude: -74.0060,
+        latitude: _serviceLocation!.latitude,
+        longitude: _serviceLocation!.longitude,
       );
 
       if (mounted) {
@@ -205,7 +230,7 @@ class _WorkerProfessionSetupScreenState extends State<WorkerProfessionSetupScree
             backgroundColor: Colors.green,
           ),
         );
-        
+
         Navigator.pushReplacementNamed(context, '/worker-home');
       }
     } catch (e) {

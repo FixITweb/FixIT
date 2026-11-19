@@ -4,7 +4,8 @@ import 'worker_services_state.dart';
 import '../../../../services/data/repositories/services_repository.dart';
 import '../../../../services/data/models/service_model.dart';
 
-class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> {
+class WorkerServicesBloc
+    extends Bloc<WorkerServicesEvent, WorkerServicesState> {
   final ServiceRepository serviceRepository;
   List<ServiceModel> _services = [];
 
@@ -34,8 +35,8 @@ class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> 
         description: event.description,
         category: event.category,
         price: event.price,
-        latitude: 0.0,
-        longitude: 0.0,
+        latitude: event.latitude,
+        longitude: event.longitude,
       );
       emit(WorkerServiceAdded('Service added successfully!'));
       final services = await serviceRepository.getMyServices();
@@ -55,6 +56,8 @@ class WorkerServicesBloc extends Bloc<WorkerServicesEvent, WorkerServicesState> 
         description: event.description,
         category: event.category,
         price: event.price,
+        latitude: event.latitude,
+        longitude: event.longitude,
       );
       emit(WorkerServiceUpdated('Service updated successfully!'));
       final services = await serviceRepository.getMyServices();

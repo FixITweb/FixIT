@@ -50,6 +50,7 @@ class ApiClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     bool requireAuth = true,
+    Duration? receiveTimeout,
   }) async {
     try {
       final options = await _getAuthOptions(requireAuth: requireAuth);
@@ -57,7 +58,9 @@ class ApiClient {
       final response = await _dio.get(
         path,
         queryParameters: queryParameters,
-        options: options,
+        options: receiveTimeout == null
+            ? options
+            : options.copyWith(receiveTimeout: receiveTimeout),
       );
 
       return response;

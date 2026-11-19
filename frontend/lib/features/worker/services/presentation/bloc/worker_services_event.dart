@@ -7,12 +7,16 @@ class AddWorkerService extends WorkerServicesEvent {
   final String category;
   final double price;
   final String description;
+  final double latitude;
+  final double longitude;
 
   AddWorkerService({
     required this.title,
     required this.category,
     required this.price,
     required this.description,
+    required this.latitude,
+    required this.longitude,
   });
 }
 
@@ -22,6 +26,8 @@ class UpdateWorkerService extends WorkerServicesEvent {
   final String category;
   final double price;
   final String description;
+  final double latitude;
+  final double longitude;
 
   UpdateWorkerService({
     required this.id,
@@ -29,6 +35,8 @@ class UpdateWorkerService extends WorkerServicesEvent {
     required this.category,
     required this.price,
     required this.description,
+    required this.latitude,
+    required this.longitude,
   });
 }
 

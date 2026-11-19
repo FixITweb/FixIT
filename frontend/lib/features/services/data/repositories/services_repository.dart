@@ -68,6 +68,8 @@ class ServiceRepository {
     required String description,
     required String category,
     required double price,
+    required double latitude,
+    required double longitude,
   }) async {
     await api.updateService(
       id: id,
@@ -75,6 +77,8 @@ class ServiceRepository {
       description: description,
       category: category,
       price: price,
+      latitude: latitude,
+      longitude: longitude,
     );
   }
 
