@@ -272,6 +272,12 @@ def smart_search(request):
 def job_requests(request):
 
     if request.method == 'GET':
+        booked_services = Service.objects.filter(
+            bookings__customer=request.user
+        ).distinct()
+        for service in booked_services:
+            match_job_request_for_booking(request.user, service)
+
         data = JobRequest.objects.filter(customer=request.user)
         return Response(JobRequestSerializer(data, many=True).data)
 

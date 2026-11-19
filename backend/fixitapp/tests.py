@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 
-from .models import JobRequest, Service
+from .models import Booking, JobRequest, Service
 
 
 class BookingRequestStatusTests(APITestCase):
@@ -91,3 +91,16 @@ class BookingRequestStatusTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         job_request.refresh_from_db()
         self.assertEqual(job_request.status, "waiting")
+
+    def test_loading_requests_matches_a_previously_created_booking(self):
+        job_request = self.create_request(
+            self.customer, "Repair a leaking sink", "Plumbing"
+        )
+        Booking.objects.create(service=self.service, customer=self.customer)
+
+        response = self.client.get("/api/requests/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["status"], "matched")
+        job_request.refresh_from_db()
+        self.assertEqual(job_request.status, "matched")
