@@ -15,19 +15,19 @@ class WorkerProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      return BlocProvider(
-  create: (context) {
-    final apiClient = ApiClient();
+    return BlocProvider(
+      create: (context) {
+        final apiClient = ApiClient();
 
-    return WorkerProfileBloc(
-      WorkerProfileRepository(
-        WorkerProfileApi(apiClient),
-        WorkerDashboardApi(apiClient),
-      ),
-    )..add(LoadWorkerProfile());
-  },
-  child: const WorkerProfileView(),
-);
+        return WorkerProfileBloc(
+          WorkerProfileRepository(
+            WorkerProfileApi(apiClient),
+            WorkerDashboardApi(apiClient),
+          ),
+        )..add(LoadWorkerProfile());
+      },
+      child: const WorkerProfileView(),
+    );
   }
 }
 
@@ -55,9 +55,11 @@ class WorkerProfileView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const Icon(Icons.error_outline,
+                        size: 64, color: Colors.red),
                     const SizedBox(height: 16),
-                    const Text('Failed to load profile.', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Failed to load profile.',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Text(
                       state.message.split('\n').first,
@@ -67,7 +69,9 @@ class WorkerProfileView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => context.read<WorkerProfileBloc>().add(LoadWorkerProfile()),
+                      onPressed: () => context
+                          .read<WorkerProfileBloc>()
+                          .add(LoadWorkerProfile()),
                       child: const Text('Retry'),
                     ),
                   ],
@@ -101,7 +105,8 @@ class WorkerProfileView extends StatelessWidget {
                       ),
                       title: Text(
                         profile.username,
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
                         "WORKER • Joined ${_formatDate(profile.createdAt)}",
@@ -109,68 +114,7 @@ class WorkerProfileView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
-                  // Worker Stats Card
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Worker Statistics",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildStatCard(
-                                  "Services",
-                                  profile.servicesCount.toString(),
-                                  Icons.work,
-                                  Colors.blue,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildStatCard(
-                                  "Rating",
-                                  profile.averageRating.toStringAsFixed(1),
-                                  Icons.star,
-                                  Colors.amber,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildStatCard(
-                                  "Bookings",
-                                  profile.bookingsCount.toString(),
-                                  Icons.calendar_today,
-                                  Colors.green,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildStatCard(
-                                  "Earnings",
-                                  "\$${profile.totalEarnings.toStringAsFixed(0)}",
-                                  Icons.attach_money,
-                                  Colors.teal,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  
+
                   // Account Information Card
                   Card(
                     child: Padding(
@@ -180,23 +124,24 @@ class WorkerProfileView extends StatelessWidget {
                         children: [
                           const Text(
                             "Account Information",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
                           _buildInfoRow("Username", profile.username),
                           _buildInfoRow("Email", profile.email),
                           _buildInfoRow("Role", profile.role.toUpperCase()),
-                          _buildInfoRow("Member Since", _formatDate(profile.createdAt)),
+                          _buildInfoRow(
+                              "Member Since", _formatDate(profile.createdAt)),
                           _buildInfoRow("Worker ID", "#${profile.id}"),
-                          _buildInfoRow("Completed Jobs", profile.completedJobs.toString()),
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   const Divider(),
-                  
+
                   // Menu Items
                   ListTile(
                     leading: const Icon(Icons.work),
@@ -226,7 +171,8 @@ class WorkerProfileView extends StatelessWidget {
                     leading: const Icon(Icons.notifications),
                     title: const Text("Notifications"),
                     trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () => Navigator.pushNamed(context, '/worker-notifications'),
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/worker-notifications'),
                   ),
                   ListTile(
                     leading: const Icon(Icons.star),
@@ -250,7 +196,8 @@ class WorkerProfileView extends StatelessWidget {
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Help & Support coming soon!')),
+                        const SnackBar(
+                            content: Text('Help & Support coming soon!')),
                       );
                     },
                   ),
@@ -266,7 +213,8 @@ class WorkerProfileView extends StatelessWidget {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('Logout'),
-                          content: const Text('Are you sure you want to logout?'),
+                          content:
+                              const Text('Are you sure you want to logout?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
@@ -296,39 +244,7 @@ class WorkerProfileView extends StatelessWidget {
           return const Center(child: Text('No data'));
         },
       ),
-      bottomNavigationBar: const WorkerBottomNav(currentIndex: 4),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
+      bottomNavigationBar: const WorkerBottomNav(currentIndex: 3),
     );
   }
 
@@ -361,8 +277,18 @@ class WorkerProfileView extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     return "${months[date.month - 1]} ${date.day}, ${date.year}";
   }
