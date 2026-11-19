@@ -155,17 +155,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: _next,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF14B8A6),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
                   child: Text(
                     isLast ? 'Get Started' : 'Next',
-                    style: const TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

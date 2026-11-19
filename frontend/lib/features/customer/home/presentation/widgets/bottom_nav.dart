@@ -7,12 +7,9 @@ class BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: currentIndex,
-      selectedItemColor: const Color(0xFF10B981),
-      unselectedItemColor: Colors.grey,
-      onTap: (index) {
+    return NavigationBar(
+      selectedIndex: currentIndex,
+      onDestinationSelected: (index) {
         switch (index) {
           case 0:
             Navigator.pushReplacementNamed(context, '/customer-home');
@@ -31,25 +28,30 @@ class BottomNav extends StatelessWidget {
             break;
         }
       },
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
           label: 'Home',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.list_alt),
+        NavigationDestination(
+          icon: Icon(Icons.assignment_outlined),
+          selectedIcon: Icon(Icons.assignment_rounded),
           label: 'Requests',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.smart_toy),
+        NavigationDestination(
+          icon: Icon(Icons.smart_toy_outlined),
+          selectedIcon: Icon(Icons.smart_toy_rounded),
           label: 'AI Guide',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
+        NavigationDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
           label: 'Bookings',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
+        NavigationDestination(
+          icon: Icon(Icons.person_outline_rounded),
+          selectedIcon: Icon(Icons.person_rounded),
           label: 'Profile',
         ),
       ],

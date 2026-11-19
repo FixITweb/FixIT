@@ -13,7 +13,7 @@ import '../../../../../shared/widgets/location_map_card.dart';
 
 class ServiceDetailScreen extends StatelessWidget {
   final String serviceId;
-  
+
   const ServiceDetailScreen({super.key, required this.serviceId});
 
   @override
@@ -49,7 +49,8 @@ class ServiceDetailView extends StatelessWidget {
                   color: const Color(0xFF10B981).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 64),
+                child: const Icon(Icons.check_circle,
+                    color: Color(0xFF10B981), size: 64),
               ),
               const SizedBox(height: 24),
               const Text(
@@ -71,18 +72,12 @@ class ServiceDetailView extends StatelessWidget {
                     Navigator.pop(context); // Close dialog
                     Navigator.pushReplacementNamed(context, '/bookings');
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF10B981),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('View Bookings', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text('View Bookings'),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Maybe Later', style: TextStyle(color: Colors.grey)),
+                child: const Text('Maybe Later'),
               ),
             ],
           ),
@@ -119,7 +114,8 @@ class ServiceDetailView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const Icon(Icons.error_outline,
+                        size: 64, color: Colors.red),
                     const SizedBox(height: 16),
                     Text('Error: ${state.message}'),
                     const SizedBox(height: 16),
@@ -166,12 +162,14 @@ class ServiceDetailView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                                  icon: const Icon(Icons.arrow_back,
+                                      color: Colors.white),
                                   onPressed: () => Navigator.pop(context),
                                 ),
                                 const Spacer(),
                                 IconButton(
-                                  icon: const Icon(Icons.share, color: Colors.white),
+                                  icon: const Icon(Icons.share,
+                                      color: Colors.white),
                                   onPressed: () {},
                                 ),
                               ],
@@ -187,7 +185,8 @@ class ServiceDetailView extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(20),
@@ -205,7 +204,7 @@ class ServiceDetailView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -225,7 +224,9 @@ class ServiceDetailView extends StatelessWidget {
                                   radius: 32,
                                   backgroundColor: const Color(0xFF14B8A6),
                                   child: Text(
-                                    service.worker.username.substring(0, 1).toUpperCase(),
+                                    service.worker.username
+                                        .substring(0, 1)
+                                        .toUpperCase(),
                                     style: const TextStyle(
                                       fontSize: 28,
                                       fontWeight: FontWeight.bold,
@@ -236,7 +237,8 @@ class ServiceDetailView extends StatelessWidget {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         service.worker.username,
@@ -248,7 +250,8 @@ class ServiceDetailView extends StatelessWidget {
                                       const SizedBox(height: 4),
                                       Row(
                                         children: [
-                                          const Icon(Icons.star, color: Colors.amber, size: 18),
+                                          const Icon(Icons.star,
+                                              color: Colors.amber, size: 18),
                                           const SizedBox(width: 4),
                                           Text(
                                             '${service.rating.toStringAsFixed(1)} rating',
@@ -263,9 +266,11 @@ class ServiceDetailView extends StatelessWidget {
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF14B8A6).withOpacity(0.1),
+                                    color: const Color(0xFF14B8A6)
+                                        .withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -281,13 +286,18 @@ class ServiceDetailView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        const Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text('Description',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
                         Text(
                           service.description,
-                          style: TextStyle(fontSize: 16, color: Colors.grey.shade700, height: 1.5),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade700,
+                              height: 1.5),
                         ),
                         const SizedBox(height: 24),
                         LocationMapCard(
@@ -298,7 +308,7 @@ class ServiceDetailView extends StatelessWidget {
                           distance: service.distance,
                         ),
                         const SizedBox(height: 24),
-                        
+
                         // Book Now Button
                         SizedBox(
                           width: double.infinity,
@@ -307,20 +317,26 @@ class ServiceDetailView extends StatelessWidget {
                             onPressed: (state is BookingInProgress)
                                 ? null
                                 : () {
-                                    context.read<ServiceDetailBloc>().add(BookService(service!.id));
+                                    context
+                                        .read<ServiceDetailBloc>()
+                                        .add(BookService(service!.id));
                                   },
                             icon: (state is BookingInProgress)
-                                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                ? SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                 : const Icon(Icons.calendar_today),
                             label: Text(
-                              (state is BookingInProgress) ? 'Processing...' : 'Book Now - \$${service.price.toStringAsFixed(0)}',
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF10B981),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 2,
+                              (state is BookingInProgress)
+                                  ? 'Processing...'
+                                  : 'Book Now - \$${service.price.toStringAsFixed(0)}',
                             ),
                           ),
                         ),

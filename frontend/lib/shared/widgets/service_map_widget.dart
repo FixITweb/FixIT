@@ -60,14 +60,15 @@ class ServiceMapWidget extends StatelessWidget {
                 );
               },
             ),
-            
+
             // Location Info Overlay
             Positioned(
               top: 12,
               left: 12,
               right: 12,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -81,7 +82,8 @@ class ServiceMapWidget extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.location_on, color: Color(0xFF14B8A6), size: 20),
+                    const Icon(Icons.location_on,
+                        color: Color(0xFF14B8A6), size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
@@ -110,7 +112,7 @@ class ServiceMapWidget extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Get Directions Button
             Positioned(
               bottom: 12,
@@ -120,16 +122,12 @@ class ServiceMapWidget extends StatelessWidget {
                 icon: const Icon(Icons.directions, size: 18),
                 label: const Text('Get Directions'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF14B8A6),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
               ),
             ),
-            
+
             // Tap to Open Full Map
             Positioned.fill(
               child: Material(
@@ -153,7 +151,7 @@ class ServiceMapWidget extends StatelessWidget {
     const zoom = 14;
     const size = '600x300';
     const markerColor = '0xFF14B8A6';
-    
+
     return 'https://maps.googleapis.com/maps/api/staticmap?'
         'center=$latitude,$longitude'
         '&zoom=$zoom'
@@ -167,7 +165,7 @@ class ServiceMapWidget extends StatelessWidget {
     final googleMapsUrl = Uri.parse(
       'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude',
     );
-    
+
     final appleMapsUrl = Uri.parse(
       'https://maps.apple.com/?q=$latitude,$longitude',
     );

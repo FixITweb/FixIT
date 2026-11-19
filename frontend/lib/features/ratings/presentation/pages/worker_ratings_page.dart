@@ -28,9 +28,7 @@ class WorkerRatingsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Worker Ratings'),
-          centerTitle: true,
           elevation: 0,
-          backgroundColor: const Color(0xFF14B8A6),
         ),
         body: BlocBuilder<RatingBloc, RatingState>(
           builder: (context, state) {
@@ -43,7 +41,8 @@ class WorkerRatingsPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+                    const Icon(Icons.error_outline,
+                        size: 64, color: Colors.grey),
                     const SizedBox(height: 16),
                     Text(state.message),
                   ],
@@ -217,7 +216,8 @@ class _RatingDistribution extends StatelessWidget {
           ...List.generate(5, (index) {
             final stars = 5 - index;
             final count = distribution[stars] ?? 0;
-            final percentage = total > 0 ? (count / total * 100).toStringAsFixed(0) : '0';
+            final percentage =
+                total > 0 ? (count / total * 100).toStringAsFixed(0) : '0';
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -231,7 +231,8 @@ class _RatingDistribution extends StatelessWidget {
                           '$stars',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const Icon(Icons.star, size: 14, color: Color(0xFFF97316)),
+                        const Icon(Icons.star,
+                            size: 14, color: Color(0xFFF97316)),
                       ],
                     ),
                   ),
@@ -316,12 +317,14 @@ class _RatingCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            if (rating.customerName != null && rating.customerName != 'Anonymous')
+            if (rating.customerName != null &&
+                rating.customerName != 'Anonymous')
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
-                    const Icon(Icons.person_outline, size: 14, color: Colors.grey),
+                    const Icon(Icons.person_outline,
+                        size: 14, color: Colors.grey),
                     const SizedBox(width: 4),
                     Text(
                       rating.customerName ?? 'Anonymous',

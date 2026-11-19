@@ -40,11 +40,8 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[50],
       appBar: AppBar(
-        title: const Text("Incoming Bookings",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Incoming Bookings"),
         elevation: 0,
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -312,13 +309,11 @@ class _WorkerBookingCard extends StatelessWidget {
           if (isPending)
             _ActionRow(
               leftLabel: "Reject",
-              leftColor: Colors.red[50]!,
-              leftTextColor: Colors.red,
+              leftDestructive: true,
               onLeft: () => context
                   .read<WorkerBookingsBloc>()
                   .add(RejectBooking(booking.id)),
               rightLabel: "Accept Job",
-              rightColor: const Color(0xFF14B8A6),
               onRight: () => context
                   .read<WorkerBookingsBloc>()
                   .add(AcceptBooking(booking.id)),
@@ -326,11 +321,9 @@ class _WorkerBookingCard extends StatelessWidget {
           else if (isAccepted)
             _ActionRow(
               leftLabel: "Help",
-              leftColor: Colors.grey[100]!,
-              leftTextColor: Colors.grey,
+              leftDestructive: false,
               onLeft: () {},
               rightLabel: "Complete Job",
-              rightColor: const Color(0xFFF97316),
               onRight: () => context
                   .read<WorkerBookingsBloc>()
                   .add(CompleteBooking(booking.id)),
@@ -382,64 +375,48 @@ class _StatusTag extends StatelessWidget {
 
 class _ActionRow extends StatelessWidget {
   final String leftLabel;
-  final Color leftColor;
-  final Color leftTextColor;
+  final bool leftDestructive;
   final VoidCallback onLeft;
   final String rightLabel;
-  final Color rightColor;
   final VoidCallback onRight;
 
   const _ActionRow({
     required this.leftLabel,
-    required this.leftColor,
-    required this.leftTextColor,
+    required this.leftDestructive,
     required this.onLeft,
     required this.rightLabel,
-    required this.rightColor,
     required this.onRight,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey[100]!)),
+        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
+      padding: const EdgeInsets.all(8),
       child: Row(
         children: [
           Expanded(
-            child: InkWell(
-              onTap: onLeft,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                alignment: Alignment.center,
-                child: Text(
-                  leftLabel,
-                  style: TextStyle(
-                      color: leftTextColor, fontWeight: FontWeight.bold),
-                ),
-              ),
+            child: OutlinedButton(
+              onPressed: onLeft,
+              style: leftDestructive
+                  ? OutlinedButton.styleFrom(
+                      foregroundColor: colorScheme.error,
+                      side: BorderSide(color: colorScheme.error),
+                    )
+                  : null,
+              child: Text(leftLabel),
             ),
           ),
-          Container(height: 30, width: 1, color: Colors.grey[100]),
+          const SizedBox(width: 8),
           Expanded(
             flex: 2,
-            child: InkWell(
-              onTap: onRight,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: rightColor,
-                  borderRadius:
-                      const BorderRadius.only(bottomRight: Radius.circular(24)),
-                ),
-                child: Text(
-                  rightLabel,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              ),
+            child: FilledButton(
+              onPressed: onRight,
+              child: Text(rightLabel),
             ),
           ),
         ],

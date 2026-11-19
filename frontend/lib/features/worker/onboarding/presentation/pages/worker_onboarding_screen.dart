@@ -26,13 +26,13 @@ class WorkerOnboardingScreen extends StatelessWidget {
             ),
             const SizedBox(height: 60),
             ElevatedButton(
-              onPressed: () => Navigator.pushReplacementNamed(context, '/worker-home'),
+              onPressed: () =>
+                  Navigator.pushReplacementNamed(context, '/worker-home'),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
               child: const Text(
                 "Continue to Dashboard",
-                style: TextStyle(fontSize: 18),
               ),
             ),
           ],

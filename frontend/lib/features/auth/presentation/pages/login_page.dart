@@ -162,27 +162,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: loginAs == 'customer'
-                                ? const Color(0xFF14B8A6)
-                                : Colors.grey[300],
-                          ),
-                          onPressed: () => setState(() => loginAs = 'customer'),
-                          child: const Text("Customer"),
-                        ),
+                        child: loginAs == 'customer'
+                            ? FilledButton(
+                                onPressed: () =>
+                                    setState(() => loginAs = 'customer'),
+                                child: const Text("Customer"),
+                              )
+                            : OutlinedButton(
+                                onPressed: () =>
+                                    setState(() => loginAs = 'customer'),
+                                child: const Text("Customer"),
+                              ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: loginAs == 'worker'
-                                ? const Color(0xFF14B8A6)
-                                : Colors.grey[300],
-                          ),
-                          onPressed: () => setState(() => loginAs = 'worker'),
-                          child: const Text("Worker"),
-                        ),
+                        child: loginAs == 'worker'
+                            ? FilledButton(
+                                onPressed: () =>
+                                    setState(() => loginAs = 'worker'),
+                                child: const Text("Worker"),
+                              )
+                            : OutlinedButton(
+                                onPressed: () =>
+                                    setState(() => loginAs = 'worker'),
+                                child: const Text("Worker"),
+                              ),
                       ),
                     ],
                   ),

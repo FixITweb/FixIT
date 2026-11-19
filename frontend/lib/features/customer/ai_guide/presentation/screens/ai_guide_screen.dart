@@ -84,20 +84,11 @@ class _AIGuideScreenState extends State<AIGuideScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('AI Guide', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        iconTheme: const IconThemeData(color: Colors.white),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF00B4DB), Color(0xFF0083B0)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        title: const Text('AI Guide'),
       ),
       body: Column(
         children: [
@@ -108,7 +99,7 @@ class _AIGuideScreenState extends State<AIGuideScreen> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -121,46 +112,37 @@ class _AIGuideScreenState extends State<AIGuideScreen> {
                   child: TextField(
                     controller: _promptController,
                     decoration: InputDecoration(
-                      hintText: 'Describe what you need to fix (e.g., Leaking sink pipe)...',
-                      hintStyle: TextStyle(color: Colors.grey.shade400),
+                      hintText:
+                          'Describe what you need to fix (e.g., Leaking sink pipe)...',
+                      hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: colorScheme.surface,
                       contentPadding: const EdgeInsets.all(16),
                     ),
                     maxLines: 2,
                   ),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
+                FilledButton(
                   onPressed: _isLoading ? null : _getAIGuide,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00B4DB), // Primary teal/blue color
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    elevation: 4,
-                    shadowColor: const Color(0xFF00B4DB).withOpacity(0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            color: colorScheme.onPrimary,
+                            strokeWidth: 2,
+                          ),
                         )
-                      : const Text(
-                          'Get AI Fix Guide',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
+                      : const Text('Get AI Fix Guide'),
                 ),
               ],
             ),
           ),
-          
           if (_guideSteps != null && _guideSteps!.isNotEmpty)
             Expanded(
               child: PageView.builder(
@@ -174,12 +156,6 @@ class _AIGuideScreenState extends State<AIGuideScreen> {
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 24.0),
                     child: Card(
-                      color: Colors.white,
-                      elevation: 8,
-                      shadowColor: Colors.black.withOpacity(0.2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
                         child: Column(
@@ -188,22 +164,22 @@ class _AIGuideScreenState extends State<AIGuideScreen> {
                             Text(
                               'Step ${index + 1} of ${_guideSteps!.length}',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey.shade500,
-                                letterSpacing: 1.2,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                    letterSpacing: 1.2,
+                                  ),
                             ),
                             const SizedBox(height: 24),
                             Text(
                               step['title'] ?? 'Action',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF0083B0),
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(color: colorScheme.primary),
                             ),
                             const SizedBox(height: 24),
                             Expanded(
@@ -211,11 +187,10 @@ class _AIGuideScreenState extends State<AIGuideScreen> {
                                 child: Text(
                                   step['description'] ?? '',
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    height: 1.6,
-                                    color: Colors.black87,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(height: 1.6),
                                 ),
                               ),
                             ),
@@ -223,28 +198,17 @@ class _AIGuideScreenState extends State<AIGuideScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                ElevatedButton.icon(
+                                OutlinedButton.icon(
                                   onPressed: isFirst ? null : _prevStep,
-                                  icon: const Icon(Icons.arrow_back_ios, size: 16),
+                                  icon: const Icon(Icons.arrow_back_ios,
+                                      size: 16),
                                   label: const Text("Previous"),
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF00B4DB),
-                                    backgroundColor: Colors.white,
-                                    elevation: 0,
-                                    disabledForegroundColor: Colors.grey.shade400,
-                                  ),
                                 ),
-                                ElevatedButton.icon(
+                                FilledButton.icon(
                                   onPressed: isLast ? null : _nextStep,
-                                  icon: const Icon(Icons.arrow_forward_ios, size: 16),
+                                  icon: const Icon(Icons.arrow_forward_ios,
+                                      size: 16),
                                   label: const Text("Next"),
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: const Color(0xFF00B4DB),
-                                    elevation: 2,
-                                    disabledBackgroundColor: Colors.grey.shade200,
-                                    disabledForegroundColor: Colors.grey.shade400,
-                                  ),
                                 ),
                               ],
                             ),

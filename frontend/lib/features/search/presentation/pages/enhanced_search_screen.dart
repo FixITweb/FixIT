@@ -17,7 +17,9 @@ class EnhancedSearchScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => SearchBloc(
         SearchRepository(SearchApi(ApiClient())),
-      )..add(initialQuery != null ? SearchServices(initialQuery!) : LoadSearchSuggestions()),
+      )..add(initialQuery != null
+          ? SearchServices(initialQuery!)
+          : LoadSearchSuggestions()),
       child: const EnhancedSearchView(),
     );
   }
@@ -80,7 +82,9 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
             icon: const Icon(Icons.search),
             onPressed: () {
               if (_searchController.text.isNotEmpty) {
-                context.read<SearchBloc>().add(SearchServices(_searchController.text));
+                context
+                    .read<SearchBloc>()
+                    .add(SearchServices(_searchController.text));
               }
             },
           ),
@@ -102,7 +106,8 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                   Text('Error: ${state.message}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<SearchBloc>().add(LoadSearchSuggestions()),
+                    onPressed: () =>
+                        context.read<SearchBloc>().add(LoadSearchSuggestions()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -125,9 +130,12 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
   }
 
   Widget _buildSuggestionsView(BuildContext context, SearchState state) {
-    final suggestions = state is SearchSuggestionsLoaded ? state.suggestions : <String>[];
-    final trending = state is SearchSuggestionsLoaded ? state.trending : <String>[];
-    final categories = state is SearchSuggestionsLoaded ? state.categories : <String>[];
+    final suggestions =
+        state is SearchSuggestionsLoaded ? state.suggestions : <String>[];
+    final trending =
+        state is SearchSuggestionsLoaded ? state.trending : <String>[];
+    final categories =
+        state is SearchSuggestionsLoaded ? state.categories : <String>[];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -155,7 +163,8 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
               runSpacing: 8,
               children: trending.map((term) {
                 return ActionChip(
-                  avatar: const Icon(Icons.whatshot, size: 18, color: Colors.orange),
+                  avatar: const Icon(Icons.whatshot,
+                      size: 18, color: Colors.orange),
                   label: Text(term),
                   onPressed: () {
                     _searchController.text = term;
@@ -291,11 +300,13 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                     ],
                   ),
                   SizedBox(height: 12),
-                  Text('• Try searching by service type (e.g., "plumber", "electrician")'),
+                  Text(
+                      '• Try searching by service type (e.g., "plumber", "electrician")'),
                   SizedBox(height: 4),
                   Text('• Use category names for better results'),
                   SizedBox(height: 4),
-                  Text('• Don\'t worry about typos - we\'ll find what you need!'),
+                  Text(
+                      '• Don\'t worry about typos - we\'ll find what you need!'),
                 ],
               ),
             ),
@@ -361,11 +372,6 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                     },
                     icon: const Icon(Icons.add_circle_outline),
                     label: const Text('Post Job Request'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF14B8A6),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
                   ),
                 ],
               ),
@@ -398,7 +404,8 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 4),
-                    Text('${service.worker.username} • ${service.distance.toStringAsFixed(1)} km'),
+                    Text(
+                        '${service.worker.username} • ${service.distance.toStringAsFixed(1)} km'),
                     const SizedBox(height: 4),
                     Row(
                       children: [

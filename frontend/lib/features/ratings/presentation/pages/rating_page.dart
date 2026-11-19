@@ -42,9 +42,7 @@ class _RatingPageState extends State<RatingPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Rate Worker'),
-          centerTitle: true,
           elevation: 0,
-          backgroundColor: const Color(0xFF14B8A6),
         ),
         body: BlocListener<RatingBloc, RatingState>(
           listener: (context, state) {
@@ -220,31 +218,18 @@ class _RatingPageState extends State<RatingPage> {
                                       ),
                                     );
                               },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF14B8A6),
-                          disabledBackgroundColor: Colors.grey[300],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                         child: isLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: 24,
                                 width: 24,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
                                 ),
                               )
                             : const Text(
                                 'Submit Rating',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
                               ),
                       ),
                     );
@@ -258,20 +243,7 @@ class _RatingPageState extends State<RatingPage> {
                   height: 56,
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    child: const Text('Cancel'),
                   ),
                 ),
               ],

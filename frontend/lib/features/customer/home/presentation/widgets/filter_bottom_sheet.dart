@@ -76,7 +76,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               scrollDirection: Axis.horizontal,
               itemCount: widget.state.categories.length + 1,
               itemBuilder: (context, index) {
-                final cat = index == 0 ? 'All' : widget.state.categories[index - 1];
+                final cat =
+                    index == 0 ? 'All' : widget.state.categories[index - 1];
                 final isSelected = cat == _selectedCategory;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -107,7 +108,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ),
               Text(
                 '\$${_priceRange.start.round()} - \$${_priceRange.end.round()}',
-                style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Color(0xFF10B981), fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -139,7 +141,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ),
               Text(
                 '${_radius.round()} km',
-                style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Color(0xFF10B981), fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -197,25 +200,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: ElevatedButton(
               onPressed: () {
                 context.read<HomeBloc>().add(ApplyFilters(
-                  category: _selectedCategory,
-                  minPrice: _priceRange.start,
-                  maxPrice: _priceRange.end,
-                  radius: _radius,
-                  sort: _sort,
-                ));
+                      category: _selectedCategory,
+                      minPrice: _priceRange.start,
+                      maxPrice: _priceRange.end,
+                      radius: _radius,
+                      sort: _sort,
+                    ));
                 Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF10B981),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: const Text(
-                'Apply Filters',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              child: const Text('Apply Filters'),
             ),
           ),
           const SizedBox(height: 16),

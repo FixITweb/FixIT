@@ -194,10 +194,6 @@ class LocationMapCard extends StatelessWidget {
                           onPressed: () => _getDirections(context),
                           icon: const Icon(Icons.directions, size: 18),
                           label: const Text('Directions'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF14B8A6),
-                            foregroundColor: Colors.white,
-                          ),
                         ),
                       ),
                     ],

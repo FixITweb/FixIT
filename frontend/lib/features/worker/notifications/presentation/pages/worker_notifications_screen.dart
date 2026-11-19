@@ -36,8 +36,7 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notifications",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Notifications"),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

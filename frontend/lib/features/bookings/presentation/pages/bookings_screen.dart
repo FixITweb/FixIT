@@ -30,104 +30,83 @@ class BookingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                'My Bookings',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF10B981), Color(0xFF3B82F6)],
-                  ),
+      appBar: AppBar(
+        title: const Text('My Bookings'),
+      ),
+      body: BlocBuilder<BookingBloc, BookingState>(
+        builder: (context, state) {
+          if (state is BookingLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is BookingError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.cloud_off, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Oops! Something went wrong',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(state.message, textAlign: TextAlign.center),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () =>
+                          context.read<BookingBloc>().add(LoadBookings()),
+                      child: const Text('Try Again'),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-          SliverFillRemaining(
-            child: BlocBuilder<BookingBloc, BookingState>(
-              builder: (context, state) {
-                if (state is BookingLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            );
+          }
 
-                if (state is BookingError) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.cloud_off, size: 64, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Oops! Something went wrong',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(state.message, textAlign: TextAlign.center),
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: () => context.read<BookingBloc>().add(LoadBookings()),
-                            child: const Text('Try Again'),
-                          ),
-                        ],
-                      ),
+          if (state is BookingLoaded) {
+            if (state.bookings.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.calendar_month_outlined,
+                        size: 80, color: Colors.grey.withOpacity(0.5)),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "No Bookings Yet",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                  );
-                }
-
-                if (state is BookingLoaded) {
-                  if (state.bookings.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.calendar_month_outlined, 
-                            size: 80, 
-                            color: Colors.grey.withOpacity(0.5)
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "No Bookings Yet",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            "Services you book will appear here",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      context.read<BookingBloc>().add(LoadBookings());
-                    },
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: state.bookings.length,
-                      itemBuilder: (context, index) {
-                        final booking = state.bookings[index];
-                        return _BookingCard(booking: booking);
-                      },
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Services you book will appear here",
+                      style: TextStyle(color: Colors.grey),
                     ),
-                  );
-                }
+                  ],
+                ),
+              );
+            }
 
-                return const SizedBox();
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<BookingBloc>().add(LoadBookings());
               },
-            ),
-          ),
-        ],
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: state.bookings.length,
+                itemBuilder: (context, index) {
+                  final booking = state.bookings[index];
+                  return _BookingCard(booking: booking);
+                },
+              ),
+            );
+          }
+
+          return const SizedBox();
+        },
       ),
       bottomNavigationBar: const BottomNav(currentIndex: 3),
     );
@@ -141,7 +120,7 @@ class _BookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor(booking.status);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -158,7 +137,8 @@ class _BookingCard extends StatelessWidget {
                     color: const Color(0xFF10B981).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.work_outline, color: Color(0xFF10B981)),
+                  child:
+                      const Icon(Icons.work_outline, color: Color(0xFF10B981)),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -166,63 +146,57 @@ class _BookingCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        booking.service.title == 'Unavailable Service' 
-                            ? 'Booking #${booking.id}' 
+                        booking.service.title == 'Unavailable Service'
+                            ? 'Booking #${booking.id}'
                             : booking.service.title,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-  Text(
-    "Worker: ${booking.service.worker.username}",
-    style: TextStyle(color: Colors.grey[600]),
-  ),
-
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          if (booking.customerPhone != null)
-            Text(
-              "Customer Phone: ${booking.customerPhone}",
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-
-          if (booking.workerPhone != null)
-            Text(
-              "Worker Phone: ${booking.workerPhone}",
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-
-        ],
-      ),
+                      Text(
+                        "Worker: ${booking.service.worker.username}",
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (booking.customerPhone != null)
+                            Text(
+                              "Customer Phone: ${booking.customerPhone}",
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          if (booking.workerPhone != null)
+                            Text(
+                              "Worker Phone: ${booking.workerPhone}",
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-              
               ],
             ),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _StatusChip(
-              status: booking.status,
-              color: _getStatusColor(booking.status),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _StatusChip(
+                  status: booking.status,
+                  color: _getStatusColor(booking.status),
+                ),
+                if (booking.status.toLowerCase() == "pending")
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      context
+                          .read<BookingBloc>()
+                          .add(DeleteBooking(booking.id)); // new
+                    },
+                  ),
+              ],
             ),
-
-            if (booking.status.toLowerCase() == "pending")
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  context.read<BookingBloc>().add(DeleteBooking(booking.id)); // new
-                },
-              ),
-          ],
-        ),
-
-
             const Divider(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -230,23 +204,31 @@ class _BookingCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Price", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const Text("Price",
+                        style: TextStyle(color: Colors.grey, fontSize: 12)),
                     if (booking.service.price > 0)
                       Text(
                         "\$${booking.service.price.toStringAsFixed(0)}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF10B981)),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Color(0xFF10B981)),
                       )
                     else
                       const Text(
                         "---",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.grey),
                       ),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text("Booked On", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const Text("Booked On",
+                        style: TextStyle(color: Colors.grey, fontSize: 12)),
                     Text(
                       "${booking.createdAt.day}/${booking.createdAt.month}/${booking.createdAt.year}",
                       style: const TextStyle(fontWeight: FontWeight.w500),
@@ -255,7 +237,6 @@ class _BookingCard extends StatelessWidget {
                 ),
               ],
             ),
-            
             if (booking.status.toLowerCase() == 'completed')
               Padding(
                 padding: const EdgeInsets.only(top: 16),
@@ -280,13 +261,6 @@ class _BookingCard extends StatelessWidget {
                     },
                     icon: const Icon(Icons.star_outline),
                     label: const Text('Rate Worker'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B82F6),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
                   ),
                 ),
               ),
@@ -321,7 +295,8 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+        style:
+            TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
       ),
     );
   }

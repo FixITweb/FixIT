@@ -296,20 +296,12 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                                   }
                                 }
                               },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                         child: state is CreateRequestLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white)
+                            ? CircularProgressIndicator(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              )
                             : const Text(
                                 'Post Request',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                       ),
                     ),
