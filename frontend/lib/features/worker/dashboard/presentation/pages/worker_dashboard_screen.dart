@@ -29,15 +29,25 @@ class WorkerDashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[50],
       appBar: AppBar(
         title: const Text("Dashboard"),
         elevation: 0,
+        automaticallyImplyLeading: false,
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
-        actions: const [ThemeToggleButton()],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none),
+            tooltip: 'Notifications',
+            onPressed: () {
+              Navigator.pushNamed(context, '/worker-notifications');
+            },
+          ),
+          const ThemeToggleButton(),
+        ],
       ),
       body: BlocBuilder<WorkerDashboardBloc, WorkerDashboardState>(
         builder: (context, state) {
@@ -55,7 +65,9 @@ class WorkerDashboardView extends StatelessWidget {
                   Text('Error: ${state.message}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<WorkerDashboardBloc>().add(const LoadWorkerDashboard()),
+                    onPressed: () => context
+                        .read<WorkerDashboardBloc>()
+                        .add(const LoadWorkerDashboard()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -65,10 +77,12 @@ class WorkerDashboardView extends StatelessWidget {
 
           if (state is WorkerDashboardLoaded) {
             final dashboard = state.dashboard;
-            
+
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<WorkerDashboardBloc>().add(const RefreshWorkerDashboard());
+                context
+                    .read<WorkerDashboardBloc>()
+                    .add(const RefreshWorkerDashboard());
               },
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -93,7 +107,9 @@ class WorkerDashboardView extends StatelessWidget {
                                 radius: 40,
                                 backgroundColor: Colors.white.withOpacity(0.3),
                                 child: Text(
-                                  dashboard.username.substring(0, 1).toUpperCase(),
+                                  dashboard.username
+                                      .substring(0, 1)
+                                      .toUpperCase(),
                                   style: const TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
@@ -129,7 +145,8 @@ class WorkerDashboardView extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(20),
@@ -137,7 +154,8 @@ class WorkerDashboardView extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.star, color: Colors.white, size: 16),
+                                const Icon(Icons.star,
+                                    color: Colors.white, size: 16),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${dashboard.averageRating.toStringAsFixed(1)} Rating',
@@ -173,7 +191,8 @@ class WorkerDashboardView extends StatelessWidget {
                             icon: Icons.attach_money,
                             iconColor: Colors.green,
                             title: 'Total Earnings',
-                            value: '\$${dashboard.totalEarnings.toStringAsFixed(0)}',
+                            value:
+                                '\$${dashboard.totalEarnings.toStringAsFixed(0)}',
                             subtitle: 'This month',
                             isDark: isDark,
                           ),

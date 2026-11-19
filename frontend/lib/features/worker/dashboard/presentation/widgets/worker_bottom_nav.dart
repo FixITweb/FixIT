@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class WorkerBottomNav extends StatelessWidget {
   final int currentIndex;
-  
+
   const WorkerBottomNav({super.key, required this.currentIndex});
 
   @override
@@ -24,9 +24,6 @@ class WorkerBottomNav extends StatelessWidget {
             Navigator.pushReplacementNamed(context, '/worker-bookings');
             break;
           case 3:
-            Navigator.pushReplacementNamed(context, '/worker-notifications');
-            break;
-          case 4:
             Navigator.pushReplacementNamed(context, '/worker-profile');
             break;
         }
@@ -43,10 +40,6 @@ class WorkerBottomNav extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.calendar_today),
           label: 'Bookings',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Notifications',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),

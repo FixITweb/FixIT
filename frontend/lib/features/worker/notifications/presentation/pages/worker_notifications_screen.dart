@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../dashboard/presentation/widgets/worker_bottom_nav.dart';
 import 'package:frontend/core/network/api_client.dart';
 import 'package:frontend/features/notifications/data/datasources/notifications_api.dart';
 import 'package:frontend/features/notifications/data/repositories/notifications_repository.dart';
@@ -26,7 +25,8 @@ class WorkerNotificationsView extends StatefulWidget {
   const WorkerNotificationsView({super.key});
 
   @override
-  State<WorkerNotificationsView> createState() => _WorkerNotificationsViewState();
+  State<WorkerNotificationsView> createState() =>
+      _WorkerNotificationsViewState();
 }
 
 class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
@@ -36,11 +36,13 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notifications", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Notifications",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<NotificationsBloc>().add(LoadNotifications()),
+            onPressed: () =>
+                context.read<NotificationsBloc>().add(LoadNotifications()),
           ),
         ],
       ),
@@ -60,7 +62,9 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                   Text('Error: ${state.message}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<NotificationsBloc>().add(LoadNotifications()),
+                    onPressed: () => context
+                        .read<NotificationsBloc>()
+                        .add(LoadNotifications()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -74,11 +78,13 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.notifications_none, size: 80, color: Colors.grey),
+                    Icon(Icons.notifications_none,
+                        size: 80, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
                       'No notifications yet',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -86,7 +92,8 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
             }
 
             // Count unread notifications
-            final unreadCount = state.notifications.where((n) => !n.isRead).length;
+            final unreadCount =
+                state.notifications.where((n) => !n.isRead).length;
 
             // Filter notifications
             final filteredNotifications = _selectedFilter == 'all'
@@ -103,7 +110,8 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                 children: [
                   // Filter and action bar
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     child: Row(
                       children: [
                         Expanded(
@@ -114,19 +122,22 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                                 _NotificationFilterChip(
                                   label: 'All',
                                   isSelected: _selectedFilter == 'all',
-                                  onTap: () => setState(() => _selectedFilter = 'all'),
+                                  onTap: () =>
+                                      setState(() => _selectedFilter = 'all'),
                                 ),
                                 const SizedBox(width: 8),
                                 _NotificationFilterChip(
                                   label: 'Unread ($unreadCount)',
                                   isSelected: _selectedFilter == 'unread',
-                                  onTap: () => setState(() => _selectedFilter = 'unread'),
+                                  onTap: () => setState(
+                                      () => _selectedFilter = 'unread'),
                                 ),
                                 const SizedBox(width: 8),
                                 _NotificationFilterChip(
                                   label: 'Read',
                                   isSelected: _selectedFilter == 'read',
-                                  onTap: () => setState(() => _selectedFilter = 'read'),
+                                  onTap: () =>
+                                      setState(() => _selectedFilter = 'read'),
                                 ),
                               ],
                             ),
@@ -137,8 +148,11 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                             icon: const Icon(Icons.done_all, size: 20),
                             tooltip: 'Mark all as read',
                             onPressed: () {
-                              for (var notification in state.notifications.where((n) => !n.isRead)) {
-                                context.read<NotificationsBloc>().add(MarkAsRead(notification.id));
+                              for (var notification in state.notifications
+                                  .where((n) => !n.isRead)) {
+                                context
+                                    .read<NotificationsBloc>()
+                                    .add(MarkAsRead(notification.id));
                               }
                             },
                           ),
@@ -151,7 +165,8 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[300]),
+                                Icon(Icons.inbox_outlined,
+                                    size: 64, color: Colors.grey[300]),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No $_selectedFilter notifications',
@@ -165,15 +180,17 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                             itemCount: filteredNotifications.length,
                             itemBuilder: (context, index) {
                               final notification = filteredNotifications[index];
-                              
+
                               IconData icon = Icons.notifications;
                               Color iconColor = const Color(0xFF14B8A6);
-                              
-                              final msgLower = notification.message.toLowerCase();
+
+                              final msgLower =
+                                  notification.message.toLowerCase();
                               if (msgLower.contains('booking request')) {
                                 icon = Icons.assignment_turned_in;
                                 iconColor = Colors.orange;
-                              } else if (msgLower.contains('matched') || msgLower.contains('available')) {
+                              } else if (msgLower.contains('matched') ||
+                                  msgLower.contains('available')) {
                                 icon = Icons.handshake;
                                 iconColor = Colors.blue;
                               } else if (msgLower.contains('completed')) {
@@ -184,7 +201,9 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                               return Card(
                                 margin: const EdgeInsets.only(bottom: 12),
                                 elevation: notification.isRead ? 0 : 2,
-                                color: notification.isRead ? Colors.white : const Color(0xFF14B8A6).withOpacity(0.05),
+                                color: notification.isRead
+                                    ? Colors.white
+                                    : const Color(0xFF14B8A6).withOpacity(0.05),
                                 child: ListTile(
                                   leading: CircleAvatar(
                                     backgroundColor: iconColor.withOpacity(0.1),
@@ -193,20 +212,30 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                                   title: Text(
                                     notification.message,
                                     style: TextStyle(
-                                      fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
+                                      fontWeight: notification.isRead
+                                          ? FontWeight.normal
+                                          : FontWeight.bold,
                                     ),
                                   ),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      if (notification.user != null && notification.user!.isNotEmpty)
-                                        Text("From: ${notification.user}", style: const TextStyle(fontWeight: FontWeight.w500)),
-                                      Text(_formatDate(notification.createdAt), style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                                      if (notification.user != null &&
+                                          notification.user!.isNotEmpty)
+                                        Text("From: ${notification.user}",
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w500)),
+                                      Text(_formatDate(notification.createdAt),
+                                          style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontSize: 12)),
                                     ],
                                   ),
                                   trailing: notification.isRead
                                       ? null
-                                      : const Icon(Icons.circle, size: 8, color: Color(0xFF14B8A6)),
+                                      : const Icon(Icons.circle,
+                                          size: 8, color: Color(0xFF14B8A6)),
                                   onTap: () {
                                     if (!notification.isRead) {
                                       context.read<NotificationsBloc>().add(
@@ -227,7 +256,6 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
           return const SizedBox();
         },
       ),
-      bottomNavigationBar: const WorkerBottomNav(currentIndex: 3),
     );
   }
 
@@ -248,7 +276,6 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
     }
   }
 }
-
 
 class _NotificationFilterChip extends StatelessWidget {
   final String label;
