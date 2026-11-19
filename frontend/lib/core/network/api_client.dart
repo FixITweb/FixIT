@@ -9,7 +9,7 @@ class ApiClient {
           BaseOptions(
             baseUrl: baseUrl ??
                 const String.fromEnvironment('API_BASE_URL',
-                    defaultValue: 'https://fixit-fvja.onrender.com/api/'),
+                    defaultValue: 'https://fixit-vj74.onrender.com/api/'),
             connectTimeout: const Duration(seconds: 30),
             receiveTimeout: const Duration(seconds: 30),
             headers: {
