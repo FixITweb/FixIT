@@ -13,13 +13,15 @@ class CreateRequestBloc extends Bloc<CreateRequestEvent, CreateRequestState> {
     required this.serviceRepository,
   }) : super(CreateRequestInitial()) {
     on<LoadCategories>((event, emit) async {
+      emit(CategoriesLoading());
       try {
         final categories = await serviceRepository.getCategories();
-        // Capitalize for UI
         final capitalized = categories.map((c) => _toTileCase(c)).toList();
-        emit(CategoriesLoaded(capitalized));
+        emit(CategoriesLoaded(
+          capitalized.isEmpty ? defaultJobRequestCategories : capitalized,
+        ));
       } catch (e) {
-        emit(CreateRequestError('Failed to load categories: ${e.toString()}'));
+        emit(CategoriesLoadFailed(e.toString()));
       }
     });
 
@@ -34,7 +36,7 @@ class CreateRequestBloc extends Bloc<CreateRequestEvent, CreateRequestState> {
           longitude: event.longitude,
           budget: event.budget,
         );
-        
+
         emit(CreateRequestSuccess(
           'Request posted successfully! You\'ll be notified when matching services are available.',
         ));

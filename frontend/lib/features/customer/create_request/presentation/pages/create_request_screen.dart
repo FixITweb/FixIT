@@ -37,8 +37,8 @@ class _CreateRequestViewState extends State<CreateRequestView> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _budgetController = TextEditingController();
-  String? _selectedCategory;
-  List<String> _dynamicCategories = [];
+  String? _selectedCategory = defaultJobRequestCategories.first;
+  List<String> _dynamicCategories = defaultJobRequestCategories;
 
   @override
   void dispose() {
@@ -60,14 +60,22 @@ class _CreateRequestViewState extends State<CreateRequestView> {
           if (state is CategoriesLoaded) {
             setState(() {
               _dynamicCategories = state.categories;
-              if (_dynamicCategories.isNotEmpty && _selectedCategory == null) {
+              if (!_dynamicCategories.contains(_selectedCategory)) {
+                _selectedCategory = _dynamicCategories.first;
+              }
+            });
+          } else if (state is CategoriesLoadFailed) {
+            setState(() {
+              _dynamicCategories = defaultJobRequestCategories;
+              if (!_dynamicCategories.contains(_selectedCategory)) {
                 _selectedCategory = _dynamicCategories.first;
               }
             });
           } else if (state is CreateRequestSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Request posted! You\'ll be notified when workers are available.'),
+                content: Text(
+                    'Request posted! You\'ll be notified when workers are available.'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 3),
               ),
@@ -84,6 +92,10 @@ class _CreateRequestViewState extends State<CreateRequestView> {
         },
         child: BlocBuilder<CreateRequestBloc, CreateRequestState>(
           builder: (context, state) {
+            final categories = _dynamicCategories;
+            final selectedCategory = _selectedCategory ??
+                (state is CategoriesLoadFailed ? categories.first : null);
+
             return SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Form(
@@ -104,7 +116,7 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                               child: Text(
                                 'Post your request and get notified when matching services become available!',
                                 style: TextStyle(fontSize: 14),
-                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -115,7 +127,8 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                     // Title Field
                     const Text(
                       'Service Title',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -139,37 +152,65 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                     // Category Dropdown
                     const Text(
                       'Category',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    _dynamicCategories.isEmpty 
-                      ? const Center(child: LinearProgressIndicator())
-                      : DropdownButtonFormField<String>(
-                          value: _selectedCategory,
-                          decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.category),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                    if (categories.isEmpty &&
+                        (state is CreateRequestInitial ||
+                            state is CategoriesLoading))
+                      const Center(child: LinearProgressIndicator())
+                    else ...[
+                      if (state is CategoriesLoadFailed)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Could not load categories: ${state.message}. Using standard options.',
+                                  style: const TextStyle(color: Colors.orange),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => context
+                                    .read<CreateRequestBloc>()
+                                    .add(LoadCategories()),
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           ),
-                          items: _dynamicCategories.map((category) {
-                            return DropdownMenuItem(
-                              value: category,
-                              child: Text(category),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedCategory = value!;
-                            });
-                          },
                         ),
+                      if (state is CategoriesLoading && categories.isNotEmpty)
+                        const LinearProgressIndicator(),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedCategory,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.category),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        items: categories.map((category) {
+                          return DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategory = value!;
+                          });
+                        },
+                      ),
+                    ],
                     const SizedBox(height: 20),
 
                     // Description Field
                     const Text(
                       'Description',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -194,7 +235,8 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                     // Budget Field
                     const Text(
                       'Budget (Optional)',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -215,31 +257,38 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: state is CreateRequestLoading || _selectedCategory == null
+                        onPressed: state is CreateRequestLoading ||
+                                _selectedCategory == null
                             ? null
                             : () async {
                                 if (_formKey.currentState!.validate()) {
                                   try {
                                     // Automatically fetch location on click
-                                    final position = await LocationHelper.getCurrentPosition();
-                                    
+                                    final position = await LocationHelper
+                                        .getCurrentPosition();
+
                                     if (mounted) {
                                       context.read<CreateRequestBloc>().add(
                                             SubmitRequest(
                                               title: _titleController.text,
-                                              description: _descriptionController.text,
+                                              description:
+                                                  _descriptionController.text,
                                               category: _selectedCategory!,
                                               latitude: position.latitude,
                                               longitude: position.longitude,
-                                              budget: double.tryParse(_budgetController.text) ?? 0.0,
+                                              budget: double.tryParse(
+                                                      _budgetController.text) ??
+                                                  0.0,
                                             ),
                                           );
                                     }
                                   } catch (e) {
                                     if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         SnackBar(
-                                          content: Text('📍 Location Error: $e'),
+                                          content:
+                                              Text('📍 Location Error: $e'),
                                           backgroundColor: Colors.orange,
                                         ),
                                       );
@@ -255,10 +304,12 @@ class _CreateRequestViewState extends State<CreateRequestView> {
                           ),
                         ),
                         child: state is CreateRequestLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
                             : const Text(
                                 'Post Request',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                       ),
                     ),
