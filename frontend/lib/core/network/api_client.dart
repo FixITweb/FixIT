@@ -9,7 +9,7 @@ class ApiClient {
           BaseOptions(
             baseUrl: baseUrl ??
                 const String.fromEnvironment('API_BASE_URL',
-                    defaultValue: 'https://fixit-zysg.onrender.com/api/'),
+                    defaultValue: 'https://fixit-fvja.onrender.com/api/'),
             connectTimeout: const Duration(seconds: 30),
             receiveTimeout: const Duration(seconds: 30),
             headers: {
@@ -72,6 +72,7 @@ class ApiClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     bool requireAuth = true, // 🔥 THIS FIXES YOUR ERROR
+    Duration? receiveTimeout,
   }) async {
     try {
       final options = await _getAuthOptions(requireAuth: requireAuth);
@@ -80,7 +81,9 @@ class ApiClient {
         path,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options: receiveTimeout == null
+            ? options
+            : options.copyWith(receiveTimeout: receiveTimeout),
       );
 
       return response;
@@ -138,9 +141,14 @@ class ApiClient {
     if (error is DioException) {
       switch (error.type) {
         case DioExceptionType.connectionTimeout:
+          return Exception('Could not connect to the server in time');
+
         case DioExceptionType.sendTimeout:
+          return Exception('Request timed out while sending to the server');
+
         case DioExceptionType.receiveTimeout:
-          return Exception('Connection timeout');
+          return Exception(
+              'The server took too long to respond. If this was signup, try logging in before registering again.');
 
         case DioExceptionType.badResponse:
           return Exception(

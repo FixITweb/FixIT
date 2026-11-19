@@ -16,6 +16,7 @@ class AuthApi {
           "password": password,
         },
         requireAuth: false,
+        receiveTimeout: const Duration(seconds: 120),
       );
 
       final data = res.data;
@@ -57,6 +58,7 @@ class AuthApi {
           if (longitude != null) "longitude": longitude,
         },
         requireAuth: false,
+        receiveTimeout: const Duration(seconds: 120),
       );
 
       return res.data;
@@ -65,7 +67,7 @@ class AuthApi {
     }
   }
 
-  // PROFILE 
+  // PROFILE
   Future<Map<String, dynamic>> getProfile() async {
     try {
       final res = await client.get(Endpoints.profile);

@@ -44,9 +44,9 @@ class WorkerServicesView extends StatelessWidget {
               state is WorkerServiceUpdated ||
               state is WorkerServiceDeleted) {
             final msg = state is WorkerServiceAdded
-                ? (state as WorkerServiceAdded).message
+                ? (state).message
                 : state is WorkerServiceUpdated
-                    ? (state as WorkerServiceUpdated).message
+                    ? (state).message
                     : (state as WorkerServiceDeleted).message;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(msg), backgroundColor: Colors.green),
@@ -221,7 +221,7 @@ class WorkerServicesView extends StatelessWidget {
                 final price = double.tryParse(priceCtrl.text) ?? 0.0;
                 if (isEdit) {
                   context.read<WorkerServicesBloc>().add(UpdateWorkerService(
-                        id: service!.id,
+                        id: service.id,
                         title: titleCtrl.text,
                         category: selectedCategory,
                         price: price,
