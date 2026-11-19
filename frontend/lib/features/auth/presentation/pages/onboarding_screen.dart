@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -32,15 +33,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
   ];
 
-  void _next() {
+  Future<void> _completeOnboarding() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool('has_seen_onboarding', true);
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
+  Future<void> _next() async {
     if (_currentPage < _pages.length - 1) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.pushReplacementNamed(context, '/login');
+      await _completeOnboarding();
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,7 +69,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Align(
               alignment: Alignment.topRight,
               child: TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                onPressed: _completeOnboarding,
                 child: const Text('Skip', style: TextStyle(color: Colors.grey)),
               ),
             ),
