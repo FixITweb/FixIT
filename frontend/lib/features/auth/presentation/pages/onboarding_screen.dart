@@ -70,7 +70,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: _completeOnboarding,
-                child: const Text('Skip', style: TextStyle(color: Colors.grey)),
+                child: Text('Skip',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
             ),
 
@@ -113,9 +115,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           page.description,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             height: 1.5,
                           ),
                         ),
@@ -130,6 +132,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(_pages.length, (i) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final colorScheme = Theme.of(context).colorScheme;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -137,8 +141,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentPage == i
-                        ? const Color(0xFF14B8A6)
-                        : Colors.grey.shade300,
+                        ? colorScheme.primary
+                        : (isDark ? colorScheme.outlineVariant : Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );

@@ -35,10 +35,10 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Incoming Bookings"),
         elevation: 0,
@@ -97,22 +97,26 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
 
           if (state is WorkerBookingsLoaded) {
             if (state.bookings.isEmpty) {
+              final colorScheme = Theme.of(context).colorScheme;
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.calendar_today_outlined,
-                        size: 80, color: Colors.grey[isDark ? 700 : 300]),
+                        size: 80, color: colorScheme.outlineVariant),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       "No New Bookings",
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       "New service requests will appear here",
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -176,11 +180,13 @@ class _WorkerBookingsViewState extends State<WorkerBookingsView> {
                               children: [
                                 Icon(Icons.inbox_outlined,
                                     size: 64,
-                                    color: Colors.grey[isDark ? 700 : 300]),
+                                    color: Theme.of(context).colorScheme.outlineVariant),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No $_selectedFilter bookings',
-                                  style: const TextStyle(color: Colors.grey),
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
@@ -213,22 +219,31 @@ class _WorkerBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     bool isPending = booking.status.toLowerCase() == 'pending';
     bool isAccepted = booking.status.toLowerCase() == 'accepted';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: isDark ? colorScheme.surfaceContainer : Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: isDark
+              ? colorScheme.outlineVariant.withOpacity(0.35)
+              : colorScheme.outlineVariant.withOpacity(0.6),
+        ),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         children: [
@@ -244,19 +259,19 @@ class _WorkerBookingCard extends StatelessWidget {
                     if (booking.price > 0)
                       Text(
                         "\$${booking.price.toStringAsFixed(0)}",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF14B8A6),
+                          color: colorScheme.primary,
                         ),
                       )
                     else
-                      const Text(
+                      Text(
                         "---",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey,
+                          color: colorScheme.outline,
                         ),
                       ),
                   ],
@@ -266,40 +281,51 @@ class _WorkerBookingCard extends StatelessWidget {
                   booking.serviceTitle == 'Unavailable Service'
                       ? 'Booking #${booking.id}'
                       : booking.serviceTitle,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     if (booking.customerName != 'Unknown Customer') ...[
-                      const Icon(Icons.person_outline,
-                          size: 16, color: Colors.grey),
+                      Icon(Icons.person_outline,
+                          size: 16, color: colorScheme.onSurfaceVariant),
                       const SizedBox(width: 4),
-                      Text(booking.customerName,
-                          style: const TextStyle(color: Colors.black87)),
+                      Text(
+                        booking.customerName,
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const SizedBox(width: 12),
                     ],
                     if (booking.customerPhone != null &&
                         booking.customerPhone!.isNotEmpty) ...[
-                      const Icon(Icons.phone_outlined,
-                          size: 16, color: Colors.grey),
+                      Icon(Icons.phone_outlined,
+                          size: 16, color: colorScheme.onSurfaceVariant),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
                           booking.customerPhone!,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.black87),
+                          style: TextStyle(color: colorScheme.onSurfaceVariant),
                         ),
                       ),
                     ] else
                       const Spacer(),
-                    const Icon(Icons.event_outlined,
-                        size: 16, color: Colors.grey),
+                    Icon(Icons.event_outlined,
+                        size: 16, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 4),
                     Text(
                       "${booking.scheduledDate.day}/${booking.scheduledDate.month}",
-                      style: const TextStyle(color: Colors.black87),
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -438,20 +464,26 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF14B8A6)
-              : (isDark ? const Color(0xFF2A2A2A) : Colors.white),
+              ? colorScheme.primary
+              : (isDark ? colorScheme.surfaceContainer : Colors.white),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF14B8A6)
-                : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                ? colorScheme.primary
+                : (isDark
+                    ? colorScheme.outlineVariant.withOpacity(0.5)
+                    : colorScheme.outlineVariant),
           ),
           borderRadius: BorderRadius.circular(20),
         ),
@@ -459,9 +491,9 @@ class _FilterChip extends StatelessWidget {
           label,
           style: TextStyle(
             color: isSelected
-                ? Colors.white
-                : (isDark ? Colors.white70 : Colors.grey[700]),
-            fontWeight: FontWeight.w500,
+                ? colorScheme.onPrimary
+                : colorScheme.onSurfaceVariant,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ),

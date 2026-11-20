@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/core/theme/app_theme.dart';
-import 'package:frontend/features/notifications/data/models/notification_model.dart';
 import 'package:frontend/features/worker/notifications/presentation/pages/worker_notifications_screen.dart';
 
 void main() {
@@ -54,10 +53,7 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              final isRead = false;
-              final cardBg = isRead
-                  ? colorScheme.surfaceContainerLow
-                  : colorScheme.surfaceContainer;
+              final cardBg = colorScheme.surfaceContainer;
               return Container(
                 decoration: BoxDecoration(
                   color: cardBg,

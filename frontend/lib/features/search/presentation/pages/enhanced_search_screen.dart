@@ -350,19 +350,24 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
             Center(
               child: Column(
                 children: [
-                  const Icon(Icons.search_off, size: 80, color: Colors.grey),
+                  Icon(Icons.search_off,
+                      size: 80,
+                      color: Theme.of(context).colorScheme.outlineVariant),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'No services found',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Post your request to get notified when available',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -415,7 +420,7 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                         Text(
                           service.category,
                           style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 12,
                           ),
                         ),

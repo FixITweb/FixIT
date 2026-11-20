@@ -256,7 +256,9 @@ class ServiceDetailView extends StatelessWidget {
                                           Text(
                                             '${service.rating.toStringAsFixed(1)} rating',
                                             style: TextStyle(
-                                              color: Colors.grey.shade600,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
                                               fontSize: 14,
                                             ),
                                           ),
@@ -296,7 +298,9 @@ class ServiceDetailView extends StatelessWidget {
                           service.description,
                           style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey.shade700,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                               height: 1.5),
                         ),
                         const SizedBox(height: 24),

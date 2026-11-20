@@ -129,12 +129,12 @@ class WorkerProfileView extends StatelessWidget {
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
-                          _buildInfoRow("Username", profile.username),
-                          _buildInfoRow("Email", profile.email),
-                          _buildInfoRow("Role", profile.role.toUpperCase()),
+                          _buildInfoRow(context, "Username", profile.username),
+                          _buildInfoRow(context, "Email", profile.email),
+                          _buildInfoRow(context, "Role", profile.role.toUpperCase()),
                           _buildInfoRow(
-                              "Member Since", _formatDate(profile.createdAt)),
-                          _buildInfoRow("Worker ID", "#${profile.id}"),
+                              context, "Member Since", _formatDate(profile.createdAt)),
+                          _buildInfoRow(context, "Worker ID", "#${profile.id}"),
                         ],
                       ),
                     ),
@@ -253,7 +253,7 @@ class WorkerProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -265,7 +265,7 @@ class WorkerProfileView extends StatelessWidget {
               label,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
