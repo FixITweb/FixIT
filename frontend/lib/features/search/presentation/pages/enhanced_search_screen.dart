@@ -101,7 +101,7 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
                   const SizedBox(height: 16),
                   Text('Error: ${state.message}'),
                   const SizedBox(height: 16),
@@ -393,7 +393,7 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                   radius: 28,
                   backgroundColor: const Color(0xFF14B8A6),
                   child: Text(
-                    service.category.substring(0, 1).toUpperCase(),
+                    service.category.isNotEmpty ? service.category.substring(0, 1).toUpperCase() : '?',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -414,7 +414,7 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                        Icon(Icons.star, color: Theme.of(context).colorScheme.secondary, size: 16),
                         Text(' ${service.rating.toStringAsFixed(1)}'),
                         const SizedBox(width: 8),
                         Text(
@@ -430,10 +430,10 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
                 ),
                 trailing: Text(
                   '\$${service.price.toStringAsFixed(0)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF14B8A6),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 onTap: () {
@@ -452,11 +452,11 @@ class _EnhancedSearchViewState extends State<EnhancedSearchView> {
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 16),
-            const Row(
+            Row(
               children: [
-                Icon(Icons.recommend, color: Color(0xFF14B8A6)),
-                SizedBox(width: 8),
-                Text(
+                Icon(Icons.recommend, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                const Text(
                   'Related Searches',
                   style: TextStyle(
                     fontSize: 16,

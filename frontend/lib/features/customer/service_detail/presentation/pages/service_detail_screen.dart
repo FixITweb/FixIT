@@ -46,11 +46,11 @@ class ServiceDetailView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle,
-                    color: Color(0xFF10B981), size: 64),
+                child: Icon(Icons.check_circle,
+                    color: Theme.of(context).colorScheme.primary, size: 64),
               ),
               const SizedBox(height: 24),
               const Text(
@@ -59,10 +59,10 @@ class ServiceDetailView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Your service request has been sent. The worker will be notified immediately.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
               ),
               const SizedBox(height: 32),
               SizedBox(
@@ -277,10 +277,10 @@ class ServiceDetailView extends StatelessWidget {
                                   ),
                                   child: Text(
                                     '\$${service.price.toStringAsFixed(0)}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF14B8A6),
+                                      color: Theme.of(context).colorScheme.primary,
                                     ),
                                   ),
                                 ),

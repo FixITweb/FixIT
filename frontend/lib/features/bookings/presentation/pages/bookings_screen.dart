@@ -46,7 +46,7 @@ class BookingsView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.cloud_off, size: 64, color: Colors.grey),
+                    Icon(Icons.cloud_off, size: 64, color: Theme.of(context).colorScheme.onSurface),
                     const SizedBox(height: 16),
                     Text(
                       'Oops! Something went wrong',
@@ -123,7 +123,7 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = _getStatusColor(booking.status);
+    final statusColor = _getStatusColor(context, booking.status);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -186,7 +186,7 @@ class _BookingCard extends StatelessWidget {
               children: [
                 _StatusChip(
                   status: booking.status,
-                  color: _getStatusColor(booking.status),
+                  color: statusColor,
                 ),
                 if (booking.status.toLowerCase() == "pending")
                   IconButton(
@@ -278,12 +278,12 @@ class _BookingCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     status = status.toLowerCase();
-    if (status == 'accepted') return Colors.green;
-    if (status == 'pending') return Colors.orange;
-    if (status == 'completed') return Colors.blue;
-    return Colors.red;
+    if (status == 'accepted') return Theme.of(context).colorScheme.primary;
+    if (status == 'pending') return Theme.of(context).colorScheme.secondary;
+    if (status == 'completed') return Theme.of(context).colorScheme.tertiary;
+    return Theme.of(context).colorScheme.error;
   }
 }
 

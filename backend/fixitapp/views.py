@@ -1,5 +1,6 @@
 import os
-import google.generativeai as genai
+import json
+import requests as http_requests
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,8 +11,6 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Sum, Count
 from django.utils.timezone import now
 from datetime import timedelta
-import os
-import google.generativeai as genai
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -571,27 +570,46 @@ def ai_guide(request):
         return Response({"status": "error", "message": "user_prompt is required"}, status=400)
 
     try:
-        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        api_key = os.environ.get("OPENROUTER_API_KEY", "")
 
-        system_instruction = "You are an expert DIY repair assistant. The user will provide a household or electronic issue. You must respond strictly with a valid JSON array of objects. Each object must represent one step of the fix and contain two keys: 'title' (a short, bold-worthy title without markdown symbols) and 'description' (the detailed action required, plain text, no markdown). Do not include any conversational text outside the JSON array."
-        final_prompt = system_instruction + "\n\nUser Issue: " + user_prompt
+        system_instruction = (
+            "You are an expert DIY repair assistant. The user will provide a household or electronic issue. "
+            "You must respond strictly with a valid JSON array of objects. Each object must represent one step "
+            "of the fix and contain two keys: 'title' (a short, bold-worthy title without markdown symbols) and "
+            "'description' (the detailed action required, plain text, no markdown). "
+            "Do not include any conversational text outside the JSON array."
+        )
 
-        response = model.generate_content(final_prompt)
-        
-        import json
-        raw_text = response.text.strip()
+        response = http_requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "openai/gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": f"User Issue: {user_prompt}"},
+                ],
+            },
+            timeout=30,
+        )
+
+        response.raise_for_status()
+        raw_text = response.json()["choices"][0]["message"]["content"].strip()
+
         if raw_text.startswith("```json"):
             raw_text = raw_text[7:]
         if raw_text.startswith("```"):
             raw_text = raw_text[3:]
         if raw_text.endswith("```"):
             raw_text = raw_text[:-3]
-            
+
         guide_data = json.loads(raw_text.strip())
-        
+
         return Response({
-            "status": "success", 
+            "status": "success",
             "guide": guide_data
         })
     except Exception as e:
