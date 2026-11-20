@@ -118,21 +118,21 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                             scrollDirection: Axis.horizontal,
                             child: Row(
                               children: [
-                                _NotificationFilterChip(
+                                NotificationFilterChip(
                                   label: 'All',
                                   isSelected: _selectedFilter == 'all',
                                   onTap: () =>
                                       setState(() => _selectedFilter = 'all'),
                                 ),
                                 const SizedBox(width: 8),
-                                _NotificationFilterChip(
+                                NotificationFilterChip(
                                   label: 'Unread ($unreadCount)',
                                   isSelected: _selectedFilter == 'unread',
                                   onTap: () => setState(
                                       () => _selectedFilter = 'unread'),
                                 ),
                                 const SizedBox(width: 8),
-                                _NotificationFilterChip(
+                                NotificationFilterChip(
                                   label: 'Read',
                                   isSelected: _selectedFilter == 'read',
                                   onTap: () =>
@@ -164,84 +164,163 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.inbox_outlined,
-                                    size: 64, color: Colors.grey[300]),
+                                Icon(
+                                  Icons.inbox_outlined,
+                                  size: 64,
+                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No $_selectedFilter notifications',
-                                  style: const TextStyle(color: Colors.grey),
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
                           )
                         : ListView.builder(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             itemCount: filteredNotifications.length,
                             itemBuilder: (context, index) {
                               final notification = filteredNotifications[index];
+                              final theme = Theme.of(context);
+                              final colorScheme = theme.colorScheme;
+                              final isDark = theme.brightness == Brightness.dark;
 
                               IconData icon = Icons.notifications;
-                              Color iconColor = const Color(0xFF14B8A6);
+                              Color iconColor = colorScheme.primary;
 
                               final msgLower =
                                   notification.message.toLowerCase();
                               if (msgLower.contains('booking request')) {
-                                icon = Icons.assignment_turned_in;
-                                iconColor = Colors.orange;
+                                icon = Icons.assignment_turned_in_rounded;
+                                iconColor = isDark
+                                    ? const Color(0xFFFBBF24)
+                                    : const Color(0xFFEA580C);
                               } else if (msgLower.contains('matched') ||
                                   msgLower.contains('available')) {
-                                icon = Icons.handshake;
-                                iconColor = Colors.blue;
+                                icon = Icons.handshake_rounded;
+                                iconColor = isDark
+                                    ? const Color(0xFF60A5FA)
+                                    : const Color(0xFF2563EB);
                               } else if (msgLower.contains('completed')) {
-                                icon = Icons.done_all;
-                                iconColor = Colors.green;
+                                icon = Icons.done_all_rounded;
+                                iconColor = isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF059669);
                               }
 
-                              return Card(
+                              // Always use colorScheme — works correctly for both light and dark
+                              final cardBg = notification.isRead
+                                  ? colorScheme.surfaceContainerLow
+                                  : colorScheme.surfaceContainer;
+
+                              final cardBorderColor = notification.isRead
+                                  ? colorScheme.outlineVariant.withOpacity(0.5)
+                                  : colorScheme.primary.withOpacity(isDark ? 0.4 : 0.25);
+
+                              return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
-                                elevation: notification.isRead ? 0 : 2,
-                                color: notification.isRead
-                                    ? Colors.white
-                                    : const Color(0xFF14B8A6).withOpacity(0.05),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: iconColor.withOpacity(0.1),
-                                    child: Icon(icon, color: iconColor),
+                                decoration: BoxDecoration(
+                                  color: cardBg,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: cardBorderColor,
+                                    width: notification.isRead ? 1 : 1.2,
                                   ),
-                                  title: Text(
-                                    notification.message,
-                                    style: TextStyle(
-                                      fontWeight: notification.isRead
-                                          ? FontWeight.normal
-                                          : FontWeight.bold,
+                                  boxShadow: isDark
+                                      ? []
+                                      : [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                                notification.isRead ? 0.03 : 0.05),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: () {
+                                      if (!notification.isRead) {
+                                        context.read<NotificationsBloc>().add(
+                                              MarkAsRead(notification.id),
+                                            );
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 44,
+                                            height: 44,
+                                            decoration: BoxDecoration(
+                                              color: iconColor.withOpacity(isDark ? 0.16 : 0.12),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Icon(icon, color: iconColor, size: 22),
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  notification.message,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: notification.isRead
+                                                        ? FontWeight.w500
+                                                        : FontWeight.w700,
+                                                    color: colorScheme.onSurface,
+                                                    height: 1.3,
+                                                  ),
+                                                ),
+                                                if (notification.user != null &&
+                                                    notification.user!.isNotEmpty) ...[
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    "From: ${notification.user}",
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: colorScheme.onSurfaceVariant,
+                                                    ),
+                                                  ),
+                                                ],
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  _formatDate(notification.createdAt),
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: isDark
+                                                        ? colorScheme.onSurfaceVariant.withOpacity(0.7)
+                                                        : Colors.grey.shade600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (!notification.isRead)
+                                            Container(
+                                              margin: const EdgeInsets.only(top: 4, left: 8),
+                                              width: 8,
+                                              height: 8,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: colorScheme.primary,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      if (notification.user != null &&
-                                          notification.user!.isNotEmpty)
-                                        Text("From: ${notification.user}",
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w500)),
-                                      Text(_formatDate(notification.createdAt),
-                                          style: TextStyle(
-                                              color: Colors.grey.shade600,
-                                              fontSize: 12)),
-                                    ],
-                                  ),
-                                  trailing: notification.isRead
-                                      ? null
-                                      : const Icon(Icons.circle,
-                                          size: 8, color: Color(0xFF14B8A6)),
-                                  onTap: () {
-                                    if (!notification.isRead) {
-                                      context.read<NotificationsBloc>().add(
-                                            MarkAsRead(notification.id),
-                                          );
-                                    }
-                                  },
                                 ),
                               );
                             },
@@ -276,12 +355,13 @@ class _WorkerNotificationsViewState extends State<WorkerNotificationsView> {
   }
 }
 
-class _NotificationFilterChip extends StatelessWidget {
+class NotificationFilterChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _NotificationFilterChip({
+  const NotificationFilterChip({
+    super.key,
     required this.label,
     required this.isSelected,
     required this.onTap,
@@ -289,22 +369,49 @@ class _NotificationFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final bg = isSelected
+        ? colorScheme.primary
+        : (isDark ? colorScheme.surfaceContainer : Colors.white);
+
+    final border = isSelected
+        ? colorScheme.primary
+        : (isDark
+            ? colorScheme.outlineVariant.withOpacity(0.5)
+            : colorScheme.outlineVariant);
+
+    final textColor = isSelected
+        ? colorScheme.onPrimary
+        : (isDark ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant);
+
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF14B8A6) : Colors.white,
-          border: Border.all(
-            color: isSelected ? const Color(0xFF14B8A6) : Colors.grey[300]!,
-          ),
-          borderRadius: BorderRadius.circular(16),
+          color: bg,
+          border: Border.all(color: border, width: 1),
+          borderRadius: BorderRadius.circular(100),
+          boxShadow: isSelected && !isDark
+              ? [
+                  BoxShadow(
+                    color: colorScheme.primary.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [],
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[700],
-            fontWeight: FontWeight.w500,
+            color: textColor,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             fontSize: 12,
           ),
         ),

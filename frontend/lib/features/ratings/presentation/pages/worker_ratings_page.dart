@@ -52,6 +52,7 @@ class WorkerRatingsPage extends StatelessWidget {
 
             if (state is RatingsLoaded) {
               if (state.ratings.isEmpty) {
+                final colorScheme = Theme.of(context).colorScheme;
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -59,20 +60,21 @@ class WorkerRatingsPage extends StatelessWidget {
                       Icon(
                         Icons.star_outline,
                         size: 80,
-                        color: Colors.grey.withOpacity(0.5),
+                        color: colorScheme.outlineVariant,
                       ),
                       const SizedBox(height: 20),
-                      const Text(
+                      Text(
                         "No Ratings Yet",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         "This worker hasn't received any ratings yet",
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -177,6 +179,10 @@ class _RatingDistribution extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     // Calculate distribution
     final distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
     for (var rating in ratings) {
@@ -192,24 +198,32 @@ class _RatingDistribution extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? colorScheme.surfaceContainer : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: isDark
+              ? colorScheme.outlineVariant.withOpacity(0.35)
+              : colorScheme.outlineVariant.withOpacity(0.6),
+        ),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Rating Distribution',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
@@ -229,7 +243,10 @@ class _RatingDistribution extends StatelessWidget {
                       children: [
                         Text(
                           '$stars',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                         const Icon(Icons.star,
                             size: 14, color: Color(0xFFF97316)),
@@ -242,7 +259,9 @@ class _RatingDistribution extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: total > 0 ? count / total : 0,
                         minHeight: 8,
-                        backgroundColor: Colors.grey[200],
+                        backgroundColor: isDark
+                            ? colorScheme.surfaceContainerHigh
+                            : Colors.grey[200],
                         valueColor: AlwaysStoppedAnimation<Color>(
                           _getColorForRating(stars),
                         ),
@@ -257,7 +276,7 @@ class _RatingDistribution extends StatelessWidget {
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -284,6 +303,9 @@ class _RatingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -309,9 +331,9 @@ class _RatingCard extends StatelessWidget {
                 ),
                 Text(
                   '${rating.rating.toStringAsFixed(1)}/5',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF14B8A6),
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
@@ -323,14 +345,14 @@ class _RatingCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
-                    const Icon(Icons.person_outline,
-                        size: 14, color: Colors.grey),
+                    Icon(Icons.person_outline,
+                        size: 14, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 4),
                     Text(
                       rating.customerName ?? 'Anonymous',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -343,9 +365,10 @@ class _RatingCard extends StatelessWidget {
                 children: [
                   Text(
                     rating.review,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       height: 1.5,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -355,7 +378,7 @@ class _RatingCard extends StatelessWidget {
               _formatDate(rating.createdAt),
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],

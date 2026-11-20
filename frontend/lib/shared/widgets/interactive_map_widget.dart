@@ -57,11 +57,15 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 300,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -79,11 +83,16 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? colorScheme.surfaceContainer : Colors.white,
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark
+                        ? colorScheme.outlineVariant.withOpacity(0.4)
+                        : colorScheme.outlineVariant.withOpacity(0.6),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.2),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -91,8 +100,8 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.location_on,
-                        color: Color(0xFF14B8A6), size: 20),
+                    Icon(Icons.location_on,
+                        color: colorScheme.primary, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
@@ -100,9 +109,10 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
                         children: [
                           Text(
                             widget.workerName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
+                              color: colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -111,7 +121,7 @@ class _InteractiveMapWidgetState extends State<InteractiveMapWidget> {
                             '${widget.distance.toStringAsFixed(1)} km away',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade600,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],

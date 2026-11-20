@@ -1,16 +1,44 @@
-# frontend
+# FixIT – Flutter Frontend
 
-A new Flutter project.
+The mobile frontend for the FixIT service marketplace, built with Flutter/Dart.
 
-## Getting Started
+## Structure
 
-This project is a starting point for a Flutter application.
+```
+lib/
+├── app/            # App entry point & theme (AppTheme, light/dark)
+├── core/
+│   ├── network/    # ApiClient (Dio-based HTTP client)
+│   ├── router/     # AppRouter (named route navigation)
+│   ├── theme/      # ThemeBloc, theme switching
+│   └── utils/      # Shared utilities
+├── features/       # Feature-first architecture
+│   ├── auth/           # Login, register, onboarding
+│   ├── bookings/        # Customer booking list & management
+│   ├── customer/
+│   │   ├── ai_guide/    # AI-powered DIY fix guide screen
+│   │   ├── home/        # Customer home screen & service feed
+│   │   ├── profile/     # Customer profile
+│   │   ├── requests/    # Job requests
+│   │   └── service_detail/ # Service detail & booking flow
+│   ├── notifications/   # Notification centre
+│   ├── ratings/         # Worker rating page
+│   ├── search/          # Enhanced search screen
+│   ├── settings/        # App settings
+│   └── worker/          # Worker dashboard, bookings, profile, notifications
+└── shared/
+    └── widgets/    # Shared UI components (BottomNav, maps, etc.)
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Running the App
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+flutter pub get
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Testing
+
+```bash
+flutter test
+```

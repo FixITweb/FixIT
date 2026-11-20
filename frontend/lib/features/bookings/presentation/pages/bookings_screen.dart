@@ -46,7 +46,7 @@ class BookingsView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.cloud_off, size: 64, color: Colors.grey),
+                    Icon(Icons.cloud_off, size: 64, color: Theme.of(context).colorScheme.onSurface),
                     const SizedBox(height: 16),
                     Text(
                       'Oops! Something went wrong',
@@ -68,22 +68,26 @@ class BookingsView extends StatelessWidget {
 
           if (state is BookingLoaded) {
             if (state.bookings.isEmpty) {
+              final colorScheme = Theme.of(context).colorScheme;
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.calendar_month_outlined,
-                        size: 80, color: Colors.grey.withOpacity(0.5)),
+                        size: 80, color: colorScheme.outlineVariant),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       "No Bookings Yet",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       "Services you book will appear here",
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -119,7 +123,7 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = _getStatusColor(booking.status);
+    final statusColor = _getStatusColor(context, booking.status);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -154,7 +158,7 @@ class _BookingCard extends StatelessWidget {
                       ),
                       Text(
                         "Worker: ${booking.service.worker.username}",
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,12 +166,12 @@ class _BookingCard extends StatelessWidget {
                           if (booking.customerPhone != null)
                             Text(
                               "Customer Phone: ${booking.customerPhone}",
-                              style: TextStyle(color: Colors.grey[600]),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                             ),
                           if (booking.workerPhone != null)
                             Text(
                               "Worker Phone: ${booking.workerPhone}",
-                              style: TextStyle(color: Colors.grey[600]),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                             ),
                         ],
                       ),
@@ -182,7 +186,7 @@ class _BookingCard extends StatelessWidget {
               children: [
                 _StatusChip(
                   status: booking.status,
-                  color: _getStatusColor(booking.status),
+                  color: statusColor,
                 ),
                 if (booking.status.toLowerCase() == "pending")
                   IconButton(
@@ -204,8 +208,10 @@ class _BookingCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Price",
-                        style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text("Price",
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontSize: 12)),
                     if (booking.service.price > 0)
                       Text(
                         "\$${booking.service.price.toStringAsFixed(0)}",
@@ -215,20 +221,22 @@ class _BookingCard extends StatelessWidget {
                             color: Color(0xFF10B981)),
                       )
                     else
-                      const Text(
+                      Text(
                         "---",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
-                            color: Colors.grey),
+                            color: Theme.of(context).colorScheme.outline),
                       ),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text("Booked On",
-                        style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text("Booked On",
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontSize: 12)),
                     Text(
                       "${booking.createdAt.day}/${booking.createdAt.month}/${booking.createdAt.year}",
                       style: const TextStyle(fontWeight: FontWeight.w500),
@@ -270,12 +278,12 @@ class _BookingCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     status = status.toLowerCase();
-    if (status == 'accepted') return Colors.green;
-    if (status == 'pending') return Colors.orange;
-    if (status == 'completed') return Colors.blue;
-    return Colors.red;
+    if (status == 'accepted') return Theme.of(context).colorScheme.primary;
+    if (status == 'pending') return Theme.of(context).colorScheme.secondary;
+    if (status == 'completed') return Theme.of(context).colorScheme.tertiary;
+    return Theme.of(context).colorScheme.error;
   }
 }
 

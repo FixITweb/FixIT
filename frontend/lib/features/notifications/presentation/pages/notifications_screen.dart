@@ -65,22 +65,30 @@ class NotificationsView extends StatelessWidget {
 
           if (state is NotificationsLoaded) {
             if (state.notifications.isEmpty) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.notifications_none,
-                        size: 80, color: Colors.grey),
-                    SizedBox(height: 16),
+                    Icon(
+                      Icons.notifications_none,
+                      size: 80,
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                    const SizedBox(height: 16),
                     Text(
                       'No notifications yet',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'You\'ll be notified when services become available',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -97,77 +105,147 @@ class NotificationsView extends StatelessWidget {
                 itemCount: state.notifications.length,
                 itemBuilder: (context, index) {
                   final notification = state.notifications[index];
+                  final theme = Theme.of(context);
+                  final colorScheme = theme.colorScheme;
+                  final isDark = theme.brightness == Brightness.dark;
 
                   // Determine icon and color based on notification type
                   IconData icon = Icons.notifications;
-                  Color iconColor = Colors.teal;
+                  Color iconColor = colorScheme.primary;
 
                   if (notification.message.contains('available') ||
                       notification.message.contains('now offering')) {
-                    icon = Icons.new_releases;
-                    iconColor = Colors.green;
+                    icon = Icons.new_releases_rounded;
+                    iconColor = isDark ? const Color(0xFF34D399) : Colors.green;
                   } else if (notification.message.contains('accepted')) {
-                    icon = Icons.check_circle;
-                    iconColor = Colors.blue;
+                    icon = Icons.check_circle_rounded;
+                    iconColor = isDark ? const Color(0xFF60A5FA) : Colors.blue;
                   } else if (notification.message.contains('completed')) {
-                    icon = Icons.done_all;
-                    iconColor = Colors.purple;
+                    icon = Icons.done_all_rounded;
+                    iconColor = isDark ? const Color(0xFFA78BFA) : Colors.purple;
                   } else if (notification.message.contains('booking')) {
-                    icon = Icons.calendar_today;
-                    iconColor = Colors.orange;
+                    icon = Icons.calendar_today_rounded;
+                    iconColor = isDark ? const Color(0xFFFBBF24) : Colors.orange;
                   }
 
-                  return Card(
+                  // Always use colorScheme — works consistently in light and dark
+                  final cardBg = notification.isRead
+                      ? colorScheme.surfaceContainerLow
+                      : colorScheme.surfaceContainer;
+
+                  final cardBorderColor = notification.isRead
+                      ? colorScheme.outlineVariant.withOpacity(0.5)
+                      : colorScheme.primary.withOpacity(isDark ? 0.4 : 0.25);
+
+                  return Container(
                     margin: const EdgeInsets.only(bottom: 12),
-                    elevation: notification.isRead ? 0 : 2,
-                    color: notification.isRead
-                        ? null
-                        : Colors.teal.withOpacity(0.05),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: iconColor.withOpacity(0.2),
-                        child: Icon(icon, color: iconColor),
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: cardBorderColor,
+                        width: notification.isRead ? 1 : 1.2,
                       ),
-                      title: Text(
-                        notification.message,
-                        style: TextStyle(
-                          fontWeight: notification.isRead
-                              ? FontWeight.normal
-                              : FontWeight.bold,
+                      boxShadow: isDark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(
+                                    notification.isRead ? 0.02 : 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          if (!notification.isRead) {
+                            context.read<NotificationsBloc>().add(
+                                  MarkAsRead(notification.id),
+                                );
+                          }
+                          // Navigate to service if available
+                          if (notification.serviceId != null) {
+                            Navigator.pushNamed(
+                              context,
+                              '/service-detail',
+                              arguments: notification.serviceId.toString(),
+                            );
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: iconColor.withOpacity(isDark ? 0.16 : 0.12),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(icon, color: iconColor, size: 22),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      notification.message,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: notification.isRead
+                                            ? FontWeight.w500
+                                            : FontWeight.w700,
+                                        color: colorScheme.onSurface,
+                                        height: 1.3,
+                                      ),
+                                    ),
+                                    if (notification.user != null &&
+                                        notification.user!.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "From: ${notification.user}",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      _formatDate(notification.createdAt),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w400,
+                                        color: isDark
+                                            ? colorScheme.onSurfaceVariant.withOpacity(0.7)
+                                            : Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (!notification.isRead)
+                                Container(
+                                  margin: const EdgeInsets.only(top: 4, left: 8),
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (notification.user != null &&
-                              notification.user!.isNotEmpty)
-                            Text("From: ${notification.user}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w500)),
-                          Text(_formatDate(notification.createdAt),
-                              style: TextStyle(
-                                  color: Colors.grey.shade600, fontSize: 12)),
-                        ],
-                      ),
-                      trailing: notification.isRead
-                          ? null
-                          : const Icon(Icons.circle,
-                              size: 8, color: Colors.teal),
-                      onTap: () {
-                        if (!notification.isRead) {
-                          context.read<NotificationsBloc>().add(
-                                MarkAsRead(notification.id),
-                              );
-                        }
-                        // Navigate to service if available
-                        if (notification.serviceId != null) {
-                          Navigator.pushNamed(
-                            context,
-                            '/service-detail',
-                            arguments: notification.serviceId.toString(),
-                          );
-                        }
-                      },
                     ),
                   );
                 },

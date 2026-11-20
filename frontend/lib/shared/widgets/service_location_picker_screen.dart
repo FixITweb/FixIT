@@ -160,11 +160,11 @@ class _ServiceLocationPickerScreenState
                   left: 8,
                   bottom: 8,
                   child: Container(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: (Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainer : Colors.white).withValues(alpha: 0.9),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     child: const Text(
-                      '© OpenStreetMap contributors',
+                      'Â© OpenStreetMap contributors',
                       style: TextStyle(fontSize: 11),
                     ),
                   ),
@@ -251,3 +251,4 @@ class _ServiceLocationPickerScreenState
     );
   }
 }
+
