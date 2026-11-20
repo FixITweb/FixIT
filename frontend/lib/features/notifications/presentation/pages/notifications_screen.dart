@@ -65,7 +65,7 @@ class NotificationsView extends StatelessWidget {
 
           if (state is NotificationsLoaded) {
             if (state.notifications.isEmpty) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
