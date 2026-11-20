@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -130,6 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
+            SharedPreferences.getInstance().then((prefs) {
+              prefs.setString('role', state.role);
+            });
             _captureAndSaveLocationIfMissing().whenComplete(() {
               if (!mounted) return;
               if (state.role == 'worker') {
@@ -217,25 +221,40 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (state is AuthLoading || _isUpdatingLocation)
                     const CircularProgressIndicator()
                   else
-                    ElevatedButton(
-                      onPressed: () {
-                        final username = usernameController.text.trim();
-                        final password = passwordController.text.trim();
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final username = usernameController.text.trim();
+                          final password = passwordController.text.trim();
 
-                        if (username.isEmpty || password.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Enter username & password")),
-                          );
-                          return;
-                        }
-
-                        context.read<AuthBloc>().add(
-                              LoginEvent(username, password),
+                          if (username.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Enter username & password")),
                             );
-                      },
-                      child:
-                          const Text("Login", style: TextStyle(fontSize: 18)),
+                            return;
+                          }
+
+                          context.read<AuthBloc>().add(
+                                LoginEvent(username, password),
+                              );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
 
                   TextButton(

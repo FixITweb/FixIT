@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../../profile/presentation/bloc/profile_event.dart';
 import '../../../../profile/presentation/bloc/profile_state.dart';
@@ -166,8 +167,12 @@ class CustomerProfileView extends StatelessWidget {
                             child: const Text('Cancel'),
                           ),
                           TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               Navigator.pop(context);
+                              final prefs = await SharedPreferences.getInstance();
+                              await prefs.remove('token');
+                              await prefs.remove('role');
+                              if (!context.mounted) return;
                               Navigator.pushNamedAndRemoveUntil(
                                 context,
                                 '/login',
