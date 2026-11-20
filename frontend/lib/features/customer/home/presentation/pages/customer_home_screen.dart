@@ -37,8 +37,8 @@ class CustomerHomeView extends StatelessWidget {
         ? const Color(0xFFFFD166)
         : const Color(0xFFB45309);
     final headerActionStyle = IconButton.styleFrom(
-      foregroundColor: Colors.white,
-      backgroundColor: Colors.white.withValues(alpha: 0.12),
+      foregroundColor: colorScheme.onSurface,
+      backgroundColor: colorScheme.surfaceContainerLow,
       fixedSize: const Size.square(48),
       padding: EdgeInsets.zero,
     );
@@ -57,8 +57,8 @@ class CustomerHomeView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline,
-                        size: 64, color: Colors.red),
+                    Icon(Icons.error_outline,
+                        size: 64, color: Theme.of(context).colorScheme.error),
                     const SizedBox(height: 16),
                     Text('Error: ${state.message}'),
                     const SizedBox(height: 16),
@@ -77,8 +77,8 @@ class CustomerHomeView extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
-                    decoration: const BoxDecoration(
-                      color: AppTheme.brandHeaderColor,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(24),
                         bottomRight: Radius.circular(24),

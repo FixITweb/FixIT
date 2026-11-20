@@ -19,11 +19,15 @@ class ServiceMapWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 250,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -37,21 +41,21 @@ class ServiceMapWidget extends StatelessWidget {
               height: double.infinity,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
-                  color: Colors.grey.shade200,
+                  color: isDark ? colorScheme.surfaceContainerHigh : Colors.grey.shade200,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.map, size: 64, color: Colors.grey.shade400),
+                      Icon(Icons.map, size: 64, color: colorScheme.outlineVariant),
                       const SizedBox(height: 8),
                       Text(
                         'Map Preview',
-                        style: TextStyle(color: Colors.grey.shade600),
+                        style: TextStyle(color: colorScheme.onSurfaceVariant),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${distance.toStringAsFixed(1)} km away',
                         style: TextStyle(
-                          color: Colors.grey.shade600,
+                          color: colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -70,11 +74,16 @@ class ServiceMapWidget extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? colorScheme.surfaceContainer : Colors.white,
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark
+                        ? colorScheme.outlineVariant.withOpacity(0.4)
+                        : colorScheme.outlineVariant.withOpacity(0.6),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -82,8 +91,8 @@ class ServiceMapWidget extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.location_on,
-                        color: Color(0xFF14B8A6), size: 20),
+                    Icon(Icons.location_on,
+                        color: colorScheme.primary, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
@@ -91,9 +100,10 @@ class ServiceMapWidget extends StatelessWidget {
                         children: [
                           Text(
                             workerName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
+                              color: colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -102,7 +112,7 @@ class ServiceMapWidget extends StatelessWidget {
                             '${distance.toStringAsFixed(1)} km away',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade600,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],

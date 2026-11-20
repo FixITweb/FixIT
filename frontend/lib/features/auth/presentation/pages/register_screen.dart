@@ -113,12 +113,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 const SizedBox(height: 24),
                 // Logo
-                const Center(
+                Center(
                   child: Column(
                     children: [
-                      Icon(Icons.build, size: 64, color: Color(0xFF14B8A6)),
-                      SizedBox(height: 8),
-                      Text(
+                      const Icon(Icons.build, size: 64, color: Color(0xFF14B8A6)),
+                      const SizedBox(height: 8),
+                      const Text(
                         "FixIT",
                         style: TextStyle(
                           fontSize: 32,
@@ -126,10 +126,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           color: Color(0xFF14B8A6),
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         "Create your account",
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -211,12 +211,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF14B8A6).withOpacity(0.08),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                    ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "We will ask for your location during registration to help match nearby services.",
-                    style: TextStyle(color: Colors.black87, height: 1.3),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      height: 1.3,
+                    ),
                   ),
                 ),
 

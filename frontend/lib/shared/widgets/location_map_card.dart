@@ -26,6 +26,10 @@ class LocationMapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -35,18 +39,18 @@ class LocationMapCard extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            color: const Color(0xFF14B8A6).withValues(alpha: 0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF14B8A6),
+                    color: colorScheme.primary,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                     size: 24,
                   ),
                 ),
@@ -55,11 +59,12 @@ class LocationMapCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Service Location',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -69,7 +74,7 @@ class LocationMapCard extends StatelessWidget {
                             : 'Location not provided',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -108,12 +113,17 @@ class LocationMapCard extends StatelessWidget {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: isDark ? colorScheme.surfaceContainer : Colors.white,
                                     borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? colorScheme.outlineVariant.withOpacity(0.5)
+                                          : colorScheme.outlineVariant.withOpacity(0.3),
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black
-                                            .withValues(alpha: 0.15),
+                                            .withValues(alpha: isDark ? 0.3 : 0.15),
                                         blurRadius: 6,
                                       ),
                                     ],
@@ -122,15 +132,16 @@ class LocationMapCard extends StatelessWidget {
                                     workerName,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 12,
+                                      color: colorScheme.onSurface,
                                     ),
                                   ),
                                 ),
-                                const Icon(
+                                Icon(
                                   Icons.location_pin,
-                                  color: Color(0xFF14B8A6),
+                                  color: colorScheme.primary,
                                   size: 36,
                                 ),
                               ],
@@ -144,14 +155,18 @@ class LocationMapCard extends StatelessWidget {
                     left: 8,
                     bottom: 8,
                     child: Container(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: (isDark ? colorScheme.surfaceContainer : Colors.white)
+                          .withValues(alpha: 0.9),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
                         vertical: 3,
                       ),
-                      child: const Text(
+                      child: Text(
                         '© OpenStreetMap contributors',
-                        style: TextStyle(fontSize: 11),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ),
@@ -165,14 +180,14 @@ class LocationMapCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.place, size: 16, color: Colors.grey.shade600),
+                      Icon(Icons.place, size: 16, color: colorScheme.onSurfaceVariant),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           address,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade700,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),

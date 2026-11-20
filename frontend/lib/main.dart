@@ -70,6 +70,7 @@ class FixITApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'FixIT',
             theme: themeState.themeData,
+            themeMode: ThemeMode.light, // ThemeBloc manages dark/light; always use the emitted theme
             initialRoute: '/',
             onGenerateRoute: AppRouter.generateRoute,
           );

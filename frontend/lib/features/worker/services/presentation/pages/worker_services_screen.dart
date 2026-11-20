@@ -93,18 +93,21 @@ class WorkerServicesView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.work_outline,
-                        size: 80, color: Colors.grey),
+                    Icon(Icons.work_outline,
+                        size: 80, color: Theme.of(context).colorScheme.outlineVariant),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       "No Services Yet",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       "Add your first service to start earning",
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
@@ -369,7 +372,10 @@ class _ServiceCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               service.description,
-              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 12,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

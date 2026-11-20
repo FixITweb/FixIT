@@ -63,20 +63,25 @@ class RequestsView extends StatelessWidget {
 
           if (state is RequestsLoaded) {
             if (state.requests.isEmpty) {
+              final colorScheme = Theme.of(context).colorScheme;
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.list_alt, size: 80, color: Colors.grey),
+                    Icon(Icons.list_alt, size: 80, color: colorScheme.outlineVariant),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       "No Requests Yet",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       "Post a request when you can't find a service",
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
@@ -124,7 +129,7 @@ class RequestsView extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               req['description'],
-                              style: const TextStyle(color: Colors.grey),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -132,18 +137,18 @@ class RequestsView extends StatelessWidget {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              const Icon(Icons.category, size: 14, color: Colors.grey),
+                              Icon(Icons.category, size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                               const SizedBox(width: 4),
                               Text(
                                 req['category'] ?? '',
-                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                               ),
                               if (req['budget'] != null && req['budget'] != 0) ...[
                                 const SizedBox(width: 16),
-                                const Icon(Icons.attach_money, size: 14, color: Colors.grey),
+                                Icon(Icons.attach_money, size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                                 Text(
                                   '${req['budget']}',
-                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                                 ),
                               ],
                             ],
